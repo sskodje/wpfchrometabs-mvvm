@@ -1,0 +1,198 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ChromeTabs"
+                    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:ChromeTabPanel}, ResourceId=addButtonStyle}"
+           TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid SnapsToDevicePixels="True">
+                        <Path Fill="{TemplateBinding Background}"
+                              Stretch="Fill"
+                              Stroke="#FF999999"
+                              Data="M36.904667,19.333333 C42.238,19.25 36.238,0.5 34.863116,0.5 23.863116,0.5 19.613032,0.5 2.8630319,0.5 -3.2202511,0.5 4.0712139,19.416667 6.5711261,19.416667 15.593514,19.416667 28.609259,19.462949 36.904667,19.333333 z" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Button}"
+           x:Key="CloseButtonStyle">
+        <Style.Resources>
+            <sys:Double x:Key="CloseButtonWidth">6</sys:Double>
+            <sys:Double x:Key="CloseCircleWidth">12</sys:Double>
+            <sys:Double x:Key="CloseButtonOffset">3</sys:Double>
+        </Style.Resources>
+        <Setter Property="Height"
+                Value="{StaticResource CloseCircleWidth}" />
+        <Setter Property="Width"
+                Value="{StaticResource CloseCircleWidth}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="HorizontalAlignment"
+                Value="Center" />
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="Foreground"
+                Value="DarkGray" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Canvas Background="Transparent"
+                            x:Name="CloseButton"
+                            Width="{StaticResource CloseCircleWidth}"
+                            Height="{StaticResource CloseCircleWidth}">
+                        <Ellipse Width="{StaticResource CloseCircleWidth}"
+                                 Fill="{TemplateBinding Background}"
+                                 Height="{StaticResource CloseCircleWidth}" />
+                        <Canvas Canvas.Left="{StaticResource CloseButtonOffset}"
+                                Canvas.Top="{StaticResource CloseButtonOffset}"
+                                Background="Transparent"
+                                Width="{StaticResource CloseButtonWidth}"
+                                Height="{StaticResource CloseButtonWidth}">
+                            <Line X1="0"
+                                  Y1="0"
+                                  X2="{StaticResource CloseButtonWidth}"
+                                  Y2="{StaticResource CloseButtonWidth}"
+                                  Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="2" />
+                            <Line X1="0"
+                                  Y1="{StaticResource CloseButtonWidth}"
+                                  X2="{StaticResource CloseButtonWidth}"
+                                  Y2="0"
+                                  Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="2" />
+                        </Canvas>
+                    </Canvas>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="DarkGray" />
+                <Setter Property="Foreground"
+                        Value="White" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type local:ChromeTabControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ChromeTabControl}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25" />
+                            <!--<RowDefinition Height="*" />-->
+                        </Grid.RowDefinitions>
+                        <local:ChromeTabPanel IsItemsHost="True">
+                            <local:ChromeTabPanel.Background>
+                                <!--<LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
+                                    <GradientStop Color="#FFEEEEEE" Offset="0" />
+                                    <GradientStop Color="#FFCCCCCC" Offset=".9" />
+                                </LinearGradientBrush>-->
+                                <SolidColorBrush Color="Transparent"
+                                                 po:Freeze="true" />
+                            </local:ChromeTabPanel.Background>
+                        </local:ChromeTabPanel>
+                        <!--<Grid Grid.Row="1">
+                            <ContentPresenter Content="{TemplateBinding SelectedContent}" />
+                        </Grid>-->
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:ChromeTabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ChromeTabItem}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="5" />
+                        </Grid.ColumnDefinitions>
+                        <Path Name="TabFill"
+                              Margin="0 0 0 0"
+                              Grid.ColumnSpan="4"
+                              VerticalAlignment="Top"
+                              Stretch="Fill"
+                              Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96">
+                            <Path.Fill>
+                                <LinearGradientBrush EndPoint="0.5,1"
+                                                     StartPoint="0.5,0"
+                                                     Opacity="1">
+                                    <GradientStop Color="#FFEEEEEE"
+                                                  Offset="0" />
+                                    <GradientStop Color="#FFDDDDDD"
+                                                  Offset="1" />
+                                </LinearGradientBrush>
+                            </Path.Fill>
+                        </Path>
+                        <Path Name="TabPath"
+                              Grid.ColumnSpan="4"
+                              VerticalAlignment="Top"
+                              Stretch="Fill"
+                              Stroke="#FF999999"
+                              Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96" />
+                        <Path Name="TabHighlight"
+                              Margin="0 0 0 1"
+                              Grid.ColumnSpan="4"
+                              VerticalAlignment="Top"
+                              Stretch="Fill"
+                              Stroke="White"
+                              Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96">
+                            <Path.RenderTransformOrigin>
+                                <Point X=".5"
+                                       Y=".5" />
+                            </Path.RenderTransformOrigin>
+                            <Path.RenderTransform>
+                                <TransformGroup>
+                                    <TranslateTransform Y=".5" />
+                                    <ScaleTransform ScaleX=".96"
+                                                    ScaleY=".94" />
+                                </TransformGroup>
+                            </Path.RenderTransform>
+                        </Path>
+                        <ContentPresenter x:Name="ContentSite"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left"
+                                          ContentSource="Header" />
+                        <!--<Label Margin="10 0 0 0" VerticalAlignment="Center" Content="{TemplateBinding Header}" Grid.Column="1" />-->
+                        <Button KeyboardNavigation.IsTabStop="False"
+                                Margin="0 0 10 0"
+                                Style="{StaticResource CloseButtonStyle}"
+                                Grid.Column="2"
+                                Command="{x:Static local:ChromeTabItem.CloseTabCommand}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected"
+                                 Value="True">
+                            <Setter Property="Fill"
+                                    TargetName="TabFill"
+                                    Value="#FFF1F6FB" />
+                            <Setter Property="Margin"
+                                    TargetName="TabFill"
+                                    Value="0 0 0 -1" />
+                            <Setter Property="Margin"
+                                    TargetName="TabPath"
+                                    Value="0" />
+                            <Setter Property="Stroke"
+                                    TargetName="TabHighlight"
+                                    Value="Transparent" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
