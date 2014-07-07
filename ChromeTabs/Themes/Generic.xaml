@@ -90,19 +90,20 @@
                             <RowDefinition Height="25" />
                             <!--<RowDefinition Height="*" />-->
                         </Grid.RowDefinitions>
-                        <local:ChromeTabPanel IsItemsHost="True">
-                            <local:ChromeTabPanel.Background>
-                                <!--<LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
+                        <local:ChromeTabPanel IsItemsHost="True"
+                                              Background="{TemplateBinding Background}">
+                            <!--<local:ChromeTabPanel.Background>
+                                --><!--<LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
                                     <GradientStop Color="#FFEEEEEE" Offset="0" />
                                     <GradientStop Color="#FFCCCCCC" Offset=".9" />
-                                </LinearGradientBrush>-->
+                                </LinearGradientBrush>--><!--
                                 <SolidColorBrush Color="Transparent"
                                                  po:Freeze="true" />
-                            </local:ChromeTabPanel.Background>
+                            </local:ChromeTabPanel.Background>-->
                         </local:ChromeTabPanel>
-                        <!--<Grid Grid.Row="1">
+                        <Grid Grid.Row="1">
                             <ContentPresenter Content="{TemplateBinding SelectedContent}" />
-                        </Grid>-->
+                        </Grid>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
