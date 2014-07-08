@@ -41,6 +41,8 @@ namespace Demo
         private void ChromeTabControl_TabDraggedOutsideBonds(object sender, TabDragEventArgs e)
         {
             ITab draggedTab = e.Tab as ITab;
+            if (draggedTab is TabClass3)
+                return;//We don't want out TabClass3 to form new windows, so we stop it here.
             DockingWindow win = _openWindows.FirstOrDefault(x => x.DataContext == draggedTab);//check if it's already open
             if (win == null)//If not, create a new one
             {

@@ -8,9 +8,11 @@
         xmlns:local="clr-namespace:Demo"
         xmlns:usercontrols="clr-namespace:Demo.UserControls"
         xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
+        xmlns:conv="clr-namespace:Demo.Converters"
         Background="WhiteSmoke">
-    <!--These DataTemplates load the correct user control based on the viewmodel--> 
+    <!--These DataTemplates load the correct user control based on the viewmodel-->
     <Window.Resources>
+        <conv:TabToTabSnapConverter x:Key="TabToTabSnapConverter" />
         <DataTemplate DataType="{x:Type local:TabClass1}">
             <usercontrols:UserControl1 />
         </DataTemplate>
@@ -21,7 +23,6 @@
             <usercontrols:UserControl3 />
         </DataTemplate>
     </Window.Resources>
-    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -34,7 +35,7 @@
                              SelectedItem="{Binding SelectedTab}"
                              CanMoveTabs="{Binding CanMoveTabs}"
                              IsAddButtonVisible="{Binding ShowAddButton}"
-                             CloseTabWhenDraggedOutsideBonds="true"
+                             CloseTabWhenDraggedOutsideBonds="{Binding SelectedTab, Converter={StaticResource TabToTabSnapConverter}}"
                              AddTabCommand="{Binding AddTabCommand}"
                              CloseTabCommand="{Binding CloseTabCommand}"
                              ReorderTabsCommand="{Binding ReorderTabsCommand}"
@@ -82,8 +83,7 @@
                       IsChecked="{Binding ShowAddButton}" />
             <CheckBox Content="Movable tabs"
                       Margin="5"
-                      IsChecked="{Binding CanMoveTabs}"
- />
+                      IsChecked="{Binding CanMoveTabs}" />
         </StackPanel>
     </Grid>
 </Window>

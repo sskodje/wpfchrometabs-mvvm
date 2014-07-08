@@ -7,8 +7,11 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <StackPanel  Margin="30,10">
-        <TextBlock Text="{Binding MyStringContent}"
-                       Margin="0,0,0,20" />
+            <Label Content="{Binding TabName}"
+                   FontSize="18" />
+            <TextBlock Text="{Binding MyStringContent}"
+                       Margin="0,0,0,20" 
+                       TextWrapping="Wrap"/>
             <Image Source="{Binding MyImageUrl}"
                     Stretch="Uniform"/>
         </StackPanel>

@@ -6,7 +6,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <TextBlock  Margin="30,10"
-                    Text="{Binding MyStringContent}" />
+        <StackPanel Margin="30,10">
+            <Label Content="{Binding TabName}" FontSize="18" />
+            <TextBlock Text="{Binding MyStringContent}" />
+        </StackPanel>
     </Grid>
 </UserControl>

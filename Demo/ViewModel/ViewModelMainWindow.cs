@@ -100,7 +100,7 @@ namespace Demo
         }
         private void AddTab3()
         {
-            var tab = new TabClass3() { TabName = "Tab class 3", MyStringContent = "Try right clicking on the tab header", MyImageUrl = new Uri("/Resources/Kitten.jpg", UriKind.Relative) };
+            var tab = new TabClass3() { TabName = "Tab class 3", MyStringContent = "Try right clicking on the tab header. This tab can not be dragged out to a new window, to demonstrate that you can dynamically choose what tabs can, based on the viewmodel.", MyImageUrl = new Uri("/Resources/Kitten.jpg", UriKind.Relative) };
             this.ItemCollection.Add(tab);
             this.SelectedTab = tab;
 
