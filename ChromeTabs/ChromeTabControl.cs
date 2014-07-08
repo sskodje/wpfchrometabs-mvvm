@@ -148,7 +148,8 @@ namespace ChromeTabs
             ChromeTabControl ctc = d as ChromeTabControl;
 
             ChromeTabPanel panel = (ChromeTabPanel)ctc.ItemsHost;
-            panel.InvalidateVisual();
+            if (panel != null)
+                panel.InvalidateVisual();
         }
 
 
@@ -198,7 +199,7 @@ namespace ChromeTabs
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChromeTabControl ctc = (ChromeTabControl)d;
-            if (e.NewValue != null && ctc.SelectedItem!=null)
+            if (e.NewValue != null && ctc.SelectedItem != null)
                 ctc.AsTabItem(ctc.SelectedItem).SelectedTabBrush = (Brush)e.NewValue;
         }
         /// <summary>
