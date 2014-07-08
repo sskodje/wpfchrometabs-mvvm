@@ -30,26 +30,26 @@ namespace ChromeTabs
     /// Add this XmlNamespace attribute to the root element of the markup file where it is 
     /// to be used:
     ///
-    ///     xmlns:MyNamespace="clr-namespace:ChromiumTabs"
+    ///     xmlns:MyNamespace="clr-namespace:ChromeTabs"
     ///
     ///
     /// Step 1b) Using this custom control in a XAML file that exists in a different project.
     /// Add this XmlNamespace attribute to the root element of the markup file where it is 
     /// to be used:
     ///
-    ///     xmlns:MyNamespace="clr-namespace:ChromiumTabs;assembly=ChromiumTabs"
+    ///     xmlns:MyNamespace="clr-namespace:ChromeTabs;assembly=ChromeTabs"
     ///
     /// You will also need to add a project reference from the project where the XAML file lives
     /// to this project and Rebuild to avoid compilation errors:
     ///
     ///     Right click on the target project in the Solution Explorer and
-    ///     "Add Reference"->"Projects"->[Select this project]
+    ///     "Add Reference"->"Projects"->[Browse to and select this project]
     ///
     ///
     /// Step 2)
     /// Go ahead and use your control in the XAML file.
     ///
-    ///     <MyNamespace:CustomControl1/>
+    ///     <MyNamespace:ChromeTabs/>
     ///
     /// </summary>
     public class ChromeTabControl : Selector
@@ -119,6 +119,20 @@ namespace ChromeTabs
 
 
 
+        public bool CloseTabWhenDraggedOutsideBonds
+        {
+            get { return (bool)GetValue(CloseTabWhenDraggedOutsideBondsProperty); }
+            set { SetValue(CloseTabWhenDraggedOutsideBondsProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CloseTabWhenDraggedOutsideBonds.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CloseTabWhenDraggedOutsideBondsProperty =
+            DependencyProperty.Register("CloseTabWhenDraggedOutsideBonds", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(false));
+
+
+
+
+
         public bool IsAddButtonVisible
         {
             get { return (bool)GetValue(IsAddButtonVisibleProperty); }
@@ -127,7 +141,15 @@ namespace ChromeTabs
 
         // Using a DependencyProperty as the backing store for IsAddButtonEnabled.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsAddButtonVisibleProperty =
-            DependencyProperty.Register("IsAddButtonVisible", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
+            DependencyProperty.Register("IsAddButtonVisible", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true, new PropertyChangedCallback(IsAddButtonVisiblePropertyCallback)));
+
+        private static void IsAddButtonVisiblePropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChromeTabControl ctc = d as ChromeTabControl;
+
+            ChromeTabPanel panel = (ChromeTabPanel)ctc.ItemsHost;
+            panel.InvalidateVisual();
+        }
 
 
 
@@ -155,6 +177,20 @@ namespace ChromeTabs
             DependencyProperty.Register("DragWindowWithOneTab", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
 
 
+
+
+
+        public Brush SelectedTabBrush
+        {
+            get { return (Brush)GetValue(SelectedTabBrushProperty); }
+            set { SetValue(SelectedTabBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SelectedTabBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SelectedTabBrushProperty =
+            DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(Brushes.AliceBlue));
+
+        
 
 
         static ChromeTabControl()
@@ -190,11 +226,6 @@ namespace ChromeTabs
             }
             if (this.AddTabCommand != null)
                 this.AddTabCommand.Execute(null);
-            //this.Items.Add(tab);
-            //if (select || this.Items.Count == 1)
-            //{
-            //    this.SelectedIndex = this.Items.Count - 1;
-            //}
         }
 
         public bool CanAddTab
@@ -205,6 +236,7 @@ namespace ChromeTabs
         public void RemoveTab(object tab)
         {
             ChromeTabItem removeItem = this.AsTabItem(tab);
+            if(CloseTabCommand!=null)
             CloseTabCommand.Execute(removeItem.DataContext);
         }
 
@@ -261,9 +293,11 @@ namespace ChromeTabs
                 return;
             }
             object fromTab = this.Items[fromIndex];
-
-            ReorderTabsCommandParameter = new TabReorder(fromIndex, toIndex);
-            this.ReorderTabsCommand.Execute(ReorderTabsCommandParameter);
+            if (this.ReorderTabsCommand != null)
+            {
+                ReorderTabsCommandParameter = new TabReorder(fromIndex, toIndex);
+                this.ReorderTabsCommand.Execute(ReorderTabsCommandParameter);
+            }
 
             for (int i = 0; i < this.Items.Count; i += 1)
             {
@@ -280,7 +314,10 @@ namespace ChromeTabs
 
         protected override DependencyObject GetContainerForItemOverride()
         {
-            return new ChromeTabItem();
+           var tab = new ChromeTabItem();
+           tab.SelectedTabBrush = this.SelectedTabBrush;
+           return tab;
+
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)

@@ -29,14 +29,14 @@ namespace ChromeTabs
     /// Add this XmlNamespace attribute to the root element of the markup file where it is 
     /// to be used:
     ///
-    ///     xmlns:MyNamespace="clr-namespace:ChromiumTabs"
+    ///     xmlns:MyNamespace="clr-namespace:ChromeTabs"
     ///
     ///
     /// Step 1b) Using this custom control in a XAML file that exists in a different project.
     /// Add this XmlNamespace attribute to the root element of the markup file where it is 
     /// to be used:
     ///
-    ///     xmlns:MyNamespace="clr-namespace:ChromiumTabs;assembly=ChromiumTabs"
+    ///     xmlns:MyNamespace="clr-namespace:ChromeTabs;assembly=ChromeTabs"
     ///
     /// You will also need to add a project reference from the project where the XAML file lives
     /// to this project and Rebuild to avoid compilation errors:
@@ -48,7 +48,7 @@ namespace ChromeTabs
     /// Step 2)
     /// Go ahead and use your control in the XAML file.
     ///
-    ///     <MyNamespace:ChromiumTabPanel/>
+    ///     <MyNamespace:ChromeTabs/>
     ///
     /// </summary>
     [ToolboxItem(false)]
@@ -110,7 +110,7 @@ namespace ChromeTabs
         {
             if (index == this.VisualChildrenCount - 1)
             {
-                return ParentTabControl.IsAddButtonVisible ? this.addButton : null;
+                return this.addButton;// ParentTabControl.IsAddButtonVisible ? this.addButton : null;
             }
             else if (index < this.VisualChildrenCount - 1)
             {
@@ -136,11 +136,14 @@ namespace ChromeTabs
             double activeWidth = finalSize.Width - this.leftMargin - this.rightMargin;
             this.currentTabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap) / this.Children.Count, this.minTabWidth), this.maxTabWidth);
             ParentTabControl.SetCanAddTab(this.currentTabWidth > this.minTabWidth);
-            if (ParentTabControl.IsAddButtonVisible)
-                if (_hideAddButton)
-                    this.addButton.Visibility = System.Windows.Visibility.Hidden;
-                else
-                    this.addButton.Visibility = this.currentTabWidth > this.minTabWidth ? Visibility.Visible : Visibility.Collapsed;
+
+            if (_hideAddButton)
+                this.addButton.Visibility = System.Windows.Visibility.Hidden;
+            else if (ParentTabControl.IsAddButtonVisible)
+                this.addButton.Visibility = this.currentTabWidth > this.minTabWidth ? Visibility.Visible : Visibility.Collapsed;
+            else
+                this.addButton.Visibility = System.Windows.Visibility.Collapsed;
+          
             this.finalSize = finalSize;
             double offset = leftMargin;
             foreach (UIElement element in this.Children)
@@ -164,13 +167,14 @@ namespace ChromeTabs
             double activeWidth = double.IsPositiveInfinity(availableSize.Width) ? 500 : availableSize.Width - this.leftMargin - this.rightMargin;
             this.currentTabWidth = Math.Min(Math.Max((activeWidth + (this.Children.Count - 1) * overlap) / this.Children.Count, this.minTabWidth), this.maxTabWidth);
             ParentTabControl.SetCanAddTab(this.currentTabWidth > this.minTabWidth);
-            if (parent.IsAddButtonVisible)
-            {
-                if (_hideAddButton)
-                    this.addButton.Visibility = System.Windows.Visibility.Hidden;
-                else
-                    this.addButton.Visibility = this.currentTabWidth > this.minTabWidth ? Visibility.Visible : Visibility.Collapsed;
-            }
+
+            if (_hideAddButton)
+                this.addButton.Visibility = System.Windows.Visibility.Hidden;
+            else if (ParentTabControl.IsAddButtonVisible)
+                this.addButton.Visibility = this.currentTabWidth > this.minTabWidth ? Visibility.Visible : Visibility.Collapsed;
+            else
+                this.addButton.Visibility = System.Windows.Visibility.Collapsed;
+
             double height = double.IsPositiveInfinity(availableSize.Height) ? this.defaultMeasureHeight : availableSize.Height;
             Size resultSize = new Size(0, availableSize.Height);
             foreach (UIElement child in this.Children)
@@ -207,19 +211,16 @@ namespace ChromeTabs
             {
                 if (this.slideIntervals != null)
                 {
-                    //   Debug.WriteLine("SlideIntervals is not null, returning");
                     return;
                 }
 
-                if (ParentTabControl.IsAddButtonVisible)
-                {
                     if (this.addButtonRect.Contains(e.GetPosition(this)))
                     {
                         this.addButton.Background = Brushes.DarkGray;
                         this.InvalidateVisual();
                         return;
                     }
-                }
+                
                 DependencyObject originalSource = e.OriginalSource as DependencyObject;
 
 
@@ -313,8 +314,7 @@ namespace ChromeTabs
 
         private void ProcessMouseMove(Point p)
         {
-            if (!ParentTabControl.CanMoveTabs)
-                return;
+
             Point nowPoint = p;
             if (ParentTabControl.IsAddButtonVisible)
             {
@@ -329,7 +329,7 @@ namespace ChromeTabs
                     this.InvalidateVisual();
                 }
             }
-            if (this.draggedTab == null || this.draggingWindow)
+            if (this.draggedTab == null || this.draggingWindow || !ParentTabControl.CanMoveTabs)
                 return;
 
             Point insideTabPoint = this.TranslatePoint(p, this.draggedTab);
@@ -371,19 +371,16 @@ namespace ChromeTabs
 
                     if (insideTabPoint.X > 0 && (nowPoint.X + (this.draggedTab.ActualWidth - insideTabPoint.X)) >= this.ActualWidth)
                     {
-                        //  Debug.WriteLine("Skipping, outside width of panel: panel width is: " + this.ActualWidth, "ChromeTabPanel");
                         return;
                     }
                     else if (insideTabPoint.X < this.downTabBoundsPoint.X && (nowPoint.X - insideTabPoint.X) <= 0)
                     {
-                        //   Debug.WriteLine("Skipping, margin is below zero", "ChromeTabPanel");
                         return;
                     }
 
                     this.draggedTab.Margin = margin;
                     if (_IsAnimating)
                     {
-                        //   Debug.WriteLine("Is animating, returning", "ChromeTabPanel");
                         return;
                     }
                     this.addButton.Visibility = System.Windows.Visibility.Hidden;
@@ -421,7 +418,6 @@ namespace ChromeTabs
                         if (!shiftedTab.Equals(this.draggedTab))
                         {
                             var offset = changed * (this.currentTabWidth - this.overlap);
-                            //    Debug.WriteLine(string.Format("StickyReanimate start for tab  {0}, left offset is {1}", shiftedTab.Index, offset), "ChromeTabPanel");
                             StickyReanimate(shiftedTab, offset, 0.10);
 
                         }
@@ -437,7 +433,6 @@ namespace ChromeTabs
 
             if (this.draggedTab == null)
             {
-                //  Debug.WriteLine("Mouse move: Draggedtab is null, returning", "ChromeTabPanel");
                 return;
             }
             Window parentWindow = Window.GetWindow(this);
@@ -446,17 +441,14 @@ namespace ChromeTabs
             if (isOutsideWindow == true)
             {
                 object viewmodel = draggedTab.Content;
-                OnTabRelease(e.GetPosition(this), 0.001);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
-                this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel));
-                    }));
-                //  Debug.WriteLine("tab item is outside bonds", "ChromeTabPanel");
+
+                OnTabRelease(e.GetPosition(this), ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.1);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
+                RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel));
             }
         }
 
 
-        private void OnTabRelease(Point p, double animationDuration = 0.10)
+        private void OnTabRelease(Point p, bool closeTabOnRelease, double animationDuration = 0.10)
         {
             lock (_lockObject)
             {
@@ -498,7 +490,6 @@ namespace ChromeTabs
                             ParentTabControl.ChangeSelectedItem(this.draggedTab);
                             object vm = this.draggedTab.Content;
                             this.draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
-                            //  Debug.WriteLine(string.Format("Margin set in completed for tab {0}: {1}", this.draggedTab.Index, this.draggedTab.Margin), "ChromeTabPanel");
                             this.draggedTab = null;
                             this.captureGuard = 0;
                             ParentTabControl.MoveTab(this.originalIndex, this.slideIndex - 1);
@@ -506,16 +497,13 @@ namespace ChromeTabs
                             this.addButton.Visibility = System.Windows.Visibility.Visible;
                             _hideAddButton = false;
                             this.InvalidateVisual();
+                            if (closeTabOnRelease && ParentTabControl.CloseTabCommand != null)
+                                ParentTabControl.CloseTabCommand.Execute(vm);
 
-                        }
-                        else
-                        {
-                            Debug.WriteLine("reanimate completed, but draggedtab is null", "ChromeTabPanel");
                         }
                     };
 
                     Reanimate(this.draggedTab, offset, animationDuration, completed);
-                    //    Debug.WriteLine(string.Format("Reanimated tab {0}, left offset is {1}", this.draggedTab.Index, offset), "ChromeTabPanel");
 
                 }
                 else
@@ -538,7 +526,7 @@ namespace ChromeTabs
         {
             base.OnPreviewMouseLeftButtonUp(e);
 
-            OnTabRelease(e.GetPosition(this));
+            OnTabRelease(e.GetPosition(this),false);
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
@@ -575,11 +563,6 @@ namespace ChromeTabs
                 if (this.draggedTab != null)
                 {
                     tab.Margin = new Thickness(left, 0, -left, 0);
-                    //  Debug.WriteLine(string.Format("StickyReanimate complete, set tab {0} margin to {1}", tab.Index, tab.Margin), "ChromeTabPanel");
-                }
-                else
-                {
-                    //  Debug.WriteLine("StickyReanimate stopped because draggedtab is null", "ChromeTabPanel");
                 }
             };
 

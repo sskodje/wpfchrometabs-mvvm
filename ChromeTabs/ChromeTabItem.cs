@@ -22,14 +22,14 @@ namespace ChromeTabs
     /// Add this XmlNamespace attribute to the root element of the markup file where it is 
     /// to be used:
     ///
-    ///     xmlns:MyNamespace="clr-namespace:ChromiumTabs"
+    ///     xmlns:MyNamespace="clr-namespace:ChromeTabs"
     ///
     ///
     /// Step 1b) Using this custom control in a XAML file that exists in a different project.
     /// Add this XmlNamespace attribute to the root element of the markup file where it is 
     /// to be used:
     ///
-    ///     xmlns:MyNamespace="clr-namespace:ChromiumTabs;assembly=ChromiumTabs"
+    ///     xmlns:MyNamespace="clr-namespace:ChromeTabs;assembly=ChromeTabs"
     ///
     /// You will also need to add a project reference from the project where the XAML file lives
     /// to this project and Rebuild to avoid compilation errors:
@@ -41,12 +41,32 @@ namespace ChromeTabs
     /// Step 2)
     /// Go ahead and use your control in the XAML file.
     ///
-    ///     <MyNamespace:ChromiumTabItem/>
+    ///     <MyNamespace:ChromeTabs/>
     ///
     /// </summary>
     public class ChromeTabItem : HeaderedContentControl
     {
+        public bool IsSelected
+        {
+            get { return (bool)GetValue(IsSelectedProperty); }
+            set { SetValue(IsSelectedProperty, value); }
+        }
         public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromeTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
+
+
+
+
+        public Brush SelectedTabBrush
+        {
+            get { return (Brush)GetValue(SelectedTabBrushProperty); }
+            set { SetValue(SelectedTabBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SelectedTabBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SelectedTabBrushProperty =
+            DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabItem), new PropertyMetadata(Brushes.White));
+
+        
 
         private static readonly RoutedUICommand closeTabCommand = new RoutedUICommand("Close tab", "CloseTab", typeof(ChromeTabItem));
 
@@ -87,6 +107,7 @@ namespace ChromeTabs
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeAllTabsCommand, HandleCloseAllTabsCommand));
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeOtherTabsCommand, HandleCloseOtherTabsCommand));
         }
+        
 
         private static void HandleCloseOtherTabsCommand(object sender, ExecutedRoutedEventArgs e)
         {
@@ -116,11 +137,7 @@ namespace ChromeTabs
             }
         }
 
-        public bool IsSelected
-        {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
-        }
+
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
