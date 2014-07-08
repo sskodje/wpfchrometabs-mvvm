@@ -1,5 +1,3 @@
-# WPF Chrome Tabs
+# WPF Chrome Tabs - MVVM
 
-A WPF custom tab control built from the ground up to mimic the user experience found in Google's Chrome browser.
-
-Here's [a video on Vimeo](https://vimeo.com/44969662) showing the control in action.
+A modification of [WPF chrome tabs](https://github.com/realistschuckle/wpfchrometabs) to work with the MVVM pattern.
