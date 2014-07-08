@@ -81,6 +81,7 @@ namespace Demo
             view.SortDescriptions.Add(new SortDescription("TabNumber", ListSortDirection.Ascending)); 
 
             this.CanMoveTabs = true;
+            this.ShowAddButton = true;
             this.ReorderTabsCommand = new RelayCommand<TabReorder>(ReorderTabsCommandAction);
             this.CloseTabCommand = new RelayCommand<ITab>(CloseTabCommandAction);
             this.AddTabCommand = new RelayCommand(AddTabCommandAction);

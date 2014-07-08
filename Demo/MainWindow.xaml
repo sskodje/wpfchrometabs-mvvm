@@ -30,13 +30,14 @@
         </Grid.RowDefinitions>
         <ct:ChromeTabControl x:Name="MyChromeTabControl"
                              Background="AliceBlue"
-                             SelectedTabBrush="WhiteSmoke"
                              ItemsSource="{Binding ItemCollection}"
                              SelectedItem="{Binding SelectedTab}"
+                             SelectedTabBrush="WhiteSmoke"
                              CanMoveTabs="{Binding CanMoveTabs}"
                              IsAddButtonVisible="{Binding ShowAddButton}"
                              CloseTabWhenDraggedOutsideBonds="{Binding SelectedTab, Converter={StaticResource TabToTabSnapConverter}}"
                              AddTabCommand="{Binding AddTabCommand}"
+                             DragWindowWithOneTab="true"
                              CloseTabCommand="{Binding CloseTabCommand}"
                              ReorderTabsCommand="{Binding ReorderTabsCommand}"
                              TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
@@ -54,8 +55,7 @@
                                    VerticalAlignment="Center" />
                         <!--</Border>-->
 
-                        <!--We can implement a context menu for the header here. The tab items expose for convenience the following commands, "CloseTabCommand: close the current tab, "CloseAllTabsCommand", and "CloseOtherTabsCommand", which closes all tabs except the current. For more customization options,
-                          you can override the tab controls ItemContainerStyle. -->
+                        <!--We can implement a context menu for the header here. The ChromeTabItems expose for convenience the following commands, "CloseTabCommand: close the current tab, "CloseAllTabsCommand", and "CloseOtherTabsCommand", which closes all tabs except the current.-->
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Close"

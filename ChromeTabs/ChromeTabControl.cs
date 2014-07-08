@@ -188,16 +188,19 @@ namespace ChromeTabs
 
         // Using a DependencyProperty as the backing store for SelectedTabBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedTabBrushProperty =
-            DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(Brushes.AliceBlue));
-
-        
+            DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(null, new PropertyChangedCallback(SelectedTabBrushPropertyCallback)));
 
 
         static ChromeTabControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
         }
-
+        private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChromeTabControl ctc = (ChromeTabControl)d;
+            if (e.NewValue != null && ctc.SelectedItem!=null)
+                ctc.AsTabItem(ctc.SelectedItem).SelectedTabBrush = (Brush)e.NewValue;
+        }
         /// <summary>
         /// Grabs hold of the tab based on the input viewmodel and positions it at the mouse cursor.
         /// </summary>
@@ -236,8 +239,8 @@ namespace ChromeTabs
         public void RemoveTab(object tab)
         {
             ChromeTabItem removeItem = this.AsTabItem(tab);
-            if(CloseTabCommand!=null)
-            CloseTabCommand.Execute(removeItem.DataContext);
+            if (CloseTabCommand != null)
+                CloseTabCommand.Execute(removeItem.DataContext);
         }
 
         public void RemoveAllTabs(object exceptThis = null)
@@ -314,9 +317,10 @@ namespace ChromeTabs
 
         protected override DependencyObject GetContainerForItemOverride()
         {
-           var tab = new ChromeTabItem();
-           tab.SelectedTabBrush = this.SelectedTabBrush;
-           return tab;
+            var tab = new ChromeTabItem();
+            if (this.SelectedTabBrush != null)
+                tab.SelectedTabBrush = this.SelectedTabBrush;
+            return tab;
 
         }
 
@@ -365,6 +369,11 @@ namespace ChromeTabs
                             this.SelectedItem = _lastSelectedItem;
                         else
                             this.SelectedItem = this.Items[0];
+                    }
+                    else
+                    {
+                        this.SelectedItem = null;
+                        this.SelectedContent = null;
                     }
                 }
                 return;
