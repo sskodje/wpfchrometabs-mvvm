@@ -11,4 +11,4 @@ New features include:
  - Bindable property for selected tab brush
  - Bindable property to drag window instead when dragging the last remaining tab.
  
-A demo project is included.
+A complete demo project is included.
