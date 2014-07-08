@@ -1,8 +1,89 @@
-﻿<Window x:Class="Demo.MainWindow"
+﻿<Window x:Name="window"
+        x:Class="Demo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid Margin="0,0,-83,-82">
-        
+        Title="MainWindow"
+        Height="600"
+        Width="600"
+        xmlns:local="clr-namespace:Demo"
+        xmlns:usercontrols="clr-namespace:Demo.UserControls"
+        xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
+        Background="WhiteSmoke">
+    <!--These DataTemplates load the correct user control based on the viewmodel--> 
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type local:TabClass1}">
+            <usercontrols:UserControl1 />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:TabClass2}">
+            <usercontrols:UserControl2 />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:TabClass3}">
+            <usercontrols:UserControl3 />
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <ct:ChromeTabControl x:Name="MyChromeTabControl"
+                             Background="AliceBlue"
+                             SelectedTabBrush="WhiteSmoke"
+                             ItemsSource="{Binding ItemCollection}"
+                             SelectedItem="{Binding SelectedTab}"
+                             CanMoveTabs="{Binding CanMoveTabs}"
+                             IsAddButtonVisible="{Binding ShowAddButton}"
+                             CloseTabWhenDraggedOutsideBonds="true"
+                             AddTabCommand="{Binding AddTabCommand}"
+                             CloseTabCommand="{Binding CloseTabCommand}"
+                             ReorderTabsCommand="{Binding ReorderTabsCommand}"
+                             TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
+            <!--We must override the item template to show our tab name in the header. Here we use a simple
+            textblock, but you could put any combination of controls here. Uncomment the orange border to shows
+            the bounds of the header content presenter-->
+            <ct:ChromeTabControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type ct:ChromeTabItem}}}">
+                        <!--<Border BorderBrush="Orange"
+                                BorderThickness="1">-->
+                        <TextBlock Text="{Binding TabName}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center" />
+                        <!--</Border>-->
+
+                        <!--We can implement a context menu for the header here. The tab items expose for convenience the following commands, "CloseTabCommand: close the current tab, "CloseAllTabsCommand", and "CloseOtherTabsCommand", which closes all tabs except the current. For more customization options,
+                          you can override the tab controls ItemContainerStyle. -->
+                        <Grid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Close"
+                                          Command="{Binding Path=PlacementTarget.Tag.CloseTabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <MenuItem Header="Close all"
+                                          Command="{Binding Path=PlacementTarget.Tag.CloseAllTabsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <MenuItem Header="Close other tabs"
+                                          Command="{Binding Path=PlacementTarget.Tag.CloseOtherTabsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          CommandParameter="{Binding}" />
+                            </ContextMenu>
+                        </Grid.ContextMenu>
+                    </Grid>
+                </DataTemplate>
+            </ct:ChromeTabControl.ItemTemplate>
+
+        </ct:ChromeTabControl>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <CheckBox Content="Show add button"
+                      Margin="5"
+                      IsChecked="{Binding ShowAddButton}" />
+            <CheckBox Content="Movable tabs"
+                      Margin="5"
+                      IsChecked="{Binding CanMoveTabs}"
+ />
+        </StackPanel>
     </Grid>
 </Window>
