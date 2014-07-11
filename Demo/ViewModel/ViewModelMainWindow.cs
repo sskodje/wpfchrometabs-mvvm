@@ -90,19 +90,25 @@ namespace Demo
         private void AddTab1()
         {
             var tab = new TabClass1() { TabName = "Tab class 1", MyStringContent = "Try drag the tab from left to right" };
+            //Simply adding items to the collection adds a tab
             this.ItemCollection.Add(tab);
+            //and setting SelectedTab to it, will select it.
             this.SelectedTab = tab;
         }
         private void AddTab2()
         {
             var tab = new TabClass2() { TabName = "Tab class 2, with a long name", MyStringContent = "Try drag the tab outside the bonds of the tab control", MyNumberCollection = new int[] { 1, 2, 3, 4, }, MySelectedNumber = 1 };
+            //Simply adding items to the collection adds a tab
             this.ItemCollection.Add(tab);
+            //and setting SelectedTab to it, will select it.
             this.SelectedTab = tab;
         }
         private void AddTab3()
         {
             var tab = new TabClass3() { TabName = "Tab class 3", MyStringContent = "Try right clicking on the tab header. This tab can not be dragged out to a new window, to demonstrate that you can dynamically choose what tabs can, based on the viewmodel.", MyImageUrl = new Uri("/Resources/Kitten.jpg", UriKind.Relative) };
+            //Simply adding items to the collection adds a tab
             this.ItemCollection.Add(tab);
+            //and setting SelectedTab to it, will select it.
             this.SelectedTab = tab;
 
         }
