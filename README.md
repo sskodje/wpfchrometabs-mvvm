@@ -12,4 +12,5 @@ New features include:
  - Bindable property to drag window instead when dragging the last remaining tab.
  
 A complete demo project is included.
+
 Now available on [nuget](https://www.nuget.org/packages/WPFChromeTabsMVVM/)
