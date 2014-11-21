@@ -13,4 +13,4 @@ New features include:
  
 A complete demo project is included.
 
-Now available on [nuget](https://www.nuget.org/packages/WPFChromeTabsMVVM/)
+Now available on [nuget](https://www.nuget.org/packages/WPFChromeTabsMVVM/).
