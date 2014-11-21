@@ -47,6 +47,7 @@
             <ct:ChromeTabControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type ct:ChromeTabItem}}}">
+
                         <!--<Border BorderBrush="Orange"
                                 BorderThickness="1">-->
                         <TextBlock Text="{Binding TabName}"

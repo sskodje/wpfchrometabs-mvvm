@@ -2,6 +2,7 @@
 using Demo.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -98,24 +99,26 @@ namespace Demo
             if (windowUnder != null && windowUnder.Equals(this))
             {
                 Point relativePoint = this.PointFromScreen(p);//The screen position relative to the main window
+                FrameworkElement element = this.MyChromeTabControl.InputHitTest(relativePoint) as FrameworkElement;//Hit test against the tab control
 
-                var result = this.MyChromeTabControl.InputHitTest(relativePoint); //Hit test against the tab control
-
-                Point insideTabBarPoint = this.MyChromeTabControl.PointFromScreen(p);
-                if (result != null && result is ChromeTabPanel)
+                if (element != null)
                 {
+                    ChromeTabItem tabItem = element.TemplatedParent as ChromeTabItem;
 
-                    ITab dockedWindowVM = (ITab)win.DataContext;
-                    ViewModelMainWindow mainWindowVm = (ViewModelMainWindow)this.DataContext;
+                    if (element is ChromeTabPanel || tabItem != null)
+                    {
+                        ITab dockedWindowVM = (ITab)win.DataContext;
+                        ViewModelMainWindow mainWindowVm = (ViewModelMainWindow)this.DataContext;
 
-                    mainWindowVm.ItemCollection.Add(dockedWindowVM);
-                    win.Close();
+                        mainWindowVm.ItemCollection.Add(dockedWindowVM);
+                        win.Close();
 
-                    mainWindowVm.SelectedTab = dockedWindowVM;
-                    
-                    //We run this method on the tab control for it to grab the tab and position it at the mouse, ready to move again.
-                    this.MyChromeTabControl.GrabTab(dockedWindowVM);
-                 
+                        mainWindowVm.SelectedTab = dockedWindowVM;
+
+                        //We run this method on the tab control for it to grab the tab and position it at the mouse, ready to move again.
+                        this.MyChromeTabControl.GrabTab(dockedWindowVM);
+
+                    }
                 }
             }
         }
