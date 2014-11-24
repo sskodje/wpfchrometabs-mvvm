@@ -10,5 +10,33 @@ New features include:
  - Bindable property to show/hide "add tab" button
  - Bindable property for selected tab brush
  - Bindable property to drag window instead when dragging the last remaining tab.
- 
-A complete demo project is included.
+
+Available on [NuGet](https://www.nuget.org/packages/WPFChromeTabsMVVM/).
+
+The basic functionality can be done as simple as :
+
+        xaml:
+        xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
+    
+        <ct:ChromeTabControl ItemsSource="{Binding ItemCollection}"
+                             SelectedItem="{Binding SelectedTab}"
+                             AddTabCommand="{Binding AddTabCommand}"
+                             CloseTabCommand="{Binding CloseTabCommand}">
+                             
+        viewmodel: 
+        public ObservableCollection<MyTabClass> ItemCollection { get; set; }
+        public MyTabClass SelectedTab { get; set; }
+        (...)
+        void CloseTabCommandAction(MyTabClass tab)
+        {
+            ItemCollection.Remove(tab);
+        }
+        void AddTabCommandAction()
+        {
+            ItemCollection.Add(New MyTabClass());
+        }
+
+See the demo project for advanced functionality like tab tearing, snapping windows to tabs, tab reordering, context menus and more.
+
+![Example](http://i.imgur.com/q5WXWh1.gif)
+
