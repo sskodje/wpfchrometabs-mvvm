@@ -153,7 +153,6 @@ namespace ChromeTabs
         }
 
 
-
         public bool CanMoveTabs
         {
             get { return (bool)GetValue(CanMoveTabsProperty); }
@@ -163,8 +162,6 @@ namespace ChromeTabs
         // Using a DependencyProperty as the backing store for CanMoveTabs.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CanMoveTabsProperty =
             DependencyProperty.Register("CanMoveTabs", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
-
-
 
 
         public bool DragWindowWithOneTab
@@ -178,9 +175,6 @@ namespace ChromeTabs
             DependencyProperty.Register("DragWindowWithOneTab", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
 
 
-
-
-
         public Brush SelectedTabBrush
         {
             get { return (Brush)GetValue(SelectedTabBrushProperty); }
@@ -192,10 +186,25 @@ namespace ChromeTabs
             DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(null, new PropertyChangedCallback(SelectedTabBrushPropertyCallback)));
 
 
+        /// <summary>
+        /// The extra pixel distance you need to drag up or down the tab before the tab tears out.
+        /// </summary>
+        public double TabTearTriggerDistance
+        {
+            get { return (double)GetValue(TabTearTriggerDistanceProperty); }
+            set { SetValue(TabTearTriggerDistanceProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TabTearTriggerDistanceProperty =
+            DependencyProperty.Register("TabTearTriggerDistance", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(0.0));
+
+
         static ChromeTabControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
         }
+
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChromeTabControl ctc = (ChromeTabControl)d;

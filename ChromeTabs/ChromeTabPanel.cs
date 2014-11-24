@@ -255,17 +255,20 @@ namespace ChromeTabs
             // Debug.WriteLine(string.Format("Picking up tab at position {0}", downPoint), "ChromeTabPanel");
             if (tab != null)
             {
+                this.InvalidateMeasure();
+                this.InvalidateArrange();
+                this.UpdateLayout();
                 double index = ((this.currentTabWidth - overlap) * tab.Index) + (this.currentTabWidth / 2);
                 this.downPoint = new Point(index, downPoint.Y);
             }
             else
                 this.downPoint = downPoint;
+
             StartTabDrag(downPoint, tab);
         }
 
         internal void StartTabDrag(Point p, ChromeTabItem tab = null)
         {
-
             if (tab == null)
             {
                 HitTestResult result = VisualTreeHelper.HitTest(this, this.downPoint);
@@ -277,7 +280,6 @@ namespace ChromeTabs
                 }
                 if (source == null)
                 {
-                    //    Debug.WriteLine("drag source is null, returning", "ChromeTabPanel");
                     return;
                 }
                 this.draggedTab = source as ChromeTabItem;
@@ -286,7 +288,6 @@ namespace ChromeTabs
                 this.draggedTab = tab;
             else
             {
-                //   Debug.WriteLine("No tab to drag found, returning", "ChromeTabPanel");
                 return;
             }
 
@@ -314,7 +315,6 @@ namespace ChromeTabs
 
         private void ProcessMouseMove(Point p)
         {
-
             Point nowPoint = p;
             if (ParentTabControl.IsAddButtonVisible)
             {
@@ -333,7 +333,6 @@ namespace ChromeTabs
                 return;
 
             Point insideTabPoint = this.TranslatePoint(p, this.draggedTab);
-
             Thickness margin = new Thickness(nowPoint.X - this.downPoint.X, 0, this.downPoint.X - nowPoint.X, 0);
 
             if (margin.Left != 0)
@@ -341,30 +340,29 @@ namespace ChromeTabs
                 int guardValue = Interlocked.Increment(ref this.captureGuard);
                 if (guardValue == 1)
                 {
-
                     this.draggedTab.Margin = margin;
-                    //we capture the mouse and start tab movement
-                    this.originalIndex = this.draggedTab.Index;
-                    this.slideIndex = this.originalIndex + 1;
-                    //Add slide intervals, the positions  where the tab slides over the next.
-                    this.slideIntervals = new List<double>();
-                    this.slideIntervals.Add(double.NegativeInfinity);
-                    for (int i = 1; i <= this.Children.Count; i += 1)
-                    {
-                        var diff = i - this.slideIndex;
-                        var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
-                        var bound = Math.Min(1, Math.Abs(diff)) * ((sign * this.currentTabWidth / 3) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (this.currentTabWidth - this.overlap)));
-                        this.slideIntervals.Add(bound);
-                    }
-                    this.slideIntervals.Add(double.PositiveInfinity);
-                    this.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            if (this.CaptureMouse())
+
+                            //we capture the mouse and start tab movement
+                            this.originalIndex = this.draggedTab.Index;
+                            this.slideIndex = this.originalIndex + 1;
+                            //Add slide intervals, the positions  where the tab slides over the next.
+                            this.slideIntervals = new List<double>();
+                            this.slideIntervals.Add(double.NegativeInfinity);
+                            for (int i = 1; i <= this.Children.Count; i += 1)
                             {
-                                _hasMouseCapture = true;
-                                //    Debug.WriteLine("Mouse captured", "ChromeTabPanel");
+                                var diff = i - this.slideIndex;
+                                var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
+                                var bound = Math.Min(1, Math.Abs(diff)) * ((sign * this.currentTabWidth / 3) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (this.currentTabWidth - this.overlap)));
+                                this.slideIntervals.Add(bound);
                             }
-                        }));
+                            this.slideIntervals.Add(double.PositiveInfinity);
+                            this.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    if (this.CaptureMouse())
+                                    {
+                                        _hasMouseCapture = true;
+                                    }
+                                }));
                 }
                 else if (this.slideIntervals != null)
                 {
@@ -377,7 +375,6 @@ namespace ChromeTabs
                     {
                         return;
                     }
-
                     this.draggedTab.Margin = margin;
                     if (_IsAnimating)
                     {
@@ -437,7 +434,7 @@ namespace ChromeTabs
             }
             Window parentWindow = Window.GetWindow(this);
             Point nowPoint = e.GetPosition(parentWindow);
-            bool isOutsideWindow = nowPoint.X < 0 || nowPoint.X > parentWindow.ActualWidth || nowPoint.Y < -70 || nowPoint.Y > 100;
+            bool isOutsideWindow = nowPoint.X < 0 || nowPoint.X > parentWindow.ActualWidth || nowPoint.Y < -(this.ActualHeight + ParentTabControl.TabTearTriggerDistance) || nowPoint.Y > this.ActualHeight + 5+ParentTabControl.TabTearTriggerDistance;
             if (isOutsideWindow == true)
             {
                 object viewmodel = draggedTab.Content;

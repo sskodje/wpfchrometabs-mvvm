@@ -2,7 +2,7 @@
         x:Class="Demo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow"
+        Title="ChromeTabs Demo"
         Height="600"
         Width="600"
         xmlns:local="clr-namespace:Demo"
@@ -40,6 +40,7 @@
                              DragWindowWithOneTab="true"
                              CloseTabCommand="{Binding CloseTabCommand}"
                              ReorderTabsCommand="{Binding ReorderTabsCommand}"
+                             TabTearTriggerDistance="10"
                              TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
             <!--We must override the item template to show our tab name in the header. Here we use a simple
             textblock, but you could put any combination of controls here. Uncomment the orange border to shows
