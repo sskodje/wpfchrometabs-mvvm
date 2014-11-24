@@ -38,4 +38,5 @@ The basic functionality can be done as simple as :
 
 See the demo project for advanced functionality like tab tearing, snapping windows to tabs, tab reordering, context menus and more.
 
-![ScreenShot](http://i.imgur.com/nneM0Kw.gif)
+![Example](http://i.imgur.com/q5WXWh1.gif)
+
