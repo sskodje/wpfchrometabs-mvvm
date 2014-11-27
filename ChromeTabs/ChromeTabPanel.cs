@@ -143,7 +143,7 @@ namespace ChromeTabs
                 this.addButton.Visibility = this.currentTabWidth > this.minTabWidth ? Visibility.Visible : Visibility.Collapsed;
             else
                 this.addButton.Visibility = System.Windows.Visibility.Collapsed;
-          
+
             this.finalSize = finalSize;
             double offset = leftMargin;
             foreach (UIElement element in this.Children)
@@ -214,13 +214,13 @@ namespace ChromeTabs
                     return;
                 }
 
-                    if (this.addButtonRect.Contains(e.GetPosition(this)))
-                    {
-                        this.addButton.Background = Brushes.DarkGray;
-                        this.InvalidateVisual();
-                        return;
-                    }
-                
+                if (this.addButtonRect.Contains(e.GetPosition(this)))
+                {
+                    this.addButton.Background = Brushes.DarkGray;
+                    this.InvalidateVisual();
+                    return;
+                }
+
                 DependencyObject originalSource = e.OriginalSource as DependencyObject;
 
 
@@ -342,27 +342,27 @@ namespace ChromeTabs
                 {
                     this.draggedTab.Margin = margin;
 
-                            //we capture the mouse and start tab movement
-                            this.originalIndex = this.draggedTab.Index;
-                            this.slideIndex = this.originalIndex + 1;
-                            //Add slide intervals, the positions  where the tab slides over the next.
-                            this.slideIntervals = new List<double>();
-                            this.slideIntervals.Add(double.NegativeInfinity);
-                            for (int i = 1; i <= this.Children.Count; i += 1)
+                    //we capture the mouse and start tab movement
+                    this.originalIndex = this.draggedTab.Index;
+                    this.slideIndex = this.originalIndex + 1;
+                    //Add slide intervals, the positions  where the tab slides over the next.
+                    this.slideIntervals = new List<double>();
+                    this.slideIntervals.Add(double.NegativeInfinity);
+                    for (int i = 1; i <= this.Children.Count; i += 1)
+                    {
+                        var diff = i - this.slideIndex;
+                        var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
+                        var bound = Math.Min(1, Math.Abs(diff)) * ((sign * this.currentTabWidth / 3) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (this.currentTabWidth - this.overlap)));
+                        this.slideIntervals.Add(bound);
+                    }
+                    this.slideIntervals.Add(double.PositiveInfinity);
+                    this.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (this.CaptureMouse())
                             {
-                                var diff = i - this.slideIndex;
-                                var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
-                                var bound = Math.Min(1, Math.Abs(diff)) * ((sign * this.currentTabWidth / 3) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (this.currentTabWidth - this.overlap)));
-                                this.slideIntervals.Add(bound);
+                                _hasMouseCapture = true;
                             }
-                            this.slideIntervals.Add(double.PositiveInfinity);
-                            this.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    if (this.CaptureMouse())
-                                    {
-                                        _hasMouseCapture = true;
-                                    }
-                                }));
+                        }));
                 }
                 else if (this.slideIntervals != null)
                 {
@@ -434,12 +434,15 @@ namespace ChromeTabs
             }
             Window parentWindow = Window.GetWindow(this);
             Point nowPoint = e.GetPosition(parentWindow);
-            bool isOutsideWindow = nowPoint.X < 0 || nowPoint.X > parentWindow.ActualWidth || nowPoint.Y < -(this.ActualHeight + ParentTabControl.TabTearTriggerDistance) || nowPoint.Y > this.ActualHeight + 5+ParentTabControl.TabTearTriggerDistance;
+            bool isOutsideWindow = nowPoint.X < 0
+                || nowPoint.X > parentWindow.ActualWidth
+                || nowPoint.Y < -(this.ActualHeight + ParentTabControl.TabTearTriggerDistance)
+                || nowPoint.Y > this.ActualHeight + 5 + ParentTabControl.TabTearTriggerDistance;
             if (isOutsideWindow == true)
             {
                 object viewmodel = draggedTab.Content;
 
-                OnTabRelease(e.GetPosition(this), ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.1);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
+                OnTabRelease(e.GetPosition(this), ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
                 RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel));
             }
         }
@@ -523,7 +526,7 @@ namespace ChromeTabs
         {
             base.OnPreviewMouseLeftButtonUp(e);
 
-            OnTabRelease(e.GetPosition(this),false);
+            OnTabRelease(e.GetPosition(this), false);
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
