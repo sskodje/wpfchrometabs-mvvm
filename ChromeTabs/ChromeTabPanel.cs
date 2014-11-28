@@ -77,7 +77,6 @@ namespace ChromeTabs
         private Rect addButtonRect;
         private Size addButtonSize;
         private Button addButton;
-
         private DateTime _lastMouseDown;
         private object _lockObject = new object();
         private bool _hasMouseCapture;
@@ -502,9 +501,21 @@ namespace ChromeTabs
                             this.addButton.Visibility = System.Windows.Visibility.Visible;
                             _hideAddButton = false;
                             this.InvalidateVisual();
+                            this.UpdateLayout();
                             if (closeTabOnRelease && ParentTabControl.CloseTabCommand != null)
+                            {
                                 ParentTabControl.CloseTabCommand.Execute(vm);
+                                if (this.Children.Count > 1)
+                                {
+                                    //this fixes a bug where sometimes tabs got stuck in the wrong position when dragged out very fast.
+                                    RealignAllTabs();
+                                }
+                            }
 
+                        }
+                        else
+                        {
+                            Debug.WriteLine("draggedtab is null");
                         }
                     };
 
@@ -524,6 +535,16 @@ namespace ChromeTabs
                     this.captureGuard = 0;
                     this.slideIntervals = null;
                 }
+            }
+        }
+
+        private void RealignAllTabs()
+        {
+            for (int i = 0; i < this.Children.Count; i++)
+            {
+                var shiftedTab = parent.AsTabItem(this.Children[i]);
+                var offset = 1 * (this.currentTabWidth - this.overlap);
+                shiftedTab.Margin = new Thickness(0, 0, 0, 0);
             }
         }
 
