@@ -438,16 +438,17 @@ namespace ChromeTabs
             }
             Window parentWindow = Window.GetWindow(this);
             Point nowPoint = e.GetPosition(parentWindow);
-            bool isOutsideWindow = nowPoint.X < 0
-                || nowPoint.X > parentWindow.ActualWidth
+            bool isOutsideWindow = nowPoint.X < 0-ParentTabControl.TabTearTriggerDistance
+                || nowPoint.X > parentWindow.ActualWidth+ParentTabControl.TabTearTriggerDistance
                 || nowPoint.Y < -(this.ActualHeight + ParentTabControl.TabTearTriggerDistance)
                 || nowPoint.Y > this.ActualHeight + 5 + ParentTabControl.TabTearTriggerDistance;
             if (isOutsideWindow == true)
             {
                 object viewmodel = draggedTab.Content;
 
-                OnTabRelease(e.GetPosition(this), ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
+
                 RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel));
+                OnTabRelease(e.GetPosition(this), ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
             }
         }
 
@@ -475,17 +476,18 @@ namespace ChromeTabs
                 {
 
                     this.ReleaseMouseCapture();
-                    //  Debug.WriteLine("Releasing mouse capture", "ChromeTabPanel");
                     _hasMouseCapture = false;
                     double offset = 0;
-
-                    if (this.slideIndex < this.originalIndex + 1)
+                    if (this.slideIntervals != null)
                     {
-                        offset = this.slideIntervals[this.slideIndex + 1] - 2 * this.currentTabWidth / 3 + this.overlap;
-                    }
-                    else if (this.slideIndex > this.originalIndex + 1)
-                    {
-                        offset = this.slideIntervals[this.slideIndex - 1] + 2 * this.currentTabWidth / 3 - this.overlap;
+                        if (this.slideIndex < this.originalIndex + 1)
+                        {
+                            offset = this.slideIntervals[this.slideIndex + 1] - 2 * this.currentTabWidth / 3 + this.overlap;
+                        }
+                        else if (this.slideIndex > this.originalIndex + 1)
+                        {
+                            offset = this.slideIntervals[this.slideIndex - 1] + 2 * this.currentTabWidth / 3 - this.overlap;
+                        }
                     }
                     Action completed = () =>
                     {
@@ -501,21 +503,15 @@ namespace ChromeTabs
                             this.addButton.Visibility = System.Windows.Visibility.Visible;
                             _hideAddButton = false;
                             this.InvalidateVisual();
-                            this.UpdateLayout();
                             if (closeTabOnRelease && ParentTabControl.CloseTabCommand != null)
                             {
                                 ParentTabControl.CloseTabCommand.Execute(vm);
-                                if (this.Children.Count > 1)
-                                {
-                                    //this fixes a bug where sometimes tabs got stuck in the wrong position when dragged out very fast.
-                                    RealignAllTabs();
-                                }
                             }
-
-                        }
-                        else
-                        {
-                            Debug.WriteLine("draggedtab is null");
+                            if (this.Children.Count > 1)
+                            {
+                                //this fixes a bug where sometimes tabs got stuck in the wrong position.
+                                RealignAllTabs();
+                            }
                         }
                     };
 
@@ -524,8 +520,6 @@ namespace ChromeTabs
                 }
                 else
                 {
-
-                    //   Debug.WriteLine("mouse is not captured", "ChromeTabPanel");
                     if (this.draggedTab != null)
                     {
                         ParentTabControl.ChangeSelectedItem(this.draggedTab);

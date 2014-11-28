@@ -54,6 +54,10 @@ namespace Demo
                 win.Closed += win_Closed;
                 win.Show();
             }
+            else
+            {
+                Debug.WriteLine(DateTime.Now.ToShortTimeString() + " got window");
+            }
             this._openWindows.Add(win);
             //Use a BeginInvoke to delay the execution slightly, else we can have problems grabbing the newly opened window.
             this.Dispatcher.BeginInvoke(new Action(() =>
@@ -68,10 +72,11 @@ namespace Demo
                     //We position the window at the mouse position
                     win.Left = pt.X - win.Width + 200;
                     win.Top = pt.Y - 20;
-
+                    Debug.WriteLine(DateTime.Now.ToShortTimeString() + " dragging window");
                     if (Mouse.LeftButton == MouseButtonState.Pressed)
                         win.DragMove();//capture the movement to the mouse, so it can be dragged around
                     win.Topmost = false;
+                    win.ReleaseMouseCapture();
                 }));
         }
 
@@ -79,6 +84,7 @@ namespace Demo
         void win_Closed(object sender, EventArgs e)
         {
             this._openWindows.Remove(sender as DockingWindow);
+            Debug.WriteLine(DateTime.Now.ToShortTimeString() + " closed window");
         }
         //We use this to keep track of where the window is on the screen, so we can dock it later
         private void win_LocationChanged(object sender, EventArgs e)
