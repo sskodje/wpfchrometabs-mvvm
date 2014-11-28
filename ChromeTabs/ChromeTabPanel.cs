@@ -54,6 +54,7 @@ namespace ChromeTabs
     [ToolboxItem(false)]
     public class ChromeTabPanel : Panel
     {
+        private const double _stickyReanimateDuration = 0.10;
         private bool _hideAddButton;
         internal bool draggingWindow;
         internal Size finalSize;
@@ -80,7 +81,6 @@ namespace ChromeTabs
         private DateTime _lastMouseDown;
         private object _lockObject = new object();
         private bool _hasMouseCapture;
-        private volatile bool _IsAnimating;
         static ChromeTabPanel()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabPanel), new FrameworkPropertyMetadata(typeof(ChromeTabPanel)));
@@ -249,7 +249,7 @@ namespace ChromeTabs
 
             }
         }
-        internal void StartTabDrag(ChromeTabItem tab = null)
+        internal void StartTabDrag(ChromeTabItem tab = null, bool isTabGrab = false)
         {
             Point downPoint = MouseUtilities.CorrectGetPosition(this);
             // Debug.WriteLine(string.Format("Picking up tab at position {0}", downPoint), "ChromeTabPanel");
@@ -264,10 +264,10 @@ namespace ChromeTabs
             else
                 this.downPoint = downPoint;
 
-            StartTabDrag(downPoint, tab);
+            StartTabDrag(downPoint, tab,isTabGrab);
         }
 
-        internal void StartTabDrag(Point p, ChromeTabItem tab = null)
+        internal void StartTabDrag(Point p, ChromeTabItem tab = null, bool isTabGrab = false)
         {
             if (tab == null)
             {
@@ -298,7 +298,15 @@ namespace ChromeTabs
                     this.downTabBoundsPoint = MouseUtilities.CorrectGetPosition(this.draggedTab);
                     Canvas.SetZIndex(this.draggedTab, 1000);
                     ParentTabControl.ChangeSelectedItem(this.draggedTab);
-                    ProcessMouseMove(new Point(p.X + 0.1, p.Y));
+                    if (isTabGrab)
+                    {
+                        for (int i = 0; i < this.Children.Count; i++)
+                        {
+                            ProcessMouseMove(new Point(p.X + 0.1, p.Y));
+                        }
+                    }
+                    else
+                        ProcessMouseMove(new Point(p.X + 0.1, p.Y));
                 }
                 else if (this.Children.Count == 1)
                 {
@@ -376,10 +384,6 @@ namespace ChromeTabs
                         return;
                     }
                     this.draggedTab.Margin = margin;
-                    if (_IsAnimating)
-                    {
-                        return;
-                    }
                     this.addButton.Visibility = System.Windows.Visibility.Hidden;
                     _hideAddButton = true;
 
@@ -412,10 +416,11 @@ namespace ChromeTabs
                             diff = 2;
                         }
                         ChromeTabItem shiftedTab = this.Children[this.slideIndex - diff] as ChromeTabItem;
+                       
                         if (!shiftedTab.Equals(this.draggedTab))
                         {
                             var offset = changed * (this.currentTabWidth - this.overlap);
-                            StickyReanimate(shiftedTab, offset, 0.10);
+                            StickyReanimate(shiftedTab, offset, _stickyReanimateDuration);
 
                         }
                     }
@@ -448,7 +453,7 @@ namespace ChromeTabs
         }
 
 
-        private void OnTabRelease(Point p, bool closeTabOnRelease, double animationDuration = 0.10)
+        private void OnTabRelease(Point p, bool closeTabOnRelease, double animationDuration = _stickyReanimateDuration)
         {
             lock (_lockObject)
             {
@@ -571,10 +576,8 @@ namespace ChromeTabs
 
         private void Reanimate(ChromeTabItem tab, double left, double duration, Action completed)
         {
-            _IsAnimating = true;
             if (tab == null)
             {
-                _IsAnimating = false;
                 return;
             }
             Thickness offset = new Thickness(left, 0, -left, 0);
@@ -592,7 +595,6 @@ namespace ChromeTabs
                 {
                     completed();
                 }
-                _IsAnimating = false;
             };
             sb.Begin();
         }

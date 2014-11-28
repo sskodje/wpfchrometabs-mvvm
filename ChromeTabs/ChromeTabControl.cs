@@ -219,7 +219,7 @@ namespace ChromeTabs
         {
             ChromeTabPanel p = (ChromeTabPanel)ItemsHost;
             ChromeTabItem item = AsTabItem(viewModel);
-            p.StartTabDrag(item);
+            p.StartTabDrag(item,true);
         }
         protected Panel ItemsHost
         {

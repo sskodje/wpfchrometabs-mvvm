@@ -131,12 +131,12 @@ namespace Demo
         /// <returns></returns>
         private Window FindWindowUnderThisAt(Window source, Point screenPoint)  // WPF units (96dpi), not device units
         {
-            return (
-              from win in SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>())
-              where new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint)
+            var allWindows = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>());
+            var windowsUnderCurrent =               from win in allWindows
+              where ( win.WindowState== System.Windows.WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
               && !Equals(win, source)
-              select win
-            ).FirstOrDefault();
+              select win;
+            return windowsUnderCurrent.FirstOrDefault();
         }
 
         /// <summary>
