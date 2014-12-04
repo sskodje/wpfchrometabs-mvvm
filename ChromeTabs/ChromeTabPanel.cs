@@ -383,6 +383,9 @@ namespace ChromeTabs
                         return;
                     }
                     this.draggedTab.Margin = margin;
+                    //We return on small marging changes to avoid the tabs jumping around when quickly clicking between tabs.
+                    if (Math.Abs(this.draggedTab.Margin.Left) < 10)
+                        return;
                     this.addButton.Visibility = System.Windows.Visibility.Hidden;
                     _hideAddButton = true;
 
