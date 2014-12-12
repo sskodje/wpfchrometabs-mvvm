@@ -59,16 +59,12 @@ namespace Demo
                 Debug.WriteLine(DateTime.Now.ToShortTimeString() + " got window");
             }
             this._openWindows.Add(win);
+            Debug.WriteLine(e.CursorPosition);
             //Use a BeginInvoke to delay the execution slightly, else we can have problems grabbing the newly opened window.
             this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     win.Topmost = true;
-                    W32Point pt = new W32Point();
-                    if (!Win32.GetCursorPos(ref pt))
-                    {
-                        Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
-                    }
-
+                    Point pt = e.CursorPosition;
                     //We position the window at the mouse position
                     win.Left = pt.X - win.Width + 200;
                     win.Top = pt.Y - 20;
@@ -97,14 +93,14 @@ namespace Demo
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
-            Point p = new Point(pt.X, pt.Y);
+           
+            Point absoluteScreenPos = new Point(pt.X, pt.Y);
 
-            var absoluteScreenPos = p;
             var windowUnder = FindWindowUnderThisAt(win, absoluteScreenPos);
 
             if (windowUnder != null && windowUnder.Equals(this))
             {
-                Point relativePoint = this.PointFromScreen(p);//The screen position relative to the main window
+                Point relativePoint = this.PointFromScreen(absoluteScreenPos);//The screen position relative to the main window
                 FrameworkElement element = this.MyChromeTabControl.InputHitTest(relativePoint) as FrameworkElement;//Hit test against the tab control
 
                 if (element != null)
@@ -138,10 +134,10 @@ namespace Demo
         private Window FindWindowUnderThisAt(Window source, Point screenPoint)  // WPF units (96dpi), not device units
         {
             var allWindows = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>());
-            var windowsUnderCurrent =               from win in allWindows
-              where ( win.WindowState== System.Windows.WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
-              && !Equals(win, source)
-              select win;
+            var windowsUnderCurrent = from win in allWindows
+                                      where (win.WindowState == System.Windows.WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
+                                      && !Equals(win, source)
+                                      select win;
             return windowsUnderCurrent.FirstOrDefault();
         }
 

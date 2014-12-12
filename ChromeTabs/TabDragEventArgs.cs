@@ -10,7 +10,8 @@ namespace ChromeTabs
     public class TabDragEventArgs : RoutedEventArgs
     {
         public object Tab { get; set; }
-        public TabDragEventArgs(RoutedEvent routedEvent, object tab) : base(routedEvent) { this.Tab = tab; }
-        public TabDragEventArgs(RoutedEvent routedEvent, object source, object tab) : base(routedEvent, source) { this.Tab = tab; }
+        public Point CursorPosition { get; set; }
+        public TabDragEventArgs(RoutedEvent routedEvent, object tab, Point cursorPos) : base(routedEvent) { this.Tab = tab; this.CursorPosition = cursorPos; }
+        public TabDragEventArgs(RoutedEvent routedEvent, object source, object tab, Point cursorPos) : base(routedEvent, source) { this.Tab = tab; this.CursorPosition = cursorPos; }
     }
 }

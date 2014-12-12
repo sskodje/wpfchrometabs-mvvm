@@ -212,7 +212,7 @@ namespace ChromeTabs
                 {
                     return;
                 }
-
+                
                 if (this.addButtonRect.Contains(e.GetPosition(this)))
                 {
                     this.addButton.Background = Brushes.DarkGray;
@@ -221,8 +221,6 @@ namespace ChromeTabs
                 }
 
                 DependencyObject originalSource = e.OriginalSource as DependencyObject;
-
-
 
                 bool isButton = false;
                 while (true)
@@ -268,6 +266,7 @@ namespace ChromeTabs
 
         internal void StartTabDrag(Point p, ChromeTabItem tab = null, bool isTabGrab = false)
         {
+            this._lastMouseDown = DateTime.UtcNow;
             if (tab == null)
             {
                 HitTestResult result = VisualTreeHelper.HitTest(this, this.downPoint);
@@ -317,7 +316,6 @@ namespace ChromeTabs
                     }
                 }
             }
-            this._lastMouseDown = DateTime.UtcNow;
         }
 
         private void ProcessMouseMove(Point p)
@@ -435,22 +433,20 @@ namespace ChromeTabs
             base.OnPreviewMouseMove(e);
             ProcessMouseMove(e.GetPosition(this));
 
-            if (this.draggedTab == null)
+            if (this.draggedTab == null || DateTime.UtcNow.Subtract(_lastMouseDown).TotalMilliseconds < 50)
             {
                 return;
             }
             Window parentWindow = Window.GetWindow(this);
             Point nowPoint = e.GetPosition(parentWindow);
-            bool isOutsideWindow = nowPoint.X < 0-ParentTabControl.TabTearTriggerDistance
+            bool isOutsideTabPanel = nowPoint.X < 0-ParentTabControl.TabTearTriggerDistance
                 || nowPoint.X > parentWindow.ActualWidth+ParentTabControl.TabTearTriggerDistance
                 || nowPoint.Y < -(this.ActualHeight + ParentTabControl.TabTearTriggerDistance)
                 || nowPoint.Y > this.ActualHeight + 5 + ParentTabControl.TabTearTriggerDistance;
-            if (isOutsideWindow == true)
+            if (isOutsideTabPanel == true && Mouse.LeftButton== MouseButtonState.Pressed)
             {
                 object viewmodel = draggedTab.Content;
-
-
-                RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel));
+                RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel,this.PointToScreen(e.GetPosition(this))));
                 OnTabRelease(e.GetPosition(this), ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
             }
         }
@@ -548,7 +544,6 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonUp(e);
-
             OnTabRelease(e.GetPosition(this), false);
         }
 
