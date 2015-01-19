@@ -98,14 +98,6 @@ namespace ChromeTabs
             set { SetValue(ReorderTabsCommandProperty, value); }
         }
 
-        public static DependencyProperty ReorderTabsCommandParameterProperty =
-    DependencyProperty.Register("ReorderTabsCommandParameter", typeof(object), typeof(ChromeTabControl));
-        public object ReorderTabsCommandParameter
-        {
-            get { return GetValue(ReorderTabsCommandParameterProperty); }
-            set { SetValue(ReorderTabsCommandParameterProperty, value); }
-        }
-
         // Provide CLR accessors for the event
         public event TabDragEventHandler TabDraggedOutsideBonds
         {
@@ -199,7 +191,6 @@ namespace ChromeTabs
         public static readonly DependencyProperty TabTearTriggerDistanceProperty =
             DependencyProperty.Register("TabTearTriggerDistance", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(0.0));
 
-
         static ChromeTabControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
@@ -219,7 +210,7 @@ namespace ChromeTabs
         {
             ChromeTabPanel p = (ChromeTabPanel)ItemsHost;
             ChromeTabItem item = AsTabItem(viewModel);
-            p.StartTabDrag(item,true);
+            p.StartTabDrag(item, true);
         }
         protected Panel ItemsHost
         {
@@ -308,8 +299,7 @@ namespace ChromeTabs
             object fromTab = this.Items[fromIndex];
             if (this.ReorderTabsCommand != null)
             {
-                ReorderTabsCommandParameter = new TabReorder(fromIndex, toIndex);
-                this.ReorderTabsCommand.Execute(ReorderTabsCommandParameter);
+                this.ReorderTabsCommand.Execute(new TabReorder(fromIndex, toIndex));
             }
 
             for (int i = 0; i < this.Items.Count; i += 1)

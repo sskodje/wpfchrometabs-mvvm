@@ -252,8 +252,8 @@ namespace ChromeTabs
             // Debug.WriteLine(string.Format("Picking up tab at position {0}", downPoint), "ChromeTabPanel");
             if (tab != null)
             {
-                this.InvalidateMeasure();
-                this.InvalidateArrange();
+                //this.InvalidateMeasure();
+                //this.InvalidateArrange();
                 this.UpdateLayout();
                 double index = ((this.currentTabWidth - overlap) * tab.Index) + (this.currentTabWidth / 2);
                 this.downPoint = new Point(index, downPoint.Y);
