@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -45,39 +46,56 @@ namespace Demo
             if (draggedTab is TabClass3)
                 return;//We don't want out TabClass3 to form new windows, so we stop it here.
             DockingWindow win = _openWindows.FirstOrDefault(x => x.DataContext == draggedTab);//check if it's already open
+
             if (win == null)//If not, create a new one
             {
                 win = new DockingWindow();
                 win.Title = draggedTab.TabName;
                 win.DataContext = draggedTab;
-                win.LocationChanged += win_LocationChanged;
                 win.Closed += win_Closed;
+                win.Loaded += win_Loaded;
+                win.LocationChanged += win_LocationChanged;
+                win.Tag = e.CursorPosition;
                 win.Show();
             }
             else
             {
                 Debug.WriteLine(DateTime.Now.ToShortTimeString() + " got window");
+                MoveWindow(win, e.CursorPosition);
             }
             this._openWindows.Add(win);
             Debug.WriteLine(e.CursorPosition);
-            //Use a BeginInvoke to delay the execution slightly, else we can have problems grabbing the newly opened window.
-            this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    win.Topmost = true;
-                    Point pt = e.CursorPosition;
-                    //We position the window at the mouse position
-                    win.Left = pt.X - win.Width + 200;
-                    win.Top = pt.Y - 20;
-                    Debug.WriteLine(DateTime.Now.ToShortTimeString() + " dragging window");
-                    if (Mouse.LeftButton == MouseButtonState.Pressed)
-                        win.DragMove();//capture the movement to the mouse, so it can be dragged around
-                    win.Topmost = false;
-                    win.ReleaseMouseCapture();
-                }));
         }
 
+        private void win_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window win = (Window)sender;
+            Point cursorPosition = (Point)win.Tag;
+            MoveWindow(win, cursorPosition);
+        }
+        private void MoveWindow(Window win, Point pt)
+        {
+            //Use a BeginInvoke to delay the execution slightly, else we can have problems grabbing the newly opened window.
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+
+                win.Loaded -= win_Loaded;
+                win.Topmost = true;
+                //We position the window at the mouse position
+                win.Left = pt.X - win.Width + 200;
+                win.Top = pt.Y - 20;
+                Debug.WriteLine(DateTime.Now.ToShortTimeString() + " dragging window");
+
+                if (Mouse.LeftButton == MouseButtonState.Pressed)
+                {
+                    win.DragMove();//capture the movement to the mouse, so it can be dragged around
+                }
+
+                win.Topmost = false;
+            }));
+        }
         //remove the window from the open windows collection when it is closed.
-        void win_Closed(object sender, EventArgs e)
+        private void win_Closed(object sender, EventArgs e)
         {
             this._openWindows.Remove(sender as DockingWindow);
             Debug.WriteLine(DateTime.Now.ToShortTimeString() + " closed window");
@@ -93,7 +111,7 @@ namespace Demo
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
-           
+
             Point absoluteScreenPos = new Point(pt.X, pt.Y);
 
             var windowUnder = FindWindowUnderThisAt(win, absoluteScreenPos);
@@ -105,14 +123,17 @@ namespace Demo
 
                 if (element != null)
                 {
+                    object child = LogicalTreeHelper.GetChildren(element).Cast<object>().FirstOrDefault(x => x is ChromeTabPanel);
                     ChromeTabItem tabItem = element.TemplatedParent as ChromeTabItem;
-
-                    if (element is ChromeTabPanel || tabItem != null)
+                    //test if the mouse is over the tab panel or a tab item.
+                    if (child!=null ||tabItem!=null)
                     {
+
                         ITab dockedWindowVM = (ITab)win.DataContext;
                         ViewModelMainWindow mainWindowVm = (ViewModelMainWindow)this.DataContext;
 
                         mainWindowVm.ItemCollection.Add(dockedWindowVM);
+                      
                         win.Close();
 
                         mainWindowVm.SelectedTab = dockedWindowVM;

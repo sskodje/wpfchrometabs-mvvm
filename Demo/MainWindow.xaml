@@ -28,6 +28,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        <!--The tab control with all possible settings displayed, and with tab tearing support.-->
         <ct:ChromeTabControl x:Name="MyChromeTabControl"
                              Background="AliceBlue"
                              ItemsSource="{Binding ItemCollection}"
@@ -37,11 +38,33 @@
                              IsAddButtonVisible="{Binding ShowAddButton}"
                              CloseTabWhenDraggedOutsideBonds="{Binding SelectedTab, Converter={StaticResource TabToTabSnapConverter}}"
                              AddTabCommand="{Binding AddTabCommand}"
-                             DragWindowWithOneTab="true"
+                             DragWindowWithOneTab="True"
                              CloseTabCommand="{Binding CloseTabCommand}"
                              ReorderTabsCommand="{Binding ReorderTabsCommand}"
                              TabTearTriggerDistance="10"
                              TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
+            <!--We override the control template here to show how you can modify the properties of tab panel and content presenter-->
+            <ct:ChromeTabControl.Template>
+                <ControlTemplate TargetType="{x:Type ct:ChromeTabControl}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderThickness="0,0,0,1"
+                                BorderBrush="#FF999999"
+                                Padding="10,5,10,0">
+                            <ct:ChromeTabPanel IsItemsHost="True" />
+                        </Border>
+                        <Grid Grid.Row="1">
+                            <Border Background="WhiteSmoke">
+                                <ContentPresenter Content="{TemplateBinding SelectedContent}" />
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </ct:ChromeTabControl.Template>
             <!--We must override the item template to show our tab name in the header. Here we use a simple
             textblock, but you could put any combination of controls here. Uncomment the orange border to shows
             the bounds of the header content presenter-->

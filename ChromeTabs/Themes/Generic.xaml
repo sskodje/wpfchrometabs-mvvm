@@ -3,6 +3,7 @@
                     xmlns:local="clr-namespace:ChromeTabs"
                     xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
     <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:ChromeTabPanel}, ResourceId=addButtonStyle}"
            TargetType="{x:Type Button}">
         <Setter Property="Template">
@@ -90,9 +91,12 @@
                             <RowDefinition Height="25" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <local:ChromeTabPanel IsItemsHost="True"
-                                              Background="{TemplateBinding Background}">
-                        </local:ChromeTabPanel>
+                        <Border BorderThickness="0,0,0,1"
+                                BorderBrush="#FF999999">
+                            <local:ChromeTabPanel IsItemsHost="True"
+                                                  Background="{TemplateBinding Background}">
+                            </local:ChromeTabPanel>
+                        </Border>
                         <Grid Grid.Row="1">
                             <ContentPresenter Content="{TemplateBinding SelectedContent}" />
                         </Grid>

@@ -195,7 +195,7 @@ namespace ChromeTabs
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
         }
-
+  
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChromeTabControl ctc = (ChromeTabControl)d;
@@ -350,8 +350,6 @@ namespace ChromeTabs
 
             this.SetChildrenZ();
         }
-
-
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {

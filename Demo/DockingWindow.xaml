@@ -4,7 +4,10 @@
         xmlns:local="clr-namespace:Demo"
         xmlns:usercontrols="clr-namespace:Demo.UserControls"
         xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
-        Title="DockingWindow" Height="400" Width="400">
+        Title="DockingWindow"
+        Height="400"
+        Width="400"
+        Loaded="Window_Loaded">
     <Window.Resources>
         <DataTemplate DataType="{x:Type local:TabClass1}">
             <usercontrols:UserControl1 />
@@ -15,8 +18,17 @@
         <DataTemplate DataType="{x:Type local:TabClass3}">
             <usercontrols:UserControl3 />
         </DataTemplate>
+        <Storyboard x:Key="FadeInContentAnim">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility"
+                                           Storyboard.TargetName="ContentControl">
+                <DiscreteObjectKeyFrame Value="{x:Static Visibility.Visible}"
+                                        KeyTime="0:0:0.1" />
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
     </Window.Resources>
     <Grid>
-        <ContentControl Content="{Binding}" />
+        <ContentControl x:Name="ContentControl"
+                        Visibility="Collapsed"
+                        Content="{Binding}" />
     </Grid>
 </Window>
