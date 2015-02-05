@@ -122,9 +122,6 @@ namespace ChromeTabs
             DependencyProperty.Register("CloseTabWhenDraggedOutsideBonds", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(false));
 
 
-
-
-
         public bool IsAddButtonVisible
         {
             get { return (bool)GetValue(IsAddButtonVisibleProperty); }
@@ -195,7 +192,7 @@ namespace ChromeTabs
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
         }
-  
+
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChromeTabControl ctc = (ChromeTabControl)d;
@@ -292,7 +289,7 @@ namespace ChromeTabs
 
         internal void MoveTab(int fromIndex, int toIndex)
         {
-            if (this.Items.Count == 0 || fromIndex == toIndex)
+            if (this.Items.Count == 0 || fromIndex == toIndex || fromIndex >= this.Items.Count)
             {
                 return;
             }

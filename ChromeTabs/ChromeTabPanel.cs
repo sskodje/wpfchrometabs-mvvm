@@ -96,7 +96,7 @@ namespace ChromeTabs
             ComponentResourceKey key = new ComponentResourceKey(typeof(ChromeTabPanel), "addButtonStyle");
             Style addButtonStyle = (Style)this.FindResource(key);
             this.addButton = new Button { Style = addButtonStyle };
-            this.addButtonSize = new Size(20, 12);
+            this.addButtonSize = new Size(20, 12);       
         }
 
         protected override int VisualChildrenCount

@@ -7,7 +7,8 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <StackPanel Margin="30,10">
-            <Label Content="{Binding TabName}" FontSize="18" />
+            <Label Content="{Binding TabName}"
+                   FontSize="18" />
             <TextBlock Text="{Binding MyStringContent}" />
         </StackPanel>
     </Grid>

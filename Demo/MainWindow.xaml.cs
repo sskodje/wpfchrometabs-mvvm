@@ -126,7 +126,7 @@ namespace Demo
                     object child = LogicalTreeHelper.GetChildren(element).Cast<object>().FirstOrDefault(x => x is ChromeTabPanel);
                     ChromeTabItem tabItem = element.TemplatedParent as ChromeTabItem;
                     //test if the mouse is over the tab panel or a tab item.
-                    if (child!=null ||tabItem!=null)
+                    if (element is ChromeTabPanel || child!=null ||tabItem!=null)
                     {
 
                         ITab dockedWindowVM = (ITab)win.DataContext;

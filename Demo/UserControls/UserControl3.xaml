@@ -15,6 +15,5 @@
             <Image Source="{Binding MyImageUrl}"
                     Stretch="Uniform"/>
         </StackPanel>
-
     </Grid>
 </UserControl>
