@@ -329,16 +329,22 @@ namespace ChromeTabs
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            bool somethingSelected = false;
-            foreach (UIElement element in this.Items)
+            SetInitialSelection();
+            KeyboardNavigation.SetIsTabStop(this, false);
+        }
+
+        protected void SetInitialSelection()
+        {
+            bool? somethingSelected = null;
+            foreach (object element in this.Items)
             {
-                somethingSelected |= ChromeTabItem.GetIsSelected(element);
+                if (element is DependencyObject)
+                    somethingSelected |= ChromeTabItem.GetIsSelected((DependencyObject)element);
             }
-            if (!somethingSelected)
+            if (somethingSelected.HasValue && somethingSelected.Value == false)
             {
                 this.SelectedIndex = 0;
             }
-            KeyboardNavigation.SetIsTabStop(this, false);
         }
 
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
@@ -400,7 +406,7 @@ namespace ChromeTabs
             }
         }
 
-        internal ChromeTabItem AsTabItem(object item)
+        protected ChromeTabItem AsTabItem(object item)
         {
             ChromeTabItem tabItem = item as ChromeTabItem;
             if (tabItem == null && item != null && this.ObjectToContainer.ContainsKey(item))
@@ -422,7 +428,7 @@ namespace ChromeTabs
             }
         }
 
-        private void SetChildrenZ()
+        protected void SetChildrenZ()
         {
             int zindex = this.Items.Count - 1;
             foreach (object element in this.Items)

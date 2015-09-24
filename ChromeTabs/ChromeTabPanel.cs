@@ -55,7 +55,8 @@ namespace ChromeTabs
     [ToolboxItem(false)]
     public class ChromeTabPanel : Panel
     {
-        private const double _stickyReanimateDuration = 0.10;
+        private const double stickyReanimateDuration = 0.10;
+        private const double tabWidthSlidePercent = 0.5;
         private bool _hideAddButton;
         internal bool draggingWindow;
         internal Size finalSize;
@@ -96,7 +97,7 @@ namespace ChromeTabs
             ComponentResourceKey key = new ComponentResourceKey(typeof(ChromeTabPanel), "addButtonStyle");
             Style addButtonStyle = (Style)this.FindResource(key);
             this.addButton = new Button { Style = addButtonStyle };
-            this.addButtonSize = new Size(20, 12);       
+            this.addButtonSize = new Size(20, 12);
         }
 
         protected override int VisualChildrenCount
@@ -188,6 +189,11 @@ namespace ChromeTabs
         {
             base.OnInitialized(e);
             this.SetTabItemsOnTabs();
+            if (Children.Count > 0)
+            {
+                if (Children[0] is ChromeTabItem)
+                    ParentTabControl.ChangeSelectedItem(Children[0] as ChromeTabItem);
+            }
         }
 
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
@@ -214,7 +220,7 @@ namespace ChromeTabs
                 }
 
 
-                
+
                 //Check if we clicked the close button, and return if we do.
                 DependencyObject originalSource = e.OriginalSource as DependencyObject;
                 bool isButton = false;
@@ -256,29 +262,41 @@ namespace ChromeTabs
             StartTabDrag(downPoint, tab, isTabGrab);
         }
 
+        private ChromeTabItem GetTabFromMousePosition(Point mousePoint)
+        {
+            DependencyObject source = GetVisualItemFromMousePosition(mousePoint);
+            while (source != null && !this.Children.Contains(source as UIElement))
+            {
+                source = VisualTreeHelper.GetParent(source);
+            }
+            return source as ChromeTabItem;
+        }
+        private DependencyObject GetVisualItemFromMousePosition(Point mousePoint)
+        {
+            HitTestResult result = VisualTreeHelper.HitTest(this, mousePoint);
+            if (result == null) { return null; }
+            DependencyObject source = result.VisualHit;
+
+            if (source == null)
+            {
+                return null;
+            }
+            return source;
+        }
+
         internal void StartTabDrag(Point p, ChromeTabItem tab = null, bool isTabGrab = false)
         {
             this._lastMouseDown = DateTime.UtcNow;
             if (tab == null)
             {
-                HitTestResult result = VisualTreeHelper.HitTest(this, this.downPoint);
-                if (result == null) { return; }
-                DependencyObject source = result.VisualHit;
-                while (source != null && !this.Children.Contains(source as UIElement))
-                {
-                    source = VisualTreeHelper.GetParent(source);
-                }
-                if (source == null)
-                {
-                    //The mouse is not over a tab item, so just return.
-                    return;
-                }
-                this.draggedTab = source as ChromeTabItem;
+                tab = GetTabFromMousePosition(this.downPoint);
             }
-            else if (tab != null)
+
+            if (tab != null)
                 this.draggedTab = tab;
             else
             {
+                //The mouse is not over a tab item, so just return.
                 return;
             }
 
@@ -305,8 +323,8 @@ namespace ChromeTabs
                             ProcessMouseMove(new Point(p.X + 0.1, p.Y));
                         }
                     }
-                    else
-                        ProcessMouseMove(new Point(p.X + 0.1, p.Y));
+                    //else
+                    //    ProcessMouseMove(new Point(p.X + 0.1, p.Y));
                 }
 
             }
@@ -351,7 +369,7 @@ namespace ChromeTabs
                     {
                         var diff = i - this.slideIndex;
                         var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
-                        var bound = Math.Min(1, Math.Abs(diff)) * ((sign * this.currentTabWidth / 3) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (this.currentTabWidth - this.overlap)));
+                        var bound = Math.Min(1, Math.Abs(diff)) * ((sign * this.currentTabWidth * tabWidthSlidePercent) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (this.currentTabWidth - this.overlap)));
                         this.slideIntervals.Add(bound);
                     }
                     this.slideIntervals.Add(double.PositiveInfinity);
@@ -416,7 +434,7 @@ namespace ChromeTabs
                         if (!shiftedTab.Equals(this.draggedTab))
                         {
                             var offset = changed * (this.currentTabWidth - this.overlap);
-                            StickyReanimate(shiftedTab, offset, _stickyReanimateDuration);
+                            StickyReanimate(shiftedTab, offset, stickyReanimateDuration);
 
                         }
                     }
@@ -449,7 +467,7 @@ namespace ChromeTabs
         }
 
 
-        private void OnTabRelease(Point p, bool closeTabOnRelease, double animationDuration = _stickyReanimateDuration)
+        private void OnTabRelease(Point p, bool closeTabOnRelease, double animationDuration = stickyReanimateDuration)
         {
             lock (_lockObject)
             {
@@ -470,20 +488,20 @@ namespace ChromeTabs
                 }
                 if (this.IsMouseCaptured)
                 {
-
                     this.ReleaseMouseCapture();
                     double offset = 0;
                     if (this.slideIntervals != null)
                     {
                         if (this.slideIndex < this.originalIndex + 1)
                         {
-                            offset = this.slideIntervals[this.slideIndex + 1] - 2 * this.currentTabWidth / 3 + this.overlap;
+                            offset = this.slideIntervals[this.slideIndex + 1] - this.currentTabWidth * (1 - tabWidthSlidePercent) + this.overlap;
                         }
                         else if (this.slideIndex > this.originalIndex + 1)
                         {
-                            offset = this.slideIntervals[this.slideIndex - 1] + 2 * this.currentTabWidth / 3 - this.overlap;
+                            offset = this.slideIntervals[this.slideIndex - 1] + this.currentTabWidth * (1 - tabWidthSlidePercent) - this.overlap;
                         }
                     }
+                    int localSlideIndex = this.slideIndex;
                     Action completed = () =>
                     {
                         if (this.draggedTab != null)
@@ -493,7 +511,7 @@ namespace ChromeTabs
                             this.draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
                             this.draggedTab = null;
                             this.captureGuard = 0;
-                            ParentTabControl.MoveTab(this.originalIndex, this.slideIndex - 1);
+                            ParentTabControl.MoveTab(this.originalIndex, localSlideIndex - 1);
                             this.slideIntervals = null;
                             this.addButton.Visibility = System.Windows.Visibility.Visible;
                             _hideAddButton = false;
@@ -512,7 +530,6 @@ namespace ChromeTabs
                     };
 
                     Reanimate(this.draggedTab, offset, animationDuration, completed);
-
                 }
                 else
                 {
@@ -532,7 +549,7 @@ namespace ChromeTabs
         {
             for (int i = 0; i < this.Children.Count; i++)
             {
-                var shiftedTab = parent.AsTabItem(this.Children[i]);
+                var shiftedTab = this.Children[i] as ChromeTabItem;
                 var offset = 1 * (this.currentTabWidth - this.overlap);
                 shiftedTab.Margin = new Thickness(0, 0, 0, 0);
             }
