@@ -73,6 +73,17 @@ namespace ChromeTabs
             set { SetValue(CloseTabCommandProperty, value); }
         }
 
+        public static readonly DependencyProperty PinTabCommandProperty =
+    DependencyProperty.Register(
+       "PinTabCommand",
+       typeof(ICommand),
+       typeof(ChromeTabControl));
+
+        public ICommand PinTabCommand
+        {
+            get { return (ICommand)GetValue(PinTabCommandProperty); }
+            set { SetValue(PinTabCommandProperty, value); }
+        }
 
         public static readonly DependencyProperty AddTabCommandProperty =
     DependencyProperty.Register(
@@ -108,6 +119,19 @@ namespace ChromeTabs
         // Using a RoutedEvent
         public static readonly RoutedEvent TabDraggedOutsideBondsEvent = EventManager.RegisterRoutedEvent(
             "TabDraggedOutsideBonds", RoutingStrategy.Bubble, typeof(TabDragEventHandler), typeof(ChromeTabControl));
+
+
+
+        // Provide CLR accessors for the event
+        public event ContainerOverrideEventHandler ContainerItemPreparedForOverride
+        {
+            add { AddHandler(ContainerItemPreparedForOverrideEvent, value); }
+            remove { RemoveHandler(ContainerItemPreparedForOverrideEvent, value); }
+        }
+
+        // Using a RoutedEvent
+        public static readonly RoutedEvent ContainerItemPreparedForOverrideEvent = EventManager.RegisterRoutedEvent(
+            "ContainerItemPreparedForOverride", RoutingStrategy.Bubble, typeof(ContainerOverrideEventHandler), typeof(ChromeTabControl));
 
 
 
@@ -175,6 +199,65 @@ namespace ChromeTabs
             DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(null, new PropertyChangedCallback(SelectedTabBrushPropertyCallback)));
 
 
+
+
+        public double MinimumTabWidth
+        {
+            get { return (double)GetValue(MinimumTabWidthProperty); }
+            set { SetValue(MinimumTabWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MinimumTabWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MinimumTabWidthProperty =
+            DependencyProperty.Register("MinimumTabWidth", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(40.0, OnMinimumTabWidthPropertyChanged));
+
+        private static void OnMinimumTabWidthPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChromeTabControl ctc = (ChromeTabControl)d;
+            ctc.CoerceValue(PinnedTabWidthProperty);
+            ctc.CoerceValue(MaximumTabWidthProperty);
+        }
+
+        public double MaximumTabWidth
+        {
+            get { return (double)GetValue(MaximumTabWidthProperty); }
+            set { SetValue(MaximumTabWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MaximumTabWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MaximumTabWidthProperty =
+            DependencyProperty.Register("MaximumTabWidth", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(125.0,null,OnCoerceMaximumTabWidth));
+
+        private static object OnCoerceMaximumTabWidth(DependencyObject d, object baseValue)
+        {
+            ChromeTabControl ctc = (ChromeTabControl)d;
+
+            if ((double)baseValue <= ctc.MinimumTabWidth)
+                return ctc.MinimumTabWidth+1;
+            else
+                return baseValue;
+        }
+
+        public double PinnedTabWidth
+        {
+            get { return (double)GetValue(PinnedTabWidthProperty); }
+            set { SetValue(PinnedTabWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for PinnedTabWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PinnedTabWidthProperty =
+            DependencyProperty.Register("PinnedTabWidth", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(40.0, null, OnCoercePinnedTabWidth));
+
+        private static object OnCoercePinnedTabWidth(DependencyObject d, object baseValue)
+        {
+            ChromeTabControl ctc = (ChromeTabControl)d;
+
+            if (ctc.MinimumTabWidth > (double)baseValue)
+                return ctc.MinimumTabWidth;
+            else
+                return baseValue;
+        }
+
         /// <summary>
         /// The extra pixel distance you need to drag up or down the tab before the tab tears out.
         /// </summary>
@@ -187,6 +270,7 @@ namespace ChromeTabs
         // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TabTearTriggerDistanceProperty =
             DependencyProperty.Register("TabTearTriggerDistance", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(0.0));
+
 
         static ChromeTabControl()
         {
@@ -219,7 +303,7 @@ namespace ChromeTabs
             }
         }
 
-        public void AddTab()
+        internal void AddTab()
         {
             if (!CanAddTab)
             {
@@ -229,19 +313,26 @@ namespace ChromeTabs
                 this.AddTabCommand.Execute(null);
         }
 
-        public bool CanAddTab
+        internal bool CanAddTab
         {
             get { return (bool)GetValue(CanAddTabProperty); }
         }
 
-        public void RemoveTab(object tab)
+        internal void RemoveTab(object tab)
         {
             ChromeTabItem removeItem = this.AsTabItem(tab);
             if (CloseTabCommand != null)
                 CloseTabCommand.Execute(removeItem.DataContext);
         }
 
-        public void RemoveAllTabs(object exceptThis = null)
+        internal void PinTab(object tab)
+        {
+            ChromeTabItem removeItem = this.AsTabItem(tab);
+            if (PinTabCommand != null)
+                PinTabCommand.Execute(removeItem.DataContext);
+        }
+
+        internal void RemoveAllTabs(object exceptThis = null)
         {
             var objects = this.ItemsSource.Cast<object>().Where(x => x != exceptThis).ToList();
             foreach (object obj in objects)
@@ -294,6 +385,13 @@ namespace ChromeTabs
                 return;
             }
             object fromTab = this.Items[fromIndex];
+            object toTab = this.Items[toIndex];
+            ChromeTabItem fromItem = AsTabItem(fromTab);
+            ChromeTabItem toItem = AsTabItem(toTab);
+            if (fromItem.IsPinned && !toItem.IsPinned)
+                return;
+            if (!fromItem.IsPinned && toItem.IsPinned)
+                return;
             if (this.ReorderTabsCommand != null)
             {
                 this.ReorderTabsCommand.Execute(new TabReorder(fromIndex, toIndex));
@@ -318,7 +416,6 @@ namespace ChromeTabs
             if (this.SelectedTabBrush != null)
                 tab.SelectedTabBrush = this.SelectedTabBrush;
             return tab;
-
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)
@@ -404,6 +501,7 @@ namespace ChromeTabs
                 this.ObjectToContainer[item] = element;
                 this.SetChildrenZ();
             }
+            RaiseEvent(new ContainerOverrideEventArgs(ChromeTabControl.ContainerItemPreparedForOverrideEvent, this, item, AsTabItem(element)));
         }
 
         protected ChromeTabItem AsTabItem(object item)

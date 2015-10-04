@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <ExpressionBlendVersion>12.0.60617.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -65,11 +66,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChromeTabControlEx.cs" />
+    <Compile Include="Converters\BooleanToPinTabTextConverter.cs" />
+    <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\TabToTabSnapConverter.cs" />
     <Compile Include="DockingWindow.xaml.cs">
       <DependentUpon>DockingWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel\ITab.cs" />
+    <Compile Include="PinnedTabExampleWindow.xaml.cs">
+      <DependentUpon>PinnedTabExampleWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SampleData\SampleViewModelMainWindow.cs" />
+    <Compile Include="SampleData\SampleViewModelPinnedTabExampleWindow.cs" />
+    <Compile Include="ViewModel\IViewModelMainWindow.cs" />
+    <Compile Include="ViewModel\IViewModelPinnedTabExampleWindow.cs" />
+    <Compile Include="ViewModel\TabBase.cs" />
     <Compile Include="ViewModel\TabClass1.cs" />
     <Compile Include="ViewModel\TabClass2.cs" />
     <Compile Include="ViewModel\TabClass3.cs" />
@@ -83,8 +94,10 @@
       <DependentUpon>UserControl3.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Win32.cs" />
+    <Compile Include="ViewModel\ViewModelExampleBase.cs" />
     <Compile Include="ViewModel\ViewModelMainWindow.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="ViewModel\ViewModelPinnedTabExampleWindow.cs" />
     <Page Include="DockingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -101,6 +114,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PinnedTabExampleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\UserControl1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -148,6 +165,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\kitten.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\1.png" />
+    <Resource Include="Resources\2.png" />
+    <Resource Include="Resources\3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

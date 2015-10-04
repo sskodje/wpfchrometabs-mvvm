@@ -1,20 +1,18 @@
-﻿<Window x:Name="window"
-        x:Class="Demo.MainWindow"
+﻿<Window x:Class="Demo.PinnedTabExampleWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ChromeTabs Demo"
-        Height="600"
-        Width="600"
         xmlns:local="clr-namespace:Demo"
-        xmlns:vm="clr-namespace:Demo.ViewModel"
-        xmlns:usercontrols="clr-namespace:Demo.UserControls"
         xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
+        xmlns:usercontrols="clr-namespace:Demo.UserControls"
+        xmlns:vm="clr-namespace:Demo.ViewModel"
         xmlns:conv="clr-namespace:Demo.Converters"
-        Background="WhiteSmoke"
-        DataContext="{Binding Source={StaticResource Locator},Path=ViewModelMainWindow}">
-    <!--These DataTemplates load the correct user control based on the viewmodel-->
+        Title="PinnedTabExample"
+        Height="500"
+        Width="500"
+        DataContext="{Binding Source={StaticResource Locator},Path=VieWModelPinnedTabExampleWindow}">
     <Window.Resources>
-        <conv:TabToTabSnapConverter x:Key="TabToTabSnapConverter" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <conv:BooleanToPinTabTextConverter x:Key="BooleanToPinTabTextConverter" />
         <DataTemplate DataType="{x:Type vm:TabClass1}">
             <usercontrols:UserControl1 />
         </DataTemplate>
@@ -26,25 +24,18 @@
         </DataTemplate>
     </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
-        <!--The tab control with all possible settings displayed, and with tab tearing support.-->
-        <ct:ChromeTabControl x:Name="MyChromeTabControl"
-                                  Background="AliceBlue"
-                                  ItemsSource="{Binding ItemCollection}"
-                                  SelectedItem="{Binding SelectedTab}"
-                                  SelectedTabBrush="WhiteSmoke"
-                                  CanMoveTabs="{Binding CanMoveTabs}"
-                                  DragWindowWithOneTab="True"
-                                  IsAddButtonVisible="{Binding ShowAddButton}"
-                                  CloseTabWhenDraggedOutsideBonds="{Binding SelectedTab, Converter={StaticResource TabToTabSnapConverter}}"
-                                  AddTabCommand="{Binding AddTabCommand}"
-                                  CloseTabCommand="{Binding CloseTabCommand}"
-                                  ReorderTabsCommand="{Binding ReorderTabsCommand}"
-                                  TabTearTriggerDistance="10"
-                                  TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
+        <ct:ChromeTabControl  x:Name="MyChromeTabControlWithPinnedTabs"
+                              Background="AliceBlue"
+                              ItemsSource="{Binding ItemCollection}"
+                              SelectedItem="{Binding SelectedTab}"
+                              AddTabCommand="{Binding AddTabCommand}"
+                              PinTabCommand="{Binding PinTabCommand}"
+                              CloseTabCommand="{Binding CloseTabCommand}"
+                              ReorderTabsCommand="{Binding ReorderTabsCommand}"
+                              MinimumTabWidth="40"
+                              PinnedTabWidth="50"
+                              MaximumTabWidth="125"
+                              ContainerItemPreparedForOverride="TabControl_ContainerItemPreparedForOverride">
             <!--We override the control template here to show how you can modify the properties of tab panel and content presenter-->
             <ct:ChromeTabControl.Template>
                 <ControlTemplate TargetType="{x:Type ct:ChromeTabControl}">
@@ -85,6 +76,7 @@
                                    Stretch="Fill"
                                    Margin="5" />
                             <TextBlock Text="{Binding TabName}"
+                                       Visibility="{Binding IsPinned,Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                        TextWrapping="NoWrap"
                                        TextTrimming="CharacterEllipsis"
                                        VerticalAlignment="Center" />
@@ -104,31 +96,16 @@
                                           Command="{Binding Path=PlacementTarget.Tag.CloseOtherTabsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
                                           CommandParameter="{Binding}" />
-
+                                <Separator />
+                                <MenuItem Header="{Binding IsPinned, Converter={StaticResource BooleanToPinTabTextConverter}}"
+                                          Command="{Binding Path=PlacementTarget.Tag.PinTabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          CommandParameter="{Binding}" />
                             </ContextMenu>
                         </Grid.ContextMenu>
                     </Grid>
                 </DataTemplate>
             </ct:ChromeTabControl.ItemTemplate>
-
         </ct:ChromeTabControl>
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <CheckBox Content="Show add button"
-                      Margin="5"
-                      IsChecked="{Binding ShowAddButton}" />
-            <CheckBox Content="Movable tabs"
-                      Margin="5"
-                      IsChecked="{Binding CanMoveTabs}" />
-        </StackPanel>
-        <Button x:Name="BnOpenPinnedTabExample"
-                Content="Pinned tab example"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Bottom"
-                Margin="5,0,0,3"
-                Width="115"
-                Grid.Row="1"
-                Click="BnOpenPinnedTabExample_Click" />
     </Grid>
 </Window>

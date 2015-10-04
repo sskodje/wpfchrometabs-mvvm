@@ -54,6 +54,16 @@ namespace ChromeTabs
         public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromeTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
 
 
+        public bool IsPinned
+        {
+            get { return (bool)GetValue(IsPinnedProperty); }
+            set { SetValue(IsPinnedProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsPinned.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsPinnedProperty =
+            DependencyProperty.Register("IsPinned", typeof(bool), typeof(ChromeTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange));
+
 
 
         public Brush SelectedTabBrush
@@ -66,7 +76,7 @@ namespace ChromeTabs
         public static readonly DependencyProperty SelectedTabBrushProperty =
             DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabItem), new PropertyMetadata(Brushes.White));
 
-        
+
 
         private static readonly RoutedUICommand closeTabCommand = new RoutedUICommand("Close tab", "CloseTab", typeof(ChromeTabItem));
 
@@ -89,6 +99,13 @@ namespace ChromeTabs
             get { return closeOtherTabsCommand; }
         }
 
+        private static readonly RoutedUICommand pinTabCommand = new RoutedUICommand("Pin Tab", "PinTab", typeof(ChromeTabItem));
+
+        public static RoutedUICommand PinTabCommand
+        {
+            get { return pinTabCommand; }
+        }
+
         public static void SetIsSelected(DependencyObject item, bool value)
         {
             item.SetValue(ChromeTabItem.IsSelectedProperty, value);
@@ -106,8 +123,16 @@ namespace ChromeTabs
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeTabCommand, HandleCloseTabCommand));
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeAllTabsCommand, HandleCloseAllTabsCommand));
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeOtherTabsCommand, HandleCloseOtherTabsCommand));
+            CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(pinTabCommand, HandlePinTabCommand));
         }
-        
+
+        private static void HandlePinTabCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            ChromeTabItem item = sender as ChromeTabItem;
+            if (item == null) { return; }
+            item.ParentTabControl.PinTab(item.DataContext);
+        }
+
 
         private static void HandleCloseOtherTabsCommand(object sender, ExecutedRoutedEventArgs e)
         {
@@ -142,7 +167,7 @@ namespace ChromeTabs
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-            if(e.Key == Key.Enter || e.Key == Key.Space || e.Key == Key.Return)
+            if (e.Key == Key.Enter || e.Key == Key.Space || e.Key == Key.Return)
             {
                 ParentTabControl.ChangeSelectedItem(this);
             }

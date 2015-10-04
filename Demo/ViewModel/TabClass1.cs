@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Demo
+namespace Demo.ViewModel
 {
-    public class TabClass1 : ITab
+    public class TabClass1 : TabBase
     {
-        public int TabNumber { get; set; }
-        public string TabName { get; set; }
         public string MyStringContent { get; set; }
 
     }

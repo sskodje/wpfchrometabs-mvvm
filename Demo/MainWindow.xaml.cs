@@ -1,5 +1,6 @@
 ﻿using ChromeTabs;
 using Demo.Utilities;
+using Demo.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +31,6 @@ namespace Demo
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new ViewModelMainWindow();
             this._openWindows = new List<DockingWindow>();
         }
 
@@ -42,7 +42,7 @@ namespace Demo
         /// <param name="e"></param>
         private void ChromeTabControl_TabDraggedOutsideBonds(object sender, TabDragEventArgs e)
         {
-            ITab draggedTab = e.Tab as ITab;
+            TabBase draggedTab = e.Tab as TabBase;
             if (draggedTab is TabClass3)
                 return;//We don't want out TabClass3 to form new windows, so we stop it here.
             DockingWindow win = _openWindows.FirstOrDefault(x => x.DataContext == draggedTab);//check if it's already open
@@ -70,6 +70,7 @@ namespace Demo
         private void win_Loaded(object sender, RoutedEventArgs e)
         {
             Window win = (Window)sender;
+            win.Loaded -= win_Loaded;
             Point cursorPosition = (Point)win.Tag;
             MoveWindow(win, cursorPosition);
         }
@@ -78,8 +79,6 @@ namespace Demo
             //Use a BeginInvoke to delay the execution slightly, else we can have problems grabbing the newly opened window.
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-
-                win.Loaded -= win_Loaded;
                 win.Topmost = true;
                 //We position the window at the mouse position
                 win.Left = pt.X - win.Width + 200;
@@ -123,17 +122,14 @@ namespace Demo
 
                 if (element != null)
                 {
-                    object child = LogicalTreeHelper.GetChildren(element).Cast<object>().FirstOrDefault(x => x is ChromeTabPanel);
-                    ChromeTabItem tabItem = element.TemplatedParent as ChromeTabItem;
-                    //test if the mouse is over the tab panel or a tab item.
-                    if (element is ChromeTabPanel || child!=null ||tabItem!=null)
+                    ////test if the mouse is over the tab panel or a tab item.
+                    if (CanInsertTabItem(element))
                     {
-
-                        ITab dockedWindowVM = (ITab)win.DataContext;
+                        TabBase dockedWindowVM = (TabBase)win.DataContext;
                         ViewModelMainWindow mainWindowVm = (ViewModelMainWindow)this.DataContext;
 
                         mainWindowVm.ItemCollection.Add(dockedWindowVM);
-                      
+
                         win.Close();
 
                         mainWindowVm.SelectedTab = dockedWindowVM;
@@ -144,6 +140,30 @@ namespace Demo
                     }
                 }
             }
+        }
+
+        private bool CanInsertTabItem(FrameworkElement element)
+        {
+            if (element is ChromeTabItem)
+                return true;
+            else if (element is ChromeTabPanel)
+                return true;
+            object child = LogicalTreeHelper.GetChildren(element).Cast<object>().FirstOrDefault(x => x is ChromeTabPanel);
+            if (child != null)
+                return true;
+            FrameworkElement localElement = element;
+            while (true)
+            {
+                Object obj = localElement.TemplatedParent;
+                if (obj == null)
+                    break;
+
+                if (obj is ChromeTabItem)
+                    return true;
+                else
+                    localElement = localElement.TemplatedParent as FrameworkElement;
+            }
+            return false;
         }
 
         /// <summary>
@@ -178,5 +198,12 @@ namespace Demo
                     yield return byHandle[hWnd];
             }
         }
+
+        private void BnOpenPinnedTabExample_Click(object sender, RoutedEventArgs e)
+        {
+            PinnedTabExampleWindow window = new PinnedTabExampleWindow();
+            window.Show();
+        }
+
     }
 }

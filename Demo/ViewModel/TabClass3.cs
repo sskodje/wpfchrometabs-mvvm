@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Demo
+namespace Demo.ViewModel
 {
-    public class TabClass3 : ITab
+    public class TabClass3 : TabBase
     {
-        public int TabNumber { get; set; }
-        public string TabName { get; set; }
         public string MyStringContent { get; set; }
         public Uri MyImageUrl { get; set; }
     }

@@ -31,27 +31,38 @@ namespace Demo.ViewModel
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            ////if (ViewModelBase.IsInDesignModeStatic)
-            ////{
-            ////    // Create design time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DesignDataService>();
-            ////}
-            ////else
-            ////{
-            ////    // Create run time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DataService>();
-            ////}
+            if (ViewModelBase.IsInDesignModeStatic)
+            {
+                // Create design time view services and models
+                SimpleIoc.Default.Register<IViewModelMainWindow, SampleData.SampleViewModelMainWindow>();
+                SimpleIoc.Default.Register<IViewModelPinnedTabExampleWindow, SampleData.SampleViewModelPinnedTabExampleWindow>();
+            }
+            else
+            {
+                // Create run time view services and models
+                SimpleIoc.Default.Register<IViewModelMainWindow, ViewModelMainWindow>();
+                SimpleIoc.Default.Register<IViewModelPinnedTabExampleWindow, ViewModelPinnedTabExampleWindow>();
+            }
 
-            SimpleIoc.Default.Register<ViewModelMainWindow>();
         }
 
-        public ViewModelMainWindow Main
+        public IViewModelMainWindow ViewModelMainWindow
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<ViewModelMainWindow>();
+                return ServiceLocator.Current.GetInstance<IViewModelMainWindow>();
             }
         }
+
+        public IViewModelPinnedTabExampleWindow VieWModelPinnedTabExampleWindow
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<IViewModelPinnedTabExampleWindow>();
+            }
+
+        }
+
         
         public static void Cleanup()
         {
