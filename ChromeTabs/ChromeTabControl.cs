@@ -226,14 +226,14 @@ namespace ChromeTabs
 
         // Using a DependencyProperty as the backing store for MaximumTabWidth.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MaximumTabWidthProperty =
-            DependencyProperty.Register("MaximumTabWidth", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(125.0,null,OnCoerceMaximumTabWidth));
+            DependencyProperty.Register("MaximumTabWidth", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(125.0, null, OnCoerceMaximumTabWidth));
 
         private static object OnCoerceMaximumTabWidth(DependencyObject d, object baseValue)
         {
             ChromeTabControl ctc = (ChromeTabControl)d;
 
             if ((double)baseValue <= ctc.MinimumTabWidth)
-                return ctc.MinimumTabWidth+1;
+                return ctc.MinimumTabWidth + 1;
             else
                 return baseValue;
         }
@@ -376,6 +376,8 @@ namespace ChromeTabs
                     Canvas.SetZIndex(item, 1001);
                 }
             }
+            if (this.SelectedContent == null && item != null)
+                SetSelectedContent(false);
         }
 
         internal void MoveTab(int fromIndex, int toIndex)
@@ -453,11 +455,16 @@ namespace ChromeTabs
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
+
             base.OnSelectionChanged(e);
             this.SetChildrenZ();
 
 
-            if (e.AddedItems.Count == 0)
+            SetSelectedContent(e.AddedItems.Count == 0);
+        }
+        protected void SetSelectedContent(bool removeContent)
+        {
+            if (removeContent)
             {
                 if (this.SelectedItem == null)
                 {
