@@ -9,6 +9,7 @@
         xmlns:vm="clr-namespace:Demo.ViewModel"
         xmlns:usercontrols="clr-namespace:Demo.UserControls"
         xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
+        xmlns:ctConv="clr-namespace:ChromeTabs.Converters;assembly=ChromeTabs"
         xmlns:conv="clr-namespace:Demo.Converters"
         Background="WhiteSmoke"
         DataContext="{Binding Source={StaticResource Locator},Path=ViewModelMainWindow}">
@@ -32,22 +33,27 @@
         </Grid.RowDefinitions>
         <!--The tab control with all possible settings displayed, and with tab tearing support.-->
         <ct:ChromeTabControl x:Name="MyChromeTabControl"
-                                  Background="AliceBlue"
-                                  ItemsSource="{Binding ItemCollection}"
-                                  SelectedItem="{Binding SelectedTab}"
-                                  SelectedTabBrush="WhiteSmoke"
-                                  CanMoveTabs="{Binding CanMoveTabs}"
-                                  DragWindowWithOneTab="True"
-                                  IsAddButtonVisible="{Binding ShowAddButton}"
-                                  CloseTabWhenDraggedOutsideBonds="{Binding SelectedTab, Converter={StaticResource TabToTabSnapConverter}}"
-                                  AddTabCommand="{Binding AddTabCommand}"
-                                  CloseTabCommand="{Binding CloseTabCommand}"
-                                  ReorderTabsCommand="{Binding ReorderTabsCommand}"
-                                  TabTearTriggerDistance="10"
-                                  TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
+                             TabPersistBehavior="All"
+                             Background="AliceBlue"
+                             ItemsSource="{Binding ItemCollection}"
+                             SelectedItem="{Binding SelectedTab}"
+                             SelectedTabBrush="WhiteSmoke"
+                             CanMoveTabs="{Binding CanMoveTabs}"
+                             DragWindowWithOneTab="True"
+                             IsAddButtonVisible="{Binding ShowAddButton}"
+                             CloseTabWhenDraggedOutsideBonds="{Binding SelectedTab, Converter={StaticResource TabToTabSnapConverter}}"
+                             AddTabCommand="{Binding AddTabCommand}"
+                             CloseTabCommand="{Binding CloseTabCommand}"
+                             ReorderTabsCommand="{Binding ReorderTabsCommand}"
+                             TabTearTriggerDistance="10"
+                             TabDraggedOutsideBonds="ChromeTabControl_TabDraggedOutsideBonds">
             <!--We override the control template here to show how you can modify the properties of tab panel and content presenter-->
             <ct:ChromeTabControl.Template>
                 <ControlTemplate TargetType="{x:Type ct:ChromeTabControl}">
+                    <ControlTemplate.Resources>
+                        <ctConv:TabPersistBehaviorToContentPresenterVisibilityConverter x:Key="TabPersistBehaviorToContentPresenterVisibilityConverter" />
+                        <ctConv:TabPersistBehaviorToItemHolderVisibilityConverter x:Key="TabPersistBehaviorToItemHolderVisibilityConverter" />
+                    </ControlTemplate.Resources>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30" />
@@ -61,11 +67,14 @@
                             <ct:ChromeTabPanel IsItemsHost="True"
                                                Background="{TemplateBinding Background}" />
                         </Border>
-                        <Grid Grid.Row="1">
-                            <Border Background="WhiteSmoke">
-                                <ContentPresenter Content="{TemplateBinding SelectedContent}" />
-                            </Border>
+
+                        <Grid Grid.Row="1"
+                              Visibility="{TemplateBinding TabPersistBehavior,Converter={StaticResource TabPersistBehaviorToContentPresenterVisibilityConverter}}">
+                            <ContentPresenter Content="{TemplateBinding SelectedContent}" />
                         </Grid>
+                        <Grid x:Name="PART_ItemsHolder"
+                              Grid.Row="1"
+                              Visibility="{TemplateBinding TabPersistBehavior,Converter={StaticResource TabPersistBehaviorToItemHolderVisibilityConverter}}" />
                     </Grid>
                 </ControlTemplate>
             </ct:ChromeTabControl.Template>

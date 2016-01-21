@@ -61,7 +61,11 @@ namespace Demo.ViewModel
             return tab;
 
         }
-
+        protected TabClass1 CreateTab4()
+        {
+            var tab = new TabClass1() { TabName = "Tab class 1", MyStringContent = Properties.Resources.LoremImpsum, TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
+            return tab;
+        }
         /// <summary>
         /// Reorder the tabs and refresh collection sorting.
         /// </summary>

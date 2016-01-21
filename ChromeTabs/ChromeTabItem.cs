@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 
 namespace ChromeTabs
 {
@@ -46,6 +47,8 @@ namespace ChromeTabs
     /// </summary>
     public class ChromeTabItem : HeaderedContentControl
     {
+        private DispatcherTimer _timer;
+
         public bool IsSelected
         {
             get { return (bool)GetValue(IsSelectedProperty); }
@@ -125,6 +128,7 @@ namespace ChromeTabs
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeOtherTabsCommand, HandleCloseOtherTabsCommand));
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(pinTabCommand, HandlePinTabCommand));
         }
+
 
         private static void HandlePinTabCommand(object sender, ExecutedRoutedEventArgs e)
         {

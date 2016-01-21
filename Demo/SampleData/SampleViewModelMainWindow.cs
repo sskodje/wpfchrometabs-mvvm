@@ -69,6 +69,7 @@ namespace Demo.SampleData
                     _itemCollection.Add(CreateTab1());
                     _itemCollection.Add(CreateTab2());
                     _itemCollection.Add(CreateTab3());
+                    _itemCollection.Add(CreateTab4());
                 }
                 return _itemCollection;
             }

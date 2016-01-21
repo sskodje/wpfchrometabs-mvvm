@@ -82,10 +82,19 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="{x:Type local:ChromeTabControl}">
+    <Style TargetType="{x:Type local:ChromeTabControl}"
+           xmlns:conv="clr-namespace:ChromeTabs.Converters">
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="TabPersistBehavior"
+                Value="None" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ChromeTabControl}">
+                    <ControlTemplate.Resources>
+                        <conv:TabPersistBehaviorToContentPresenterVisibilityConverter x:Key="TabPersistBehaviorToContentPresenterVisibilityConverter" />
+                        <conv:TabPersistBehaviorToItemHolderVisibilityConverter x:Key="TabPersistBehaviorToItemHolderVisibilityConverter" />
+                    </ControlTemplate.Resources>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="25" />
@@ -97,9 +106,13 @@
                                                   Background="{TemplateBinding Background}">
                             </local:ChromeTabPanel>
                         </Border>
-                        <Grid Grid.Row="1">
+                        <Grid Grid.Row="1"
+                              Visibility="{TemplateBinding TabPersistBehavior,Converter={StaticResource TabPersistBehaviorToContentPresenterVisibilityConverter}}">
                             <ContentPresenter Content="{TemplateBinding SelectedContent}" />
                         </Grid>
+                        <Grid x:Name="PART_ItemsHolder"
+                              Grid.Row="1"
+                              Visibility="{TemplateBinding TabPersistBehavior,Converter={StaticResource TabPersistBehaviorToItemHolderVisibilityConverter}}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

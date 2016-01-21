@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -109,9 +112,20 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LoremImpsum" xml:space="preserve">
+    <value>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras purus lacus, vehicula et ullamcorper in, convallis at arcu. Donec et sem sit amet nisl pulvinar eleifend non vitae lacus. Donec auctor vulputate elit eget bibendum. Nullam auctor metus euismod turpis sodales pellentesque. Donec fringilla, nulla ac blandit dapibus, nisl enim congue ante, sit amet porttitor diam tellus non justo. Proin sem nulla, tempus quis turpis dignissim, luctus maximus tortor. Phasellus vestibulum nisl ac neque condimentum auctor. Nullam quis placerat magna. Suspendisse varius sodales dolor ac molestie. In euismod elit ac nulla pellentesque fermentum. Integer vulputate pretium sapien vel porta. Sed malesuada risus vitae congue pretium.
+
+Phasellus convallis velit in lectus tempus convallis. Etiam massa lectus, iaculis at euismod eu, lacinia at ipsum. Integer eget convallis nunc. Duis scelerisque erat eget metus ultricies, at accumsan quam tempus. Maecenas ullamcorper malesuada est, eget varius lorem mattis eu. In nec sem sed nibh malesuada auctor. Praesent viverra massa a vehicula dignissim. Phasellus malesuada a massa quis posuere. Etiam consequat ultrices nibh ac pulvinar.
+
+Pellentesque pulvinar leo et sagittis viverra. Sed nec luctus erat, at pulvinar neque. Proin ullamcorper risus nibh, non sodales ante mollis in. Donec quis tellus cursus diam rhoncus sodales quis id augue. Ut et consequat diam. Etiam vel urna eget erat congue dictum eu sit amet libero. Cras id velit eget orci egestas dapibus. Aliquam et vehicula enim. Praesent commodo massa sagittis justo euismod, at vestibulum odio auctor. Donec imperdiet purus nec nisl scelerisque euismod. Sed elementum ante sit amet velit ultrices vehicula. Maecenas ac maximus lacus. Cras ultrices neque sit amet commodo porta.
+
+Aenean mollis lorem sit amet dui tempor lacinia. Quisque ut blandit elit. Nunc rhoncus aliquam lorem ac rutrum. Quisque id convallis massa. Nam tortor mi, hendrerit quis scelerisque quis, volutpat non felis. Maecenas vel nisl risus. Pellentesque sed ultricies ipsum, ut blandit quam. Donec ultricies diam enim, eu tincidunt arcu pellentesque vel.
+
+Nunc id orci ac arcu vehicula convallis. Proin eget enim sodales, dictum purus quis, dapibus elit. Nulla placerat ex non odio tristique vestibulum. Phasellus aliquam rutrum sodales. Pellentesque varius pellentesque pellentesque. Aliquam et nunc convallis, efficitur tellus non, sagittis purus. Vivamus vitae dolor mattis, interdum justo vel, laoreet nunc. Sed at blandit massa, sed cursus lorem. Nam semper tellus massa, ultrices ultricies sapien scelerisque sed.</value>
+  </data>
 </root>

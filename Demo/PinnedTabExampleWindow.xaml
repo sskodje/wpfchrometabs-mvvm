@@ -25,6 +25,7 @@
     </Window.Resources>
     <Grid>
         <ct:ChromeTabControl  x:Name="MyChromeTabControlWithPinnedTabs"
+                              TabPersistBehavior="All"
                               Background="AliceBlue"
                               ItemsSource="{Binding ItemCollection}"
                               SelectedItem="{Binding SelectedTab}"

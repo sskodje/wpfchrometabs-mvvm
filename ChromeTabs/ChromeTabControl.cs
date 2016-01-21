@@ -52,9 +52,12 @@ namespace ChromeTabs
     ///     <MyNamespace:ChromeTabs/>
     ///
     /// </summary>
+    [TemplatePart(Name = "PART_ItemsHolder", Type = typeof(Panel))]
     public class ChromeTabControl : Selector
     {
         private object _lastSelectedItem;
+        private Panel itemsHolder;
+        private Dictionary<object, DependencyObject> objectToContainerMap;
 
         internal static readonly DependencyPropertyKey CanAddTabPropertyKey = DependencyProperty.RegisterReadOnly("CanAddTab", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
         public static readonly DependencyProperty CanAddTabProperty = CanAddTabPropertyKey.DependencyProperty;
@@ -272,9 +275,29 @@ namespace ChromeTabs
             DependencyProperty.Register("TabTearTriggerDistance", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(0.0));
 
 
+        /// <summary>
+        /// Controls the persist behavior of tabs. All = all tabs live in memory, None = no tabs live in memory, Timed= tabs gets cleared from memory after a period of being unselected.
+        /// </summary>
+        public TabPersistBehavior TabPersistBehavior
+        {
+            get { return (TabPersistBehavior)GetValue(TabPersistBehaviorProperty); }
+            set { SetValue(TabPersistBehaviorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TabPersistBehaviorProperty =
+            DependencyProperty.Register("TabPersistBehavior", typeof(TabPersistBehavior), typeof(ChromeTabControl), new PropertyMetadata(TabPersistBehavior.None));
+
+
+
         static ChromeTabControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
+
+        }
+        public ChromeTabControl()
+        {
+
         }
 
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -411,6 +434,12 @@ namespace ChromeTabs
         {
             SetValue(CanAddTabPropertyKey, value);
         }
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            itemsHolder = GetTemplateChild("PART_ItemsHolder") as Panel;
+            SetSelectedContent(false);
+        }
 
         protected override DependencyObject GetContainerForItemOverride()
         {
@@ -449,7 +478,39 @@ namespace ChromeTabs
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
+            if (itemsHolder != null)
+            {
+                switch (e.Action)
+                {
+                    case NotifyCollectionChangedAction.Replace:
+                    case NotifyCollectionChangedAction.Reset:
+                        {
+                            var itemsToRemove = itemsHolder.Children.Cast<ContentPresenter>().Where(x => !Items.Contains(x.Content)).ToList();
+                            foreach (var item in itemsToRemove)
+                                itemsHolder.Children.Remove(item);
+                        }
+                        break;
 
+                    case NotifyCollectionChangedAction.Add:
+                    case NotifyCollectionChangedAction.Remove:
+                        if (e.OldItems != null)
+                        {
+                            foreach (var item in e.OldItems)
+                            {
+                                ContentPresenter cp = FindChildContentPresenter(item);
+                                if (cp != null)
+                                {
+                                    itemsHolder.Children.Remove(cp);
+                                }
+                            }
+                        }
+
+                        // don't do anything with new items because we don't want to
+                        // create visuals that aren't being shown
+                        break;
+                }
+            }
+            SetSelectedContent(Items.Count == 0);
             this.SetChildrenZ();
         }
 
@@ -496,8 +557,20 @@ namespace ChromeTabs
             {
                 this._lastSelectedItem = null;
             }
+
             ChromeTabItem item = this.AsTabItem(this.SelectedItem);
-            this.SelectedContent = item != null ? item.Content : null;
+            if (item != null && itemsHolder != null)
+            {
+                CreateChildContentPresenter(this.SelectedItem);
+                // show the right child
+                foreach (ContentPresenter child in itemsHolder.Children)
+                {
+                    ChromeTabItem childTabItem = AsTabItem(child.Content);
+                    child.Visibility = childTabItem.IsSelected ? Visibility.Visible : Visibility.Collapsed;
+                }
+            }
+          
+             this.SelectedContent = item != null ? item.Content : null;
         }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
@@ -551,7 +624,69 @@ namespace ChromeTabs
                 zindex -= 1;
             }
         }
+        /// <summary>
+        /// create the child ContentPresenter for the given item (could be data or a TabItem)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        private ContentPresenter CreateChildContentPresenter(object item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
 
-        private Dictionary<object, DependencyObject> objectToContainerMap;
+            ContentPresenter cp = FindChildContentPresenter(item);
+
+            if (cp != null)
+            {
+                return cp;
+            }
+
+            // the actual child to be added.  cp.Tag is a reference to the TabItem
+            cp = new ContentPresenter();
+            cp.Content = (item is ChromeTabItem) ? (item as ChromeTabItem).Content : item;
+            //cp.ContentTemplate = this.SelectedContentTemplate;
+            //cp.ContentTemplateSelector = this.SelectedContentTemplateSelector;
+            //cp.ContentStringFormat = this.SelectedContentStringFormat;
+            cp.Visibility = Visibility.Collapsed;
+            //  cp.Tag = AsTabItem(item);// (item is ChromeTabItem) ? item : (this.ItemContainerGenerator.ContainerFromItem(item));
+            itemsHolder.Children.Add(cp);
+            return cp;
+        }
+
+        /// <summary>
+        /// Find the CP for the given object.  data could be a TabItem or a piece of data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private ContentPresenter FindChildContentPresenter(object data)
+        {
+            if (data is ChromeTabItem)
+            {
+                data = (data as ChromeTabItem).Content;
+            }
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            if (itemsHolder == null)
+            {
+                return null;
+            }
+
+            foreach (ContentPresenter cp in itemsHolder.Children)
+            {
+                if (cp.Content == data)
+                {
+                    return cp;
+                }
+            }
+
+            return null;
+        }
+
     }
 }
