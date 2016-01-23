@@ -55,6 +55,7 @@ namespace ChromeTabs
     [TemplatePart(Name = "PART_ItemsHolder", Type = typeof(Panel))]
     public class ChromeTabControl : Selector
     {
+        private bool _addTabButtonClicked;
         private object _lastSelectedItem;
         private Panel itemsHolder;
         private Dictionary<object, DependencyObject> objectToContainerMap;
@@ -92,8 +93,36 @@ namespace ChromeTabs
     DependencyProperty.Register(
         "AddTabCommand",
         typeof(ICommand),
-        typeof(ChromeTabControl));
+        typeof(ChromeTabControl), new PropertyMetadata(new PropertyChangedCallback(AddTabCommandPropertyChanged)));
 
+        private static void AddTabCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (DesignerProperties.GetIsInDesignMode(d))
+                return;
+            ChromeTabControl ct = (ChromeTabControl)d;
+            if (e.NewValue != null)
+            {
+                ICommand command = (ICommand)e.NewValue;
+                command.CanExecuteChanged += ct.Command_CanExecuteChanged;
+            }
+            if (e.OldValue != null)
+            {
+                ICommand command = (ICommand)e.NewValue;
+                command.CanExecuteChanged -= ct.Command_CanExecuteChanged;
+            }
+        }
+
+        private void Command_CanExecuteChanged(object sender, EventArgs e)
+        {
+            ((ChromeTabPanel)this.ItemsHost).IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
+        }
+        public static DependencyProperty AddTabCommandParameterProperty =
+DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(ChromeTabControl));
+        public object AddTabCommandParameter
+        {
+            get { return GetValue(AddTabCommandParameterProperty); }
+            set { SetValue(AddTabCommandParameterProperty, value); }
+        }
         public ICommand AddTabCommand
         {
             get { return (ICommand)GetValue(AddTabCommandProperty); }
@@ -161,6 +190,8 @@ namespace ChromeTabs
 
         private static void IsAddButtonVisiblePropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            if (DesignerProperties.GetIsInDesignMode(d))
+                return;
             ChromeTabControl ctc = d as ChromeTabControl;
 
             ChromeTabPanel panel = (ChromeTabPanel)ctc.ItemsHost;
@@ -202,6 +233,46 @@ namespace ChromeTabs
             DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(null, new PropertyChangedCallback(SelectedTabBrushPropertyCallback)));
 
 
+        public Brush AddTabButtonBrush
+        {
+            get { return (Brush)GetValue(AddButtonBrushProperty); }
+            set { SetValue(AddButtonBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AddButtonBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AddButtonBrushProperty =
+            DependencyProperty.Register("AddTabButtonBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(Brushes.Transparent));
+
+        public Brush AddTabButtonMouseDownBrush
+        {
+            get { return (Brush)GetValue(AddButtonMouseDownBrushProperty); }
+            set { SetValue(AddButtonMouseDownBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AddButtonBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AddButtonMouseDownBrushProperty =
+            DependencyProperty.Register("AddTabButtonMouseDownBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(Brushes.DarkGray));
+
+        public Brush AddTabButtonMouseOverBrush
+        {
+            get { return (Brush)GetValue(AddButtonMouseOverBrushProperty); }
+            set { SetValue(AddButtonMouseOverBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AddButtonMouseOverBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AddButtonMouseOverBrushProperty =
+            DependencyProperty.Register("AddTabButtonMouseOverBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(Brushes.White));
+
+
+        public Brush AddTabButtonDisabledBrush
+        {
+            get { return (Brush)GetValue(AddButtonDisabledBrushProperty); }
+            set { SetValue(AddButtonDisabledBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AddButtonDisabledBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AddButtonDisabledBrushProperty =
+            DependencyProperty.Register("AddTabButtonDisabledBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(Brushes.DarkGray));
 
 
         public double MinimumTabWidth
@@ -286,7 +357,45 @@ namespace ChromeTabs
 
         // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TabPersistBehaviorProperty =
-            DependencyProperty.Register("TabPersistBehavior", typeof(TabPersistBehavior), typeof(ChromeTabControl), new PropertyMetadata(TabPersistBehavior.None));
+            DependencyProperty.Register("TabPersistBehavior", typeof(TabPersistBehavior), typeof(ChromeTabControl), new PropertyMetadata(TabPersistBehavior.None, OnTabPersistBehaviorPropertyChanged));
+
+        private static void OnTabPersistBehaviorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChromeTabControl ct = (ChromeTabControl)d;
+            if (((TabPersistBehavior)e.NewValue) == TabPersistBehavior.None)
+            {
+                ct.itemsHolder.Children.Clear();
+            }
+            else
+            {
+                ct.SetSelectedContent(false);
+            }
+        }
+
+        /// <summary>
+        /// The time an inactive tab stays cached in memory before being cleared. Default duration is 30 minutes.
+        /// </summary>
+        public TimeSpan TabPersistDuration
+        {
+            get { return (TimeSpan)GetValue(TabPersistDurationProperty); }
+            set { SetValue(TabPersistDurationProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TabPersistDurationProperty =
+            DependencyProperty.Register("TabPersistDuration", typeof(TimeSpan), typeof(ChromeTabControl), new PropertyMetadata(TimeSpan.FromMinutes(30)));
+
+
+
+        public AddTabButtonBehavior AddTabButtonBehavior
+        {
+            get { return (AddTabButtonBehavior)GetValue(AddTabButtonBehaviorProperty); }
+            set { SetValue(AddTabButtonBehaviorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AddTabButtonBehavior.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AddTabButtonBehaviorProperty =
+            DependencyProperty.Register("AddTabButtonBehavior", typeof(AddTabButtonBehavior), typeof(ChromeTabControl), new PropertyMetadata(AddTabButtonBehavior.OpenNewTab));
 
 
 
@@ -297,6 +406,7 @@ namespace ChromeTabs
         }
         public ChromeTabControl()
         {
+
 
         }
 
@@ -332,8 +442,10 @@ namespace ChromeTabs
             {
                 return;
             }
+            _addTabButtonClicked = true;
             if (this.AddTabCommand != null)
                 this.AddTabCommand.Execute(null);
+
         }
 
         internal bool CanAddTab
@@ -383,9 +495,18 @@ namespace ChromeTabs
             }
             return -1;
         }
+        internal void ChangeSelectedIndex(int index)
+        {
 
+            //  int index = this.GetTabIndex(item);
+            if (Items.Count <= index)
+                return;
+            ChromeTabItem item = AsTabItem(Items[index]);
+            ChangeSelectedItem(item);
+        }
         internal void ChangeSelectedItem(ChromeTabItem item)
         {
+
             int index = this.GetTabIndex(item);
             if (index != this.SelectedIndex)
             {
@@ -490,8 +611,18 @@ namespace ChromeTabs
                                 itemsHolder.Children.Remove(item);
                         }
                         break;
-
                     case NotifyCollectionChangedAction.Add:
+                        {
+                            // don't do anything with new items not created by the add button, because we don't want to
+                            // create visuals that aren't being shown.
+                            if (_addTabButtonClicked && AddTabButtonBehavior== AddTabButtonBehavior.OpenNewTab)
+                            {
+                                _addTabButtonClicked = false;
+                                if (e.NewItems != null)
+                                    ChangeSelectedItem(AsTabItem(e.NewItems.Cast<object>().Last()));
+                            }
+                        }
+                        break;
                     case NotifyCollectionChangedAction.Remove:
                         if (e.OldItems != null)
                         {
@@ -505,8 +636,7 @@ namespace ChromeTabs
                             }
                         }
 
-                        // don't do anything with new items because we don't want to
-                        // create visuals that aren't being shown
+
                         break;
                 }
             }
@@ -559,18 +689,21 @@ namespace ChromeTabs
             }
 
             ChromeTabItem item = this.AsTabItem(this.SelectedItem);
-            if (item != null && itemsHolder != null)
+            if (TabPersistBehavior != TabPersistBehavior.None)
             {
-                CreateChildContentPresenter(this.SelectedItem);
-                // show the right child
-                foreach (ContentPresenter child in itemsHolder.Children)
+                if (item != null && itemsHolder != null)
                 {
-                    ChromeTabItem childTabItem = AsTabItem(child.Content);
-                    child.Visibility = childTabItem.IsSelected ? Visibility.Visible : Visibility.Collapsed;
+                    CreateChildContentPresenter(this.SelectedItem);
+                    // show the right child
+                    foreach (ContentPresenter child in itemsHolder.Children)
+                    {
+                        ChromeTabItem childTabItem = AsTabItem(child.Content);
+                        child.Visibility = childTabItem.IsSelected ? Visibility.Visible : Visibility.Collapsed;
+                    }
                 }
             }
-          
-             this.SelectedContent = item != null ? item.Content : null;
+
+            this.SelectedContent = item != null ? item.Content : null;
         }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
@@ -686,6 +819,19 @@ namespace ChromeTabs
             }
 
             return null;
+        }
+
+        internal void RemoveFromItemHolder(ChromeTabItem item)
+        {
+            if (itemsHolder == null)
+                return;
+            ContentPresenter presenter = FindChildContentPresenter(item);
+            if (presenter != null)
+            {
+                itemsHolder.Children.Remove(presenter);
+                Debug.WriteLine("Removing cached ContentPresenter");
+            }
+
         }
 
     }

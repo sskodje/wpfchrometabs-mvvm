@@ -58,13 +58,13 @@ namespace ChromeTabs
         private const double stickyReanimateDuration = 0.10;
         private const double tabWidthSlidePercent = 0.5;
         private bool _hideAddButton;
-        internal bool draggingWindow;
-        internal Size finalSize;
-        internal double overlap;
-        internal double leftMargin;
-        internal double rightMargin;
-        internal double defaultMeasureHeight;
-        internal double currentTabWidth;
+        private bool draggingWindow;
+        private Size finalSize;
+        private double overlap;
+        private double leftMargin;
+        private double rightMargin;
+        private double defaultMeasureHeight;
+        private double currentTabWidth;
         private int captureGuard;
         private int originalIndex;
         private int slideIndex;
@@ -78,6 +78,31 @@ namespace ChromeTabs
         private Button addButton;
         private DateTime _lastMouseDown;
         private object _lockObject = new object();
+
+
+        private bool _isAddButtonEnabled;
+
+        public bool IsAddButtonEnabled
+        {
+            get { return _isAddButtonEnabled; }
+            set
+            {
+                if (_isAddButtonEnabled != value)
+                {
+                    _isAddButtonEnabled = value;
+                    addButton.IsEnabled = value;
+                    if (ParentTabControl != null)
+                    {
+                        if (value == false)
+                            addButton.Background = ParentTabControl.AddTabButtonDisabledBrush;
+                        else
+                            addButton.Background = ParentTabControl.AddTabButtonBrush;
+                        InvalidateVisual();
+                    }
+                }
+            }
+        }
+
 
         private double MinTabWidth
         {
@@ -139,6 +164,7 @@ namespace ChromeTabs
         {
             base.OnRender(dc);
         }
+
 
         protected override Size ArrangeOverride(Size finalSize)
         {
@@ -248,14 +274,15 @@ namespace ChromeTabs
                     return;
                 }
 
-                if (this.addButtonRect.Contains(e.GetPosition(this)))
+                if (this.addButtonRect.Contains(e.GetPosition(this)) && IsAddButtonEnabled)
                 {
-                    this.addButton.Background = Brushes.DarkGray;
-                    this.InvalidateVisual();
+                    if (ParentTabControl != null)
+                    {
+                        this.addButton.Background = ParentTabControl.AddTabButtonMouseDownBrush;
+                        this.InvalidateVisual();
+                    }
                     return;
                 }
-
-
 
                 //Check if we clicked the close button, and return if we do.
                 DependencyObject originalSource = e.OriginalSource as DependencyObject;
@@ -290,9 +317,9 @@ namespace ChromeTabs
             {
                 this.UpdateLayout();
                 double totalWidth = 0;
-                for (int i = 0; i < tab.Index;i++ )
+                for (int i = 0; i < tab.Index; i++)
                 {
-                    totalWidth +=GetWidthForTabItem(Children[i] as ChromeTabItem)-overlap;
+                    totalWidth += GetWidthForTabItem(Children[i] as ChromeTabItem) - overlap;
                 }
                 double xPos = totalWidth + ((GetWidthForTabItem(tab) / 2));
                 this.downPoint = new Point(xPos, downPoint.Y);
@@ -365,23 +392,22 @@ namespace ChromeTabs
                         }
                     }
                 }
-
             }
         }
 
         private void ProcessMouseMove(Point p)
         {
             Point nowPoint = p;
-            if (ParentTabControl.IsAddButtonVisible)
+            if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible && IsAddButtonEnabled)
             {
-                if (this.addButtonRect.Contains(nowPoint) && this.addButton.Background != Brushes.White && this.addButton.Background != Brushes.DarkGray)
+                if (this.addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
                 {
-                    this.addButton.Background = Brushes.White;
+                    this.addButton.Background = ParentTabControl.AddTabButtonMouseOverBrush;
                     this.InvalidateVisual();
                 }
-                else if (!this.addButtonRect.Contains(nowPoint) && this.addButton.Background != null)
+                else if (!this.addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
                 {
-                    this.addButton.Background = null;
+                    this.addButton.Background = ParentTabControl.AddTabButtonBrush;
                     this.InvalidateVisual();
                 }
             }
@@ -514,11 +540,11 @@ namespace ChromeTabs
             lock (_lockObject)
             {
                 this.draggingWindow = false;
-                if (ParentTabControl.IsAddButtonVisible)
+                if (ParentTabControl!= null && ParentTabControl.IsAddButtonVisible)
                 {
-                    if (this.addButtonRect.Contains(p) && this.addButton.Background == Brushes.DarkGray)
+                    if (this.addButtonRect.Contains(p) && IsAddButtonEnabled)
                     {
-                        this.addButton.Background = null;
+                        this.addButton.Background = ParentTabControl.AddTabButtonBrush;
                         this.InvalidateVisual();
                         if (this.addButton.Visibility == Visibility.Visible)
                         {

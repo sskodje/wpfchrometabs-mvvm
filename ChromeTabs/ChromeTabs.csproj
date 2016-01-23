@@ -65,6 +65,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddTabButtonBehavior.cs" />
     <Compile Include="ContainerOverrideEventArgs.cs" />
     <Compile Include="Converters\IsLessThanConverter.cs" />
     <Compile Include="Converters\TabPersistBehaviorToContentPresenterVisibilityConverter.cs" />
