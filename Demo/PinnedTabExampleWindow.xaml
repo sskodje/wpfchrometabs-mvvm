@@ -9,7 +9,7 @@
         Title="PinnedTabExample"
         Height="500"
         Width="500"
-        DataContext="{Binding Source={StaticResource Locator},Path=ViewModelMainWindow}">
+        DataContext="{Binding Source={StaticResource Locator},Path=ViewModelPinnedTabExampleWindow}">
     <!--This example shows how you implement pinned tab functionality-->
     <Window.Resources>
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
