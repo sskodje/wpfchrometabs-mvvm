@@ -47,7 +47,8 @@ The basic functionality can be done as simple as :
  - Added support for styling the "new tab" button.
  - Added a property to change "new tab" button behavior between opening tabs in the background or foreground.
  - Added support for changing the tab overlap.
-
+ - Fixed an UI issue where "new tab" button was not visually disabled when command CanExecute was set to false.
+ - 
 The demo project has also been updated to show how you can fully style the control by using your own templates.
 
 ##New in 1.1:
