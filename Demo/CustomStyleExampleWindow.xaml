@@ -1,0 +1,389 @@
+﻿<Window x:Class="Demo.CustomStyleExampleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Demo"
+        xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
+        xmlns:vm="clr-namespace:Demo.ViewModel"
+        xmlns:conv="clr-namespace:Demo.Converters"
+        xmlns:ctConv="clr-namespace:ChromeTabs.Converters;assembly=ChromeTabs"
+        xmlns:usercontrols="clr-namespace:Demo.UserControls"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="CustomStyleExampleWindow"
+        Height="500"
+        Width="500"
+        DataContext="{Binding Source={StaticResource Locator},Path=VieWModelCustomStyleExampleWindow}">
+    <!--This example shows how you can create your own ItemContainerStyle to style and expand the features of the tab items-->
+    <Window.Resources>
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <conv:BooleanToPinTabTextConverter x:Key="BooleanToPinTabTextConverter" />
+        <ctConv:IsLessThanConverter x:Key="IsLessThanConverter" />
+        <DataTemplate DataType="{x:Type vm:TabClass1}">
+            <usercontrols:UserControl1 />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TabClass2}">
+            <usercontrols:UserControl2 />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TabClass3}">
+            <usercontrols:UserControl3 />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TabClass4}">
+            <usercontrols:UserControl4 />
+        </DataTemplate>
+
+        <Path x:Key="PlusSignPath"
+              Data="F1 M 2.88,17.2725C 0.959991,15.3475 0,12.95 0,10.08C 0,7.21002 0.959991,4.8125 2.88,2.88751C 4.80002,0.962494 7.19125,0 10.0537,0C 12.9163,0 15.3163,0.962494 17.2538,2.88751C 19.1913,4.8125 20.16,7.21002 20.16,10.08C 20.16,12.95 19.1913,15.3475 17.2538,17.2725C 15.3163,19.1975 12.9163,20.16 10.0537,20.16C 7.19125,20.16 4.80002,19.1975 2.88,17.2725 Z M 3.84,11.3625L 8.81998,11.3625L 8.81998,16.32L 11.34,16.32L 11.34,11.3625L 16.32,11.3625L 16.32,8.85001L 11.34,8.85001L 11.34,3.84L 8.81998,3.84L 8.81998,8.85001L 3.84,8.85001L 3.84,11.3625 Z " />
+
+        <!--A new style for the close tab button, where it is enlarged and recolored.-->
+        <Style TargetType="{x:Type Button}"
+               x:Key="CloseButtonStyle"
+               xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Style.Resources>
+                <sys:Double x:Key="CloseButtonWidth">8</sys:Double>
+                <sys:Double x:Key="CloseCircleWidth">14</sys:Double>
+                <sys:Double x:Key="CloseButtonOffset">3</sys:Double>
+            </Style.Resources>
+            <Setter Property="Height"
+                    Value="{StaticResource CloseCircleWidth}" />
+            <Setter Property="Width"
+                    Value="{StaticResource CloseCircleWidth}" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="Foreground"
+                    Value="Black" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Canvas Background="Transparent"
+                                x:Name="CloseButton"
+                                Width="{StaticResource CloseCircleWidth}"
+                                Height="{StaticResource CloseCircleWidth}">
+                            <Ellipse Width="{StaticResource CloseCircleWidth}"
+                                     Fill="{TemplateBinding Background}"
+                                     Height="{StaticResource CloseCircleWidth}" />
+                            <Canvas Canvas.Left="{StaticResource CloseButtonOffset}"
+                                    Canvas.Top="{StaticResource CloseButtonOffset}"
+                                    Background="Transparent"
+                                    Width="{StaticResource CloseButtonWidth}"
+                                    Height="{StaticResource CloseButtonWidth}">
+                                <Line X1="0"
+                                      Y1="0"
+                                      X2="{StaticResource CloseButtonWidth}"
+                                      Y2="{StaticResource CloseButtonWidth}"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="2" />
+                                <Line X1="0"
+                                      Y1="{StaticResource CloseButtonWidth}"
+                                      X2="{StaticResource CloseButtonWidth}"
+                                      Y2="0"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="2" />
+                            </Canvas>
+                        </Canvas>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="Black" />
+                    <Setter Property="Foreground"
+                            Value="Red" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--This path has been edited to reshape the tabs-->
+        <Path x:Key="TabPath"
+              Data="M39,96 C38.75,0 59.25,0 76,0 92.75,0 247,0 258,0 269,5 295.5,0 295,96" />
+
+        <SolidColorBrush x:Key="TabStrokeBrush">#FF999999</SolidColorBrush>
+        <SolidColorBrush x:Key="SelectedTabStrokeBrush">WhiteSmoke</SolidColorBrush>
+        <SolidColorBrush x:Key="TabHighlightBrush">White</SolidColorBrush>
+        <SolidColorBrush x:Key="SelectedTabHighlighBrush">Transparent</SolidColorBrush>
+        <sys:Double x:Key="MinTabWidthToShowCloseButton">60</sys:Double>
+        <Style TargetType="{x:Type ct:ChromeTabItem}"
+               x:Key="CustomTabItemStyle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ct:ChromeTabItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="5" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Close"
+                                              Command="{Binding CloseTabCommand, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <MenuItem Header="Close all"
+                                              Command="{Binding CloseAllTabsCommand, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <MenuItem Header="Close other tabs"
+                                              Command="{Binding CloseOtherTabsCommand, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              CommandTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              CommandParameter="{Binding}" />
+                                </ContextMenu>
+                            </Grid.ContextMenu>
+                            <Path x:Name="TabFill"
+                                  Margin="0 0 0 0"
+                                  Grid.ColumnSpan="5"
+                                  VerticalAlignment="Top"
+                                  Stretch="Fill"
+                                  Data="{Binding Source={StaticResource TabPath},Path=Data}">
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1"
+                                                         StartPoint="0.5,0"
+                                                         Opacity="1">
+                                        <GradientStop x:Name="TabFillGradientStop1"
+                                                      Color="#FFEEEEEE"
+                                                      Offset="0" />
+                                        <GradientStop x:Name="TabFillGradientStop2"
+                                                      Color="#FFDDDDDD"
+                                                      Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                            <Path x:Name="TabPath"
+                                  Grid.ColumnSpan="5"
+                                  VerticalAlignment="Top"
+                                  Stretch="Fill"
+                                  Stroke="{StaticResource TabStrokeBrush}"
+                                  Data="{Binding Source={StaticResource TabPath},Path=Data}" />
+                            <Path x:Name="TabHighlight"
+                                  Margin="0 0 0 1"
+                                  Grid.ColumnSpan="5"
+                                  VerticalAlignment="Top"
+                                  Stretch="Fill"
+                                  Stroke="{StaticResource TabHighlightBrush}"
+                                  Data="{Binding Source={StaticResource TabPath},Path=Data}">
+                                <Path.RenderTransformOrigin>
+                                    <Point X=".5"
+                                           Y=".5" />
+                                </Path.RenderTransformOrigin>
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <TranslateTransform Y=".5" />
+                                        <ScaleTransform ScaleX=".96"
+                                                        ScaleY=".94" />
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                            </Path>
+                            <ContentPresenter x:Name="ContentSite"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              ContentSource="Header" />
+
+                            <Button KeyboardNavigation.IsTabStop="False"
+                                    x:Name="CloseButton"
+                                    Style="{StaticResource CloseButtonStyle}"
+                                    Margin="0 0 10 0"
+                                    Grid.Column="2"
+                                    Command="{Binding CloseTabCommand, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
+
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <!--This is a trigger that will blink the tab with a notifying color bound to a boolean value in the ViewModel-->
+                            <DataTrigger Binding="{Binding IsBlinking}"
+                                         Value="true">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard x:Name="BeginBlinkTabStoryboard">
+                                        <Storyboard Storyboard.TargetName="TabFill"
+                                                    Duration="1:0:0"
+                                                    RepeatBehavior="Forever"
+                                                    Storyboard.TargetProperty="Fill.Color">
+
+                                            <Storyboard Storyboard.TargetName="TabFill"
+                                                        AutoReverse="True"
+                                                        RepeatBehavior="5x"
+                                                        Storyboard.TargetProperty="Fill.Color"
+                                                        BeginTime="0:0:0">
+                                                <ColorAnimation Storyboard.TargetName="TabFillGradientStop1"
+                                                                Storyboard.TargetProperty="Color"
+                                                                To="Yellow"
+                                                                Duration="0:0:0.5"
+                                                                AutoReverse="True"
+                                                                BeginTime="0:0:0" />
+                                                <ColorAnimation Storyboard.TargetName="TabFillGradientStop2"
+                                                                Storyboard.TargetProperty="Color"
+                                                                To="Orange"
+                                                                Duration="0:0:0.5"
+                                                                AutoReverse="True"
+                                                                BeginTime="0:0:0" />
+                                            </Storyboard>
+                                            <Storyboard Storyboard.TargetName="TabFill"
+                                                        RepeatBehavior="8x"
+                                                        AutoReverse="True"
+                                                        Storyboard.TargetProperty="Fill.Color"
+                                                        BeginTime="0:0:10">
+                                                <ColorAnimation Storyboard.TargetName="TabFillGradientStop1"
+                                                                Storyboard.TargetProperty="Color"
+                                                                To="Yellow"
+                                                                Duration="0:0:1.5"
+                                                                AutoReverse="True"
+                                                                BeginTime="0:0:0" />
+                                                <ColorAnimation Storyboard.TargetName="TabFillGradientStop2"
+                                                                Storyboard.TargetProperty="Color"
+                                                                To="Orange"
+                                                                Duration="0:0:1.5"
+                                                                AutoReverse="True"
+                                                                BeginTime="0:0:0" />
+                                            </Storyboard>
+                                            <Storyboard Storyboard.TargetName="TabFill"
+                                                        AutoReverse="True"
+                                                        RepeatBehavior="Forever"
+                                                        Storyboard.TargetProperty="Fill.Color"
+                                                        BeginTime="0:0:22">
+                                                <ColorAnimation Storyboard.TargetName="TabFillGradientStop1"
+                                                                Storyboard.TargetProperty="Color"
+                                                                From="Yellow"
+                                                                To="Yellow"
+                                                                Duration="0:0:0"
+                                                                AutoReverse="True"
+                                                                BeginTime="0:0:0" />
+                                                <ColorAnimation Storyboard.TargetName="TabFillGradientStop2"
+                                                                Storyboard.TargetProperty="Color"
+                                                                From="Orange"
+                                                                To="Orange"
+                                                                Duration="0:0:0"
+                                                                AutoReverse="True"
+                                                                BeginTime="0:0:0" />
+                                            </Storyboard>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
+                                    <StopStoryboard BeginStoryboardName="BeginBlinkTabStoryboard" />
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+                            <!--This trigger hides the close button on each tab that is shrunk to below a minimum width-->
+                            <DataTrigger Binding="{Binding Path=ActualWidth, RelativeSource={RelativeSource Self}, Converter={StaticResource IsLessThanConverter}, ConverterParameter={StaticResource MinTabWidthToShowCloseButton}}"
+                                         Value="True">
+                                <Setter Property="Button.Visibility"
+                                        TargetName="CloseButton"
+                                        Value="Collapsed" />
+                            </DataTrigger>
+                            <!--This trigger shows the close button on every tab that is selected, unless it is pinned-->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsPinned"
+                                               Value="False" />
+                                    <Condition Property="IsSelected"
+                                               Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="CloseButton"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                            </MultiTrigger>
+                            <!--This trigger hides the close button on pinned tabs-->
+                            <Trigger Property="IsPinned"
+                                     Value="True">
+                                <Setter TargetName="CloseButton"
+                                        Property="Visibility"
+                                        Value="Collapsed" />
+                            </Trigger>
+
+                            <!--This trigger changes the look of the currently selected tab item-->
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter Property="Fill"
+                                        TargetName="TabFill"
+                                        Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SelectedTabBrush}">
+                                </Setter>
+                                <Setter Property="Margin"
+                                        TargetName="TabFill"
+                                        Value="0 0 0 -1" />
+                                <Setter Property="Margin"
+                                        TargetName="TabPath"
+                                        Value="0" />
+                                <Setter Property="Stroke"
+                                        TargetName="TabHighlight"
+                                        Value="{StaticResource SelectedTabHighlighBrush}" />
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <!--The color of the add tab button can also be set as a property on the tab control.
+        Here it is set to orange on mouseover and red on click. The tab overlap is also reduced to 0-->
+        <ct:ChromeTabControl  x:Name="MyChromeTabControlWithCustomStyle"
+                              AddTabButtonMouseOverBrush="Orange"
+                              AddTabButtonMouseDownBrush="Red"
+                              SelectedTabBrush="WhiteSmoke"
+                              TabOverlap="0"
+                              Background="AliceBlue"
+                              ItemsSource="{Binding ItemCollection}"
+                              SelectedItem="{Binding SelectedTab}"
+                              AddTabCommand="{Binding AddTabCommand}"
+                              PinTabCommand="{Binding PinTabCommand}"
+                              CloseTabCommand="{Binding CloseTabCommand}"
+                              ReorderTabsCommand="{Binding ReorderTabsCommand}"
+                              MinimumTabWidth="40"
+                              PinnedTabWidth="50"
+                              MaximumTabWidth="125"
+                              ItemContainerStyle="{StaticResource CustomTabItemStyle}">
+            <!--We override the control template here to show how you can modify the properties of tab panel and content presenter-->
+            <ct:ChromeTabControl.Template>
+                <ControlTemplate TargetType="{x:Type ct:ChromeTabControl}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderThickness="0,0,0,1"
+                                BorderBrush="#FF999999"
+                                Grid.Row="0"
+                                Padding="10,5,10,0">
+                            <ct:ChromeTabPanel IsItemsHost="True"
+                                               Background="{TemplateBinding Background}" />
+                        </Border>
+                        <Grid Grid.Row="1">
+                            <Border Background="WhiteSmoke">
+                                <ContentPresenter Content="{TemplateBinding SelectedContent}" />
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </ct:ChromeTabControl.Template>
+
+            <ct:ChromeTabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding TabName}"
+                               Margin="10,0,0,0"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center" />
+                </DataTemplate>
+            </ct:ChromeTabControl.ItemTemplate>
+            <!--You can also change the control template of the add new tab button. Here it is changed to a plus sign using a Path-->
+            <ct:ChromeTabControl.AddButtonTemplate>
+                <ControlTemplate>
+                    <Viewbox SnapsToDevicePixels="True">
+                        <Path Fill="{TemplateBinding Background}"
+                              Stretch="Fill"
+                              Stroke="#FF999999"
+                              Data="{Binding Source={StaticResource PlusSignPath},Path=Data}" />
+                    </Viewbox>
+                </ControlTemplate>
+            </ct:ChromeTabControl.AddButtonTemplate>
+        </ct:ChromeTabControl>
+    </Grid>
+</Window>

@@ -209,5 +209,10 @@ namespace Demo
             window.Show();
         }
 
+        private void BnOpenCustomStyleExample_Click(object sender, RoutedEventArgs e)
+        {
+            CustomStyleExampleWindow window = new CustomStyleExampleWindow();
+            window.Show();
+        }
     }
 }

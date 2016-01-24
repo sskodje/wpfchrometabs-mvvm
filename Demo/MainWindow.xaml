@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ChromeTabs Demo"
         Height="600"
-        Width="600"
+        Width="700"
         xmlns:local="clr-namespace:Demo"
         xmlns:vm="clr-namespace:Demo.ViewModel"
         xmlns:usercontrols="clr-namespace:Demo.UserControls"
@@ -31,9 +31,10 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <!--The tab control with all possible settings displayed, and with tab tearing support.-->
+        <!--The tab control with with tab tearing support.-->
         <ct:ChromeTabControl x:Name="MyChromeTabControl"
                              TabPersistBehavior="All"
+                             AddTabButtonBehavior="OpenNewTab"
                              Background="AliceBlue"
                              ItemsSource="{Binding ItemCollection}"
                              SelectedItem="{Binding SelectedTab}"
@@ -119,25 +120,48 @@
                     </Grid>
                 </DataTemplate>
             </ct:ChromeTabControl.ItemTemplate>
-
         </ct:ChromeTabControl>
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
+                    VerticalAlignment="Center"
                     HorizontalAlignment="Right">
+            <Button x:Name="button"
+                    Content="Add Tab"
+                    Margin="5"
+                    Command="{Binding AddTabCommand}"
+                    HorizontalAlignment="Left"
+                    Width="75" />
+            <CheckBox Content="Can add tabs"
+                      Margin="5"
+                      IsChecked="{Binding CanAddTabs,Mode=TwoWay}"
+                      VerticalAlignment="Center" />
             <CheckBox Content="Show add button"
                       Margin="5"
-                      IsChecked="{Binding ShowAddButton}" />
+                      IsChecked="{Binding ShowAddButton}"
+                      VerticalAlignment="Center" />
             <CheckBox Content="Movable tabs"
                       Margin="5"
-                      IsChecked="{Binding CanMoveTabs}" />
+                      IsChecked="{Binding CanMoveTabs}"
+                      VerticalAlignment="Center" />
         </StackPanel>
-        <Button x:Name="BnOpenPinnedTabExample"
-                Content="Pinned tab example"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Bottom"
-                Margin="5,0,0,3"
-                Width="115"
-                Grid.Row="1"
-                Click="BnOpenPinnedTabExample_Click" />
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left">
+            <Button x:Name="BnOpenPinnedTabExample"
+                    Content="Pinned tab example"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                    
+                    Grid.Row="1"
+                    Click="BnOpenPinnedTabExample_Click" />
+            <Button x:Name="BnOpenCustomStyleExample"
+                    Content="Custom style example"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                   
+                    Grid.Row="1"
+                    Click="BnOpenCustomStyleExample_Click" />
+        </StackPanel>
+
     </Grid>
 </Window>

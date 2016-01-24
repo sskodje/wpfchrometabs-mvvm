@@ -41,6 +41,15 @@ The basic functionality can be done as simple as :
         }
 ```
 
+##New in 1.2:
+
+ - Background tab visual tree can now be cached in memory via the TabPersistBehavior, either for the lifetime of the application, or for a chosen duration.
+ - Added support for styling the "new tab" button.
+ - Added a property to change "new tab" button behavior between opening tabs in the background or foreground.
+ - Added support for changing the tab overlap.
+
+The demo project has also been updated to show how you can fully style the control by using your own templates.
+
 ##New in 1.1:
 
  - Pinned tabs: Chrome style pinned tabs is now supported.

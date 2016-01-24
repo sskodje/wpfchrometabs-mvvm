@@ -69,14 +69,22 @@
     <Compile Include="Converters\BooleanToPinTabTextConverter.cs" />
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\TabToTabSnapConverter.cs" />
+    <Compile Include="CustomStyleExampleWindow.xaml.cs">
+      <DependentUpon>CustomStyleExampleWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DockingWindow.xaml.cs">
       <DependentUpon>DockingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="PinnedTabExampleWindow.xaml.cs">
       <DependentUpon>PinnedTabExampleWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SampleData\SampleViewModelCustomStyleExampleWindow.cs" />
     <Compile Include="SampleData\SampleViewModelMainWindow.cs" />
     <Compile Include="SampleData\SampleViewModelPinnedTabExampleWindow.cs" />
+    <Compile Include="UserControls\UserControl4.xaml.cs">
+      <DependentUpon>UserControl4.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\IViewModelCustomStyleExampleWindow.cs" />
     <Compile Include="ViewModel\IViewModelMainWindow.cs" />
     <Compile Include="ViewModel\IViewModelPinnedTabExampleWindow.cs" />
     <Compile Include="ViewModel\TabBase.cs" />
@@ -93,10 +101,16 @@
       <DependentUpon>UserControl3.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Win32.cs" />
+    <Compile Include="ViewModel\TabClass4.cs" />
+    <Compile Include="ViewModel\ViewModelCustomStyleExampleWindow.cs" />
     <Compile Include="ViewModel\ViewModelExampleBase.cs" />
     <Compile Include="ViewModel\ViewModelMainWindow.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="ViewModel\ViewModelPinnedTabExampleWindow.cs" />
+    <Page Include="CustomStyleExampleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DockingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -126,6 +140,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\UserControl3.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\UserControl4.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -36,14 +36,24 @@ namespace Demo.ViewModel
                 // Create design time view services and models
                 SimpleIoc.Default.Register<IViewModelMainWindow, SampleData.SampleViewModelMainWindow>();
                 SimpleIoc.Default.Register<IViewModelPinnedTabExampleWindow, SampleData.SampleViewModelPinnedTabExampleWindow>();
+                SimpleIoc.Default.Register<IViewModelCustomStyleExampleWindow, SampleData.SampleViewModelCustomStyleExampleWindow>();
             }
             else
             {
                 // Create run time view services and models
                 SimpleIoc.Default.Register<IViewModelMainWindow, ViewModelMainWindow>();
                 SimpleIoc.Default.Register<IViewModelPinnedTabExampleWindow, ViewModelPinnedTabExampleWindow>();
+                SimpleIoc.Default.Register<IViewModelCustomStyleExampleWindow, ViewModelCustomStyleExampleWindow>();
             }
 
+        }
+
+        public IViewModelCustomStyleExampleWindow VieWModelCustomStyleExampleWindow
+        {
+             get
+            {
+                return ServiceLocator.Current.GetInstance<IViewModelCustomStyleExampleWindow>();
+            }
         }
 
         public IViewModelMainWindow ViewModelMainWindow
@@ -54,7 +64,7 @@ namespace Demo.ViewModel
             }
         }
 
-        public IViewModelPinnedTabExampleWindow VieWModelPinnedTabExampleWindow
+        public IViewModelPinnedTabExampleWindow ViewModelPinnedTabExampleWindow
         {
             get
             {

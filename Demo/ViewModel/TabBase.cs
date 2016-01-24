@@ -45,6 +45,7 @@ namespace Demo.ViewModel
             }
         }
 
+
         private ImageSource _tabIcon;
         public ImageSource TabIcon
         {

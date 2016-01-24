@@ -9,7 +9,8 @@
         Title="PinnedTabExample"
         Height="500"
         Width="500"
-        DataContext="{Binding Source={StaticResource Locator},Path=VieWModelPinnedTabExampleWindow}">
+        DataContext="{Binding Source={StaticResource Locator},Path=ViewModelMainWindow}">
+    <!--This example shows how you implement pinned tab functionality-->
     <Window.Resources>
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <conv:BooleanToPinTabTextConverter x:Key="BooleanToPinTabTextConverter" />
@@ -25,7 +26,6 @@
     </Window.Resources>
     <Grid>
         <ct:ChromeTabControl  x:Name="MyChromeTabControlWithPinnedTabs"
-                              TabPersistBehavior="All"
                               Background="AliceBlue"
                               ItemsSource="{Binding ItemCollection}"
                               SelectedItem="{Binding SelectedTab}"

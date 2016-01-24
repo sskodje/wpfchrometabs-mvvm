@@ -35,13 +35,29 @@ namespace Demo.ViewModel
             }
         }
 
+        private bool _canAddTabs;
+        public bool CanAddTabs
+        {
+            get { return _canAddTabs; }
+            set
+            {
+                if (_canAddTabs != value)
+                {
+                    Set(() => CanAddTabs, ref _canAddTabs, value);
+                    AddTabCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+
         public ViewModelExampleBase()
         {
             this.ItemCollection = new ObservableCollection<TabBase>();
             this.ItemCollection.CollectionChanged += ItemCollection_CollectionChanged;
             this.ReorderTabsCommand = new RelayCommand<TabReorder>(ReorderTabsCommandAction);
-            this.AddTabCommand = new RelayCommand(AddTabCommandAction);
+            this.AddTabCommand = new RelayCommand(AddTabCommandAction,()=>CanAddTabs);
             this.CloseTabCommand = new RelayCommand<TabBase>(CloseTabCommandAction);
+            CanAddTabs = true;
         }
 
         protected TabClass1 CreateTab1()
@@ -59,9 +75,13 @@ namespace Demo.ViewModel
         {
             var tab = new TabClass3() { TabName = "Tab class 3", MyStringContent = "Try right clicking on the tab header. This tab can not be dragged out to a new window, to demonstrate that you can dynamically choose what tabs can, based on the viewmodel.", MyImageUrl = new Uri("/Resources/Kitten.jpg", UriKind.Relative), TabIcon = new BitmapImage(new Uri("/Resources/3.png", UriKind.Relative)) };
             return tab;
-
         }
-        protected TabClass1 CreateTab4()
+        protected TabClass4 CreateTab4()
+        {
+            var tab = new TabClass4() { TabName = "Tab class 4", MyStringContent = "This tab demonstrates a custom tab header implementation", IsBlinking=true };
+            return tab;
+        }
+        protected TabClass1 CreateTabLoremIpsum()
         {
             var tab = new TabClass1() { TabName = "Tab class 1", MyStringContent = Properties.Resources.LoremImpsum, TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
             return tab;
