@@ -114,6 +114,8 @@ namespace ChromeTabs
 
         private void Command_CanExecuteChanged(object sender, EventArgs e)
         {
+            if (DesignerProperties.GetIsInDesignMode(this))
+                return;
             ((ChromeTabPanel)this.ItemsHost).IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
         }
         public static DependencyProperty AddTabCommandParameterProperty =
@@ -345,6 +347,16 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         public static readonly DependencyProperty TabTearTriggerDistanceProperty =
             DependencyProperty.Register("TabTearTriggerDistance", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(0.0));
 
+        public double TabOverlap
+        {
+            get { return (double)GetValue(TabOverlapProperty); }
+            set { SetValue(TabOverlapProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TabOverlap.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TabOverlapProperty =
+            DependencyProperty.Register("TabOverlap", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(10.0));
+
 
         /// <summary>
         /// Controls the persist behavior of tabs. All = all tabs live in memory, None = no tabs live in memory, Timed= tabs gets cleared from memory after a period of being unselected.
@@ -398,6 +410,26 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             DependencyProperty.Register("AddTabButtonBehavior", typeof(AddTabButtonBehavior), typeof(ChromeTabControl), new PropertyMetadata(AddTabButtonBehavior.OpenNewTab));
 
 
+
+        public ControlTemplate AddButtonTemplate
+        {
+            get { return (ControlTemplate)GetValue(AddButtonTemplateProperty); }
+            set { SetValue(AddButtonTemplateProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AddButtonControlTemplate.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AddButtonTemplateProperty =
+            DependencyProperty.Register("AddButtonTemplate", typeof(ControlTemplate), typeof(ChromeTabControl), new PropertyMetadata(null,OnAddButtonTemplateChanged));
+
+        private static void OnAddButtonTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ChromeTabControl ctc = (ChromeTabControl)d;
+            ChromeTabPanel panel = ctc.ItemsHost as ChromeTabPanel;
+            if(panel!= null)
+            {
+                panel.SetAddButtonControlTemplate(e.NewValue as ControlTemplate);
+            }
+        }
 
         static ChromeTabControl()
         {

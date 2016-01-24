@@ -7,7 +7,7 @@ using System.Windows.Data;
 
 namespace ChromeTabs.Converters
 {
-    internal class IsLessThanConverter : DependencyObject,IValueConverter
+    public class IsLessThanConverter : DependencyObject,IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

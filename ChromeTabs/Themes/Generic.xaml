@@ -118,7 +118,15 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
 
+    <Path x:Key="TabPath"
+          Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96" />
+
+    <SolidColorBrush x:Key="TabStrokeBrush">#FF999999</SolidColorBrush>
+    <SolidColorBrush x:Key="SelectedTabStrokeBrush">WhiteSmoke</SolidColorBrush>
+    <SolidColorBrush x:Key="TabHighlightBrush">White</SolidColorBrush>
+    <SolidColorBrush x:Key="SelectedTabHighlighBrush">Transparent</SolidColorBrush>
     <sys:Double x:Key="MinTabWidthToShowCloseButton">60</sys:Double>
     <Style TargetType="{x:Type local:ChromeTabItem}"
            xmlns:conv="clr-namespace:ChromeTabs.Converters">
@@ -140,7 +148,7 @@
                               Grid.ColumnSpan="4"
                               VerticalAlignment="Top"
                               Stretch="Fill"
-                              Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96">
+                              Data="{Binding Source={StaticResource TabPath},Path=Data, Mode=OneTime}">
                             <Path.Fill>
                                 <LinearGradientBrush EndPoint="0.5,1"
                                                      StartPoint="0.5,0"
@@ -156,15 +164,15 @@
                               Grid.ColumnSpan="4"
                               VerticalAlignment="Top"
                               Stretch="Fill"
-                              Stroke="#FF999999"
-                              Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96" />
+                              Stroke="{StaticResource TabStrokeBrush}"
+                              Data="{Binding Source={StaticResource TabPath},Path=Data, Mode=OneTime}"/>
                         <Path Name="TabHighlight"
                               Margin="0 0 0 1"
                               Grid.ColumnSpan="4"
                               VerticalAlignment="Top"
                               Stretch="Fill"
-                              Stroke="White"
-                              Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96">
+                              Stroke="{StaticResource TabHighlightBrush}"
+                              Data="{Binding Source={StaticResource TabPath},Path=Data, Mode=OneTime}">
                             <Path.RenderTransformOrigin>
                                 <Point X=".5"
                                        Y=".5" />
@@ -193,12 +201,14 @@
                         </Button>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <!--This trigger hides the close button on each tab that is shrunk to below a minimum width-->
                         <DataTrigger Binding="{Binding Path=ActualWidth, RelativeSource={RelativeSource Self}, Converter={StaticResource IsLessThanConverter}, ConverterParameter={StaticResource MinTabWidthToShowCloseButton}}"
                                      Value="True">
                             <Setter Property="Button.Visibility"
                                     TargetName="CloseButton"
                                     Value="Collapsed" />
                         </DataTrigger>
+                        <!--This trigger shows the close button on every tab that is selected, unless it is pinned-->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsPinned"
@@ -210,13 +220,14 @@
                                     Property="Visibility"
                                     Value="Visible" />
                         </MultiTrigger>
-
+                        <!--This trigger hides the close button on pinned tabs-->
                         <Trigger Property="IsPinned"
                                  Value="True">
                             <Setter TargetName="CloseButton"
                                     Property="Visibility"
                                     Value="Collapsed" />
                         </Trigger>
+                        <!--This trigger changes the look of the currently selected tab item-->
                         <Trigger Property="IsSelected"
                                  Value="True">
                             <Setter Property="Fill"
@@ -230,7 +241,7 @@
                                     Value="0" />
                             <Setter Property="Stroke"
                                     TargetName="TabHighlight"
-                                    Value="Transparent" />
+                                    Value="{StaticResource SelectedTabHighlighBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
