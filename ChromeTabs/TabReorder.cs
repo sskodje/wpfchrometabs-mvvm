@@ -9,10 +9,12 @@ namespace ChromeTabs
     {
         public int FromIndex { get; set; }
         public int ToIndex { get; set; }
-        public TabReorder(int from, int to)
+        public bool ReorderSource { get; set; }
+        public TabReorder(int from, int to, bool reorderSource = true)
         {
             this.FromIndex = from;
             this.ToIndex = to;
+            this.ReorderSource = reorderSource;
         }
     }
 }
