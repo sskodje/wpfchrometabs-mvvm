@@ -570,9 +570,11 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 return;
             if (!fromItem.IsPinned && toItem.IsPinned)
                 return;
+
+            var tabReorder = new TabReorder(fromIndex, toIndex);
             if (this.ReorderTabsCommand != null)
             {
-                this.ReorderTabsCommand.Execute(new TabReorder(fromIndex, toIndex));
+                this.ReorderTabsCommand.Execute(tabReorder);
             }
 
             for (int i = 0; i < this.Items.Count; i += 1)
@@ -581,6 +583,9 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 v.Margin = new Thickness(0);
             }
             this.SelectedItem = fromTab;
+
+            if (!tabReorder.ReorderSource)
+                return;
 
             var sourceType = ItemsSource.GetType();
             if (sourceType.IsGenericType)
