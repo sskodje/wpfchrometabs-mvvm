@@ -419,13 +419,13 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         // Using a DependencyProperty as the backing store for AddButtonControlTemplate.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty AddButtonTemplateProperty =
-            DependencyProperty.Register("AddButtonTemplate", typeof(ControlTemplate), typeof(ChromeTabControl), new PropertyMetadata(null,OnAddButtonTemplateChanged));
+            DependencyProperty.Register("AddButtonTemplate", typeof(ControlTemplate), typeof(ChromeTabControl), new PropertyMetadata(null, OnAddButtonTemplateChanged));
 
         private static void OnAddButtonTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChromeTabControl ctc = (ChromeTabControl)d;
             ChromeTabPanel panel = ctc.ItemsHost as ChromeTabPanel;
-            if(panel!= null)
+            if (panel != null)
             {
                 panel.SetAddButtonControlTemplate(e.NewValue as ControlTemplate);
             }
@@ -574,6 +574,19 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             {
                 this.ReorderTabsCommand.Execute(new TabReorder(fromIndex, toIndex));
             }
+            else
+            {
+                var sourceType = ItemsSource.GetType();
+                if (sourceType.IsGenericType)
+                {
+                    var sourceDefinition = sourceType.GetGenericTypeDefinition();
+                    if (sourceDefinition == typeof(ObservableCollection<>))
+                    {
+                        var method = sourceType.GetMethod("Move");
+                        method.Invoke(ItemsSource, new object[] { fromIndex, toIndex });
+                    }
+                }
+            }
 
             for (int i = 0; i < this.Items.Count; i += 1)
             {
@@ -581,6 +594,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 v.Margin = new Thickness(0);
             }
             this.SelectedItem = fromTab;
+
         }
 
         internal void SetCanAddTab(bool value)
@@ -647,7 +661,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                         {
                             // don't do anything with new items not created by the add button, because we don't want to
                             // create visuals that aren't being shown.
-                            if (_addTabButtonClicked && AddTabButtonBehavior== AddTabButtonBehavior.OpenNewTab)
+                            if (_addTabButtonClicked && AddTabButtonBehavior == AddTabButtonBehavior.OpenNewTab)
                             {
                                 _addTabButtonClicked = false;
                                 if (e.NewItems != null)

@@ -41,6 +41,9 @@ The basic functionality can be done as simple as :
         }
 ```
 
+When using an ObservableCollection and without implementing the ReorderTabsCommand, tab reordering works out of the box by modifying the source collection order.
+The demo project shows how to implement your own sorting logic using CollectionViewSource, for when you don't wish to modify the source collection or for more advanced sorting.
+
 ##New in 1.2:
 
  - Background tab visual tree can now be cached in memory via the TabPersistBehavior, either for the lifetime of the application, or for a chosen duration.

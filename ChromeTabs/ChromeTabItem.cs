@@ -151,7 +151,7 @@ namespace ChromeTabs
         {
             ChromeTabItem tabItem = (ChromeTabItem)d;
 
-            if (tabItem.ParentTabControl.TabPersistBehavior == TabPersistBehavior.Timed)
+            if (tabItem.ParentTabControl!= null && tabItem.ParentTabControl.TabPersistBehavior == TabPersistBehavior.Timed)
             {
                 if ((bool)args.NewValue == true)
                 {
