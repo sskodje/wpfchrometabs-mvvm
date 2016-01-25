@@ -581,6 +581,17 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 v.Margin = new Thickness(0);
             }
             this.SelectedItem = fromTab;
+
+            var sourceType = ItemsSource.GetType();
+            if (sourceType.IsGenericType)
+            {
+                var sourceDefinition = sourceType.GetGenericTypeDefinition();
+                if (sourceDefinition == typeof(ObservableCollection<>))
+                {
+                    var method = sourceType.GetMethod("Move");
+                    method.Invoke(ItemsSource, new object[] { fromIndex, toIndex });
+                }
+            }
         }
 
         internal void SetCanAddTab(bool value)
