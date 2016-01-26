@@ -58,7 +58,6 @@ namespace ChromeTabs
         private const double stickyReanimateDuration = 0.10;
         private const double tabWidthSlidePercent = 0.5;
         private bool hideAddButton;
-        private bool draggingWindow;
         private Size finalSize;
         private double leftMargin;
         private double rightMargin;
@@ -391,8 +390,7 @@ namespace ChromeTabs
                     && Mouse.LeftButton == MouseButtonState.Pressed
                     && !isTabGrab)
                 {
-
-                    this.draggingWindow = true;
+                    this.draggedTab = null;
                     Window.GetWindow(this).DragMove();
                 }
                 else
@@ -427,7 +425,7 @@ namespace ChromeTabs
                     this.InvalidateVisual();
                 }
             }
-            if (this.draggedTab == null || this.draggingWindow || !ParentTabControl.CanMoveTabs)
+            if (this.draggedTab == null || !ParentTabControl.CanMoveTabs)
                 return;
 
             Point insideTabPoint = this.TranslatePoint(p, this.draggedTab);
@@ -555,7 +553,6 @@ namespace ChromeTabs
         {
             lock (lockObject)
             {
-                this.draggingWindow = false;
                 if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible)
                 {
                     if (this.addButtonRect.Contains(p) && IsAddButtonEnabled)
