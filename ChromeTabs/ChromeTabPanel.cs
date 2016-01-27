@@ -192,7 +192,7 @@ namespace ChromeTabs
                 double thickness = 0.0;
                 ChromeTabItem item = ItemsControl.ContainerFromElement(this.ParentTabControl, element) as ChromeTabItem;
                 thickness = item.Margin.Bottom;
-                double tabWidth = GetWidthForTabItem(item);
+                double tabWidth = element.DesiredSize.Width;
                 element.Arrange(new Rect(offset, 0, tabWidth, finalSize.Height - thickness));
                 offset += tabWidth - Overlap;
             }
@@ -262,7 +262,7 @@ namespace ChromeTabs
                 if (Children[0] is ChromeTabItem)
                     ParentTabControl.ChangeSelectedItem(Children[0] as ChromeTabItem);
             }
-            if(ParentTabControl!= null && ParentTabControl.AddButtonTemplate!= null)
+            if (ParentTabControl != null && ParentTabControl.AddButtonTemplate != null)
             {
                 SetAddButtonControlTemplate(ParentTabControl.AddButtonTemplate);
             }
