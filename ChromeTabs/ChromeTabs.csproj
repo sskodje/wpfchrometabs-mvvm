@@ -73,6 +73,7 @@
     <Compile Include="TabPersistBehavior.cs" />
     <Compile Include="TabDragEventArgs.cs" />
     <Compile Include="TabReorder.cs" />
+    <Compile Include="TabShape.cs" />
     <Compile Include="Utilities\MouseUtilities.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>

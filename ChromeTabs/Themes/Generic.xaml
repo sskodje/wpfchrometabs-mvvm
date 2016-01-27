@@ -118,10 +118,8 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
 
-    <Path x:Key="TabPath"
-          Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96" />
+
 
     <SolidColorBrush x:Key="TabStrokeBrush">#FF999999</SolidColorBrush>
     <SolidColorBrush x:Key="SelectedTabStrokeBrush">WhiteSmoke</SolidColorBrush>
@@ -138,18 +136,16 @@
                 <ControlTemplate TargetType="{x:Type local:ChromeTabItem}">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.1*" />
+                            <ColumnDefinition Width="10" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="0.1*" />
+                            <ColumnDefinition Width="10" />
                         </Grid.ColumnDefinitions>
-                        <Path Name="TabFill"
-                              Margin="0 0 0 0"
-                              Grid.ColumnSpan="4"
-                              VerticalAlignment="Top"
-                              Stretch="Fill"
-                              Data="{Binding Source={StaticResource TabPath},Path=Data, Mode=OneTime}">
-                            <Path.Fill>
+                        <local:TabShape x:Name="TabFill"
+                                        Stretch="Fill"
+                                        Grid.ColumnSpan="4"
+                                        VerticalAlignment="Top">
+                            <Shape.Fill>
                                 <LinearGradientBrush EndPoint="0.5,1"
                                                      StartPoint="0.5,0"
                                                      Opacity="1">
@@ -158,33 +154,20 @@
                                     <GradientStop Color="#FFDDDDDD"
                                                   Offset="1" />
                                 </LinearGradientBrush>
-                            </Path.Fill>
-                        </Path>
-                        <Path Name="TabPath"
-                              Grid.ColumnSpan="4"
-                              VerticalAlignment="Top"
-                              Stretch="Fill"
-                              Stroke="{StaticResource TabStrokeBrush}"
-                              Data="{Binding Source={StaticResource TabPath},Path=Data, Mode=OneTime}"/>
-                        <Path Name="TabHighlight"
-                              Margin="0 0 0 1"
-                              Grid.ColumnSpan="4"
-                              VerticalAlignment="Top"
-                              Stretch="Fill"
-                              Stroke="{StaticResource TabHighlightBrush}"
-                              Data="{Binding Source={StaticResource TabPath},Path=Data, Mode=OneTime}">
-                            <Path.RenderTransformOrigin>
-                                <Point X=".5"
-                                       Y=".5" />
-                            </Path.RenderTransformOrigin>
-                            <Path.RenderTransform>
-                                <TransformGroup>
-                                    <TranslateTransform Y=".5" />
-                                    <ScaleTransform ScaleX=".96"
-                                                    ScaleY=".94" />
-                                </TransformGroup>
-                            </Path.RenderTransform>
-                        </Path>
+                            </Shape.Fill>
+                        </local:TabShape>
+                        <local:TabShape x:Name="TabPath"
+                                        VerticalAlignment="Top"
+                                        Stroke="{StaticResource TabStrokeBrush}"
+                                        Stretch="Fill"
+                                        Grid.ColumnSpan="4" />
+                        <local:TabShape x:Name="TabHighlight"
+                                        Margin="1,1,1,1"
+                                        Grid.ColumnSpan="4"
+                                        VerticalAlignment="Top"
+                                        Stretch="Fill"
+                                        Stroke="{StaticResource TabHighlightBrush}" />
+
                         <ContentPresenter x:Name="ContentSite"
                                           Margin="0,0,2,0"
                                           Grid.Column="1"
@@ -193,7 +176,6 @@
                                           ContentSource="Header">
                         </ContentPresenter>
                         <Button KeyboardNavigation.IsTabStop="False"
-                                Margin="0 0 10 0"
                                 x:Name="CloseButton"
                                 Style="{StaticResource CloseButtonStyle}"
                                 Grid.Column="2"

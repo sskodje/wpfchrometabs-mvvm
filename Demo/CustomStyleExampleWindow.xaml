@@ -100,10 +100,6 @@
             </Style.Triggers>
         </Style>
 
-        <!--This path has been edited to reshape the tabs-->
-        <Path x:Key="TabPath"
-              Data="M39,96 C38.75,0 59.25,0 76,0 92.75,0 247,0 258,0 269,5 295.5,0 295,96" />
-
         <SolidColorBrush x:Key="TabStrokeBrush">#FF999999</SolidColorBrush>
         <SolidColorBrush x:Key="SelectedTabStrokeBrush">WhiteSmoke</SolidColorBrush>
         <SolidColorBrush x:Key="TabHighlightBrush">White</SolidColorBrush>
@@ -135,13 +131,11 @@
                                               CommandParameter="{Binding}" />
                                 </ContextMenu>
                             </Grid.ContextMenu>
-                            <Path x:Name="TabFill"
-                                  Margin="0 0 0 0"
-                                  Grid.ColumnSpan="5"
-                                  VerticalAlignment="Top"
-                                  Stretch="Fill"
-                                  Data="{Binding Source={StaticResource TabPath},Path=Data}">
-                                <Path.Fill>
+                            <local:CustomTabShape x:Name="TabFill"
+                                                  Grid.ColumnSpan="5"
+                                                  VerticalAlignment="Top"
+                                                  Stretch="Fill">
+                                <Shape.Fill>
                                     <LinearGradientBrush EndPoint="0.5,1"
                                                          StartPoint="0.5,0"
                                                          Opacity="1">
@@ -152,33 +146,21 @@
                                                       Color="#FFDDDDDD"
                                                       Offset="1" />
                                     </LinearGradientBrush>
-                                </Path.Fill>
-                            </Path>
-                            <Path x:Name="TabPath"
-                                  Grid.ColumnSpan="5"
-                                  VerticalAlignment="Top"
-                                  Stretch="Fill"
-                                  Stroke="{StaticResource TabStrokeBrush}"
-                                  Data="{Binding Source={StaticResource TabPath},Path=Data}" />
-                            <Path x:Name="TabHighlight"
-                                  Margin="0 0 0 1"
-                                  Grid.ColumnSpan="5"
-                                  VerticalAlignment="Top"
-                                  Stretch="Fill"
-                                  Stroke="{StaticResource TabHighlightBrush}"
-                                  Data="{Binding Source={StaticResource TabPath},Path=Data}">
-                                <Path.RenderTransformOrigin>
-                                    <Point X=".5"
-                                           Y=".5" />
-                                </Path.RenderTransformOrigin>
-                                <Path.RenderTransform>
-                                    <TransformGroup>
-                                        <TranslateTransform Y=".5" />
-                                        <ScaleTransform ScaleX=".96"
-                                                        ScaleY=".94" />
-                                    </TransformGroup>
-                                </Path.RenderTransform>
-                            </Path>
+                                </Shape.Fill>
+                            </local:CustomTabShape>
+
+                            <local:CustomTabShape x:Name="TabPath"
+                                                  Grid.ColumnSpan="5"
+                                                  VerticalAlignment="Top"
+                                                  Stretch="Fill"
+                                                  Stroke="{StaticResource TabStrokeBrush}" />
+
+                            <local:CustomTabShape x:Name="TabHighlight"
+                                                  Margin="1"
+                                                  Grid.ColumnSpan="5"
+                                                  VerticalAlignment="Top"
+                                                  Stretch="Fill"
+                                                  Stroke="{StaticResource TabHighlightBrush}" />
                             <ContentPresenter x:Name="ContentSite"
                                               Grid.Column="1"
                                               VerticalAlignment="Center"
@@ -337,7 +319,7 @@
                               ReorderTabsCommand="{Binding ReorderTabsCommand}"
                               MinimumTabWidth="40"
                               PinnedTabWidth="50"
-                              MaximumTabWidth="125"
+                              MaximumTabWidth="250"
                               ItemContainerStyle="{StaticResource CustomTabItemStyle}">
             <!--We override the control template here to show how you can modify the properties of tab panel and content presenter-->
             <ct:ChromeTabControl.Template>

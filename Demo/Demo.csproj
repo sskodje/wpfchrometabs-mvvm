@@ -72,6 +72,7 @@
     <Compile Include="CustomStyleExampleWindow.xaml.cs">
       <DependentUpon>CustomStyleExampleWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomTabShape.cs" />
     <Compile Include="DockingWindow.xaml.cs">
       <DependentUpon>DockingWindow.xaml</DependentUpon>
     </Compile>

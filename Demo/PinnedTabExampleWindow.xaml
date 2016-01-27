@@ -71,8 +71,7 @@
                         <!--<Border BorderBrush="Orange"
                                 BorderThickness="1">-->
                         <StackPanel Orientation="Horizontal"
-                                    Background="Transparent"
-                                    Margin="5,0,0,0">
+                                    Background="Transparent">
                             <Image Source="{Binding TabIcon}"
                                    Stretch="Fill"
                                    Margin="5" />

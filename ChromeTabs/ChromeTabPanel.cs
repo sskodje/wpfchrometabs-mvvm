@@ -171,11 +171,6 @@ namespace ChromeTabs
             throw new IndexOutOfRangeException("Not enough visual children in the ChromeTabPanel.");
         }
 
-        protected override void OnRender(DrawingContext dc)
-        {
-            base.OnRender(dc);
-        }
-
 
         protected override Size ArrangeOverride(Size finalSize)
         {
