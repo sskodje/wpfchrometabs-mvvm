@@ -104,6 +104,7 @@ namespace ChromeTabs
             {
                 ICommand command = (ICommand)e.NewValue;
                 command.CanExecuteChanged += ct.Command_CanExecuteChanged;
+
             }
             if (e.OldValue != null)
             {
@@ -439,7 +440,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         public ChromeTabControl()
         {
 
+            this.Loaded += ChromeTabControl_Loaded;
+        }
 
+        private void ChromeTabControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            ((ChromeTabPanel)ItemsHost).IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
         }
 
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -879,6 +885,5 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             }
 
         }
-
     }
 }
