@@ -445,7 +445,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         private void ChromeTabControl_Loaded(object sender, RoutedEventArgs e)
         {
-            ((ChromeTabPanel)ItemsHost).IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
+            var panel = ItemsHost as ChromeTabPanel;
+            if (panel != null)
+            {
+                if (AddTabCommand != null)
+                    panel.IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
+            }
         }
 
         private static void SelectedTabBrushPropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
