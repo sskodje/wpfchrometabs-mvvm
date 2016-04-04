@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace ChromeTabs
 {
@@ -128,10 +129,12 @@ namespace ChromeTabs
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeAllTabsCommand, HandleCloseAllTabsCommand));
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(closeOtherTabsCommand, HandleCloseOtherTabsCommand));
             CommandManager.RegisterClassCommandBinding(typeof(ChromeTabItem), new CommandBinding(pinTabCommand, HandlePinTabCommand));
-           
+
         }
         public ChromeTabItem()
         {
+            if (DesignerProperties.GetIsInDesignMode(this))
+                return;
             this.Loaded += ChromeTabItem_Loaded;
         }
 
@@ -151,7 +154,7 @@ namespace ChromeTabs
         {
             ChromeTabItem tabItem = (ChromeTabItem)d;
 
-            if (tabItem.ParentTabControl!= null && tabItem.ParentTabControl.TabPersistBehavior == TabPersistBehavior.Timed)
+            if (tabItem.ParentTabControl != null && tabItem.ParentTabControl.TabPersistBehavior == TabPersistBehavior.Timed)
             {
                 if ((bool)args.NewValue == true)
                 {
@@ -189,7 +192,8 @@ namespace ChromeTabs
         private void PersistentTimer_Tick(object sender, EventArgs e)
         {
             StoptPersistTimer();
-            ParentTabControl.RemoveFromItemHolder(this);
+            if (ParentTabControl != null)
+                ParentTabControl.RemoveFromItemHolder(this);
         }
 
         private static void HandlePinTabCommand(object sender, ExecutedRoutedEventArgs e)
