@@ -480,7 +480,7 @@ namespace ChromeTabs
                     int changed = 0;
                     int localSlideIndex = this.slideIndex;
                     if (localSlideIndex - 1 >= 0 
-                        && localSlideIndex - 1 < this.Children.Count
+                        && localSlideIndex - 1 < this.slideIntervals.Count
                         && margin.Left < this.slideIntervals[localSlideIndex - 1])
                     {
                         SwapSlideInterval(localSlideIndex - 1);
@@ -488,7 +488,7 @@ namespace ChromeTabs
                         changed = 1;
                     }
                     else if (localSlideIndex + 1 >= 0
-                        && localSlideIndex + 1 < this.Children.Count
+                        && localSlideIndex + 1 < this.slideIntervals.Count
                         && margin.Left > this.slideIntervals[localSlideIndex + 1])
                     {
                         SwapSlideInterval(localSlideIndex + 1);
@@ -509,14 +509,19 @@ namespace ChromeTabs
                             changed = 0;
                             diff = 2;
                         }
-                        ChromeTabItem shiftedTab = this.Children[localSlideIndex - diff] as ChromeTabItem;
 
-                        if (!shiftedTab.Equals(this.draggedTab)
-                            && ((shiftedTab.IsPinned && draggedTab.IsPinned) || (!shiftedTab.IsPinned && !draggedTab.IsPinned)))
+                        int index = localSlideIndex - diff;
+                        if (index >= 0 && index < this.Children.Count)
                         {
-                            var offset = changed * (GetWidthForTabItem(this.draggedTab) - this.Overlap);
-                            StickyReanimate(shiftedTab, offset, stickyReanimateDuration);
-                            this.slideIndex = localSlideIndex;
+                            ChromeTabItem shiftedTab = this.Children[index] as ChromeTabItem;
+
+                            if (!shiftedTab.Equals(this.draggedTab)
+                                && ((shiftedTab.IsPinned && draggedTab.IsPinned) || (!shiftedTab.IsPinned && !draggedTab.IsPinned)))
+                            {
+                                var offset = changed * (GetWidthForTabItem(this.draggedTab) - this.Overlap);
+                                StickyReanimate(shiftedTab, offset, stickyReanimateDuration);
+                                this.slideIndex = localSlideIndex;
+                            }
                         }
                     }
                 }
@@ -553,7 +558,7 @@ namespace ChromeTabs
             lock (lockObject)
             {
                 if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible)
-                 {
+                {
                     if (this.addButtonRect.Contains(p) && IsAddButtonEnabled)
                     {
                         this.addButton.Background = ParentTabControl.AddTabButtonBrush;
