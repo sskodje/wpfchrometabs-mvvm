@@ -34,7 +34,8 @@
         <!--The tab control with with tab tearing support.-->
         <ct:ChromeTabControl x:Name="MyChromeTabControl"
                              MaximumTabWidth="200"
-                             TabPersistBehavior="All"
+                             TabPersistBehavior="Timed"
+                             TabPersistDuration="0:0:0:5"
                              AddTabButtonBehavior="OpenNewTab"
                              Background="AliceBlue"
                              ItemsSource="{Binding ItemCollection}"

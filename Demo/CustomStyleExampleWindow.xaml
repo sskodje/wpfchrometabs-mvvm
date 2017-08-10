@@ -170,7 +170,7 @@
                             <Button KeyboardNavigation.IsTabStop="False"
                                     x:Name="CloseButton"
                                     Style="{StaticResource CloseButtonStyle}"
-                                    Margin="0 0 10 0"
+                                    Margin="0 0 5 0"
                                     Grid.Column="2"
                                     Command="{Binding CloseTabCommand, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
 
