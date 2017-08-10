@@ -479,13 +479,17 @@ namespace ChromeTabs
 
                     int changed = 0;
                     int localSlideIndex = this.slideIndex;
-                    if (margin.Left < this.slideIntervals[localSlideIndex - 1])
+                    if (localSlideIndex - 1 >= 0 
+                        && localSlideIndex - 1 < this.Children.Count
+                        && margin.Left < this.slideIntervals[localSlideIndex - 1])
                     {
                         SwapSlideInterval(localSlideIndex - 1);
                         localSlideIndex -= 1;
                         changed = 1;
                     }
-                    else if (margin.Left > this.slideIntervals[localSlideIndex + 1])
+                    else if (localSlideIndex + 1 >= 0
+                        && localSlideIndex + 1 < this.Children.Count
+                        && margin.Left > this.slideIntervals[localSlideIndex + 1])
                     {
                         SwapSlideInterval(localSlideIndex + 1);
                         localSlideIndex += 1;
@@ -549,7 +553,7 @@ namespace ChromeTabs
             lock (lockObject)
             {
                 if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible)
-                {
+                 {
                     if (this.addButtonRect.Contains(p) && IsAddButtonEnabled)
                     {
                         this.addButton.Background = ParentTabControl.AddTabButtonBrush;
