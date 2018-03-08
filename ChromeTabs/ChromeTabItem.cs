@@ -222,6 +222,7 @@ namespace ChromeTabs
         {
             ChromeTabItem item = sender as ChromeTabItem;
             if (item == null) { return; }
+            item.ParentTabControl.RemoveFromItemHolder(item);
             item.ParentTabControl.RemoveTab(item);
         }
         public int Index

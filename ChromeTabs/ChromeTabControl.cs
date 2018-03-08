@@ -19,7 +19,7 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Reflection;
-
+using System.Runtime.CompilerServices;
 
 namespace ChromeTabs
 {
@@ -58,8 +58,7 @@ namespace ChromeTabs
         private bool _addTabButtonClicked;
         private object _lastSelectedItem;
         private Panel itemsHolder;
-        private Dictionary<object, DependencyObject> objectToContainerMap;
-
+        private ConditionalWeakTable<object, DependencyObject> objectToContainerMap;
         internal static readonly DependencyPropertyKey CanAddTabPropertyKey = DependencyProperty.RegisterReadOnly("CanAddTab", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
         public static readonly DependencyProperty CanAddTabProperty = CanAddTabPropertyKey.DependencyProperty;
         public static readonly DependencyProperty SelectedContentProperty = DependencyProperty.Register("SelectedContent", typeof(object), typeof(ChromeTabControl), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
@@ -540,8 +539,6 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         }
         internal void ChangeSelectedIndex(int index)
         {
-
-            //  int index = this.GetTabIndex(item);
             if (Items.Count <= index)
                 return;
             ChromeTabItem item = AsTabItem(Items[index]);
@@ -766,9 +763,11 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
+
             if (element != item)
             {
-                this.ObjectToContainer[item] = element;
+                this.ObjectToContainer.Remove(item);
+                this.ObjectToContainer.Add(item, element);
                 this.SetChildrenZ();
             }
             RaiseEvent(new ContainerOverrideEventArgs(ChromeTabControl.ContainerItemPreparedForOverrideEvent, this, item, AsTabItem(element)));
@@ -777,20 +776,22 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         protected ChromeTabItem AsTabItem(object item)
         {
             ChromeTabItem tabItem = item as ChromeTabItem;
-            if (tabItem == null && item != null && this.ObjectToContainer.ContainsKey(item))
+            if (tabItem == null && item != null)
             {
-                tabItem = this.ObjectToContainer[item] as ChromeTabItem;
+                DependencyObject dp;
+                this.ObjectToContainer.TryGetValue(item, out dp);
+                tabItem = dp as ChromeTabItem;
             }
             return tabItem;
         }
 
-        private Dictionary<object, DependencyObject> ObjectToContainer
+        private ConditionalWeakTable<object, DependencyObject> ObjectToContainer
         {
             get
             {
                 if (objectToContainerMap == null)
                 {
-                    objectToContainerMap = new Dictionary<object, DependencyObject>();
+                    objectToContainerMap = new ConditionalWeakTable<object, DependencyObject>();
                 }
                 return objectToContainerMap;
             }
@@ -836,11 +837,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             // the actual child to be added.  cp.Tag is a reference to the TabItem
             cp = new ContentPresenter();
             cp.Content = (item is ChromeTabItem) ? (item as ChromeTabItem).Content : item;
-            //cp.ContentTemplate = this.SelectedContentTemplate;
-            //cp.ContentTemplateSelector = this.SelectedContentTemplateSelector;
-            //cp.ContentStringFormat = this.SelectedContentStringFormat;
             cp.Visibility = Visibility.Collapsed;
-            //  cp.Tag = AsTabItem(item);// (item is ChromeTabItem) ? item : (this.ItemContainerGenerator.ContainerFromItem(item));
             itemsHolder.Children.Add(cp);
             return cp;
         }
