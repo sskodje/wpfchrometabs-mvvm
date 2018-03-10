@@ -57,6 +57,7 @@ namespace ChromeTabs
     {
         private const double stickyReanimateDuration = 0.10;
         private const double tabWidthSlidePercent = 0.5;
+        private bool isReleasingTab;
         private bool hideAddButton;
         private Size finalSize;
         private double leftMargin;
@@ -144,6 +145,30 @@ namespace ChromeTabs
             Style addButtonStyle = (Style)this.FindResource(key);
             this.addButton = new Button { Style = addButtonStyle };
             this.addButtonSize = new Size(20, 12);
+            this.Loaded += ChromeTabPanel_Loaded;
+            this.Unloaded += ChromeTabPanel_Unloaded;
+        }
+
+        private void ChromeTabPanel_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (Window.GetWindow(this) != null)
+                Window.GetWindow(this).Activated -= ChromeTabPanel_Dectivated;
+        }
+
+        private void ChromeTabPanel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Window.GetWindow(this) != null)
+                Window.GetWindow(this).Deactivated += ChromeTabPanel_Dectivated;
+        }
+
+        private void ChromeTabPanel_Dectivated(object sender, EventArgs e)
+        {
+
+            if (draggedTab != null && !this.IsMouseCaptured && !isReleasingTab)
+            {
+                Point p = MouseUtilities.CorrectGetPosition(this);
+                OnTabRelease(p, true, false);
+            }
         }
 
         internal void SetAddButtonControlTemplate(ControlTemplate template)
@@ -395,10 +420,7 @@ namespace ChromeTabs
                     ParentTabControl.ChangeSelectedItem(this.draggedTab);
                     if (isTabGrab)
                     {
-                        for (int i = 0; i < this.Children.Count; i++)
-                        {
-                            ProcessMouseMove(new Point(p.X + 0.1, p.Y));
-                        }
+                        ProcessMouseMove(new Point(p.X + 0.1, p.Y));
                     }
                 }
             }
@@ -421,110 +443,119 @@ namespace ChromeTabs
                 }
             }
             if (this.draggedTab == null || !ParentTabControl.CanMoveTabs)
+            {
                 return;
+            }
 
             Point insideTabPoint = this.TranslatePoint(p, this.draggedTab);
             Thickness margin = new Thickness(nowPoint.X - this.downPoint.X, 0, this.downPoint.X - nowPoint.X, 0);
 
-            if (margin.Left != 0)
+
+            int guardValue = Interlocked.Increment(ref this.captureGuard);
+            if (guardValue == 1)
             {
-                int guardValue = Interlocked.Increment(ref this.captureGuard);
-                if (guardValue == 1)
+                this.draggedTab.Margin = margin;
+
+                //we capture the mouse and start tab movement
+                this.originalIndex = this.draggedTab.Index;
+                this.slideIndex = this.originalIndex + 1;
+                //Add slide intervals, the positions  where the tab slides over the next.
+                this.slideIntervals = new List<double>();
+                this.slideIntervals.Add(double.NegativeInfinity);
+
+                for (int i = 1; i <= this.Children.Count; i += 1)
                 {
-                    this.draggedTab.Margin = margin;
-
-                    //we capture the mouse and start tab movement
-                    this.originalIndex = this.draggedTab.Index;
-                    this.slideIndex = this.originalIndex + 1;
-                    //Add slide intervals, the positions  where the tab slides over the next.
-                    this.slideIntervals = new List<double>();
-                    this.slideIntervals.Add(double.NegativeInfinity);
-
-                    for (int i = 1; i <= this.Children.Count; i += 1)
-                    {
-                        var tab = this.Children[i - 1] as ChromeTabItem;
-                        var diff = i - this.slideIndex;
-                        var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
-                        var bound = Math.Min(1, Math.Abs(diff)) * ((sign * GetWidthForTabItem(tab) * tabWidthSlidePercent) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (GetWidthForTabItem(tab) - this.Overlap)));
-                        this.slideIntervals.Add(bound);
-                    }
-                    this.slideIntervals.Add(double.PositiveInfinity);
-                    this.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            if (this.CaptureMouse())
-                            {
-                                Debug.WriteLine("has mouse capture=true");
-                            }
-                            else
-                                Debug.WriteLine("has mouse capture=false");
-                        }));
+                    var tab = this.Children[i - 1] as ChromeTabItem;
+                    var diff = i - this.slideIndex;
+                    var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
+                    var bound = Math.Min(1, Math.Abs(diff)) * ((sign * GetWidthForTabItem(tab) * tabWidthSlidePercent) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (GetWidthForTabItem(tab) - this.Overlap)));
+                    this.slideIntervals.Add(bound);
                 }
-                else if (this.slideIntervals != null)
+                this.slideIntervals.Add(double.PositiveInfinity);
+                this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        if (this.CaptureMouse())
+                        {
+                            Debug.WriteLine("has mouse capture=true");
+                        }
+                        else
+                            Debug.WriteLine("has mouse capture=false");
+                    }));
+            }
+            else if (this.slideIntervals != null)
+            {
+                if (insideTabPoint.X > 0 && (nowPoint.X + (this.draggedTab.ActualWidth - insideTabPoint.X)) >= this.ActualWidth)
                 {
+                    return;
+                }
+                else if (insideTabPoint.X < this.downTabBoundsPoint.X && (nowPoint.X - insideTabPoint.X) <= 0)
+                {
+                    return;
+                }
+                this.draggedTab.Margin = margin;
+                //We return on small marging changes to avoid the tabs jumping around when quickly clicking between tabs.
+                if (Math.Abs(this.draggedTab.Margin.Left) < 10)
+                    return;
+                this.addButton.Visibility = System.Windows.Visibility.Hidden;
+                hideAddButton = true;
 
-                    if (insideTabPoint.X > 0 && (nowPoint.X + (this.draggedTab.ActualWidth - insideTabPoint.X)) >= this.ActualWidth)
+                int changed = 0;
+                int localSlideIndex = this.slideIndex;
+                if (localSlideIndex - 1 >= 0
+                    && localSlideIndex - 1 < this.slideIntervals.Count
+                    && margin.Left < this.slideIntervals[localSlideIndex - 1])
+                {
+                    SwapSlideInterval(localSlideIndex - 1);
+                    localSlideIndex -= 1;
+                    changed = 1;
+                }
+                else if (localSlideIndex + 1 >= 0
+                    && localSlideIndex + 1 < this.slideIntervals.Count
+                    && margin.Left > this.slideIntervals[localSlideIndex + 1])
+                {
+                    SwapSlideInterval(localSlideIndex + 1);
+                    localSlideIndex += 1;
+                    changed = -1;
+                }
+                if (changed != 0)
+                {
+                    var rightedOriginalIndex = this.originalIndex + 1;
+                    var diff = 1;
+                    if (changed > 0 && localSlideIndex >= rightedOriginalIndex)
                     {
-                        return;
+                        changed = 0;
+                        diff = 0;
                     }
-                    else if (insideTabPoint.X < this.downTabBoundsPoint.X && (nowPoint.X - insideTabPoint.X) <= 0)
+                    else if (changed < 0 && localSlideIndex <= rightedOriginalIndex)
                     {
-                        return;
+                        changed = 0;
+                        diff = 2;
                     }
-                    this.draggedTab.Margin = margin;
-                    //We return on small marging changes to avoid the tabs jumping around when quickly clicking between tabs.
-                    if (Math.Abs(this.draggedTab.Margin.Left) < 10)
-                        return;
-                    this.addButton.Visibility = System.Windows.Visibility.Hidden;
-                    hideAddButton = true;
 
-                    int changed = 0;
-                    int localSlideIndex = this.slideIndex;
-                    if (localSlideIndex - 1 >= 0 
-                        && localSlideIndex - 1 < this.slideIntervals.Count
-                        && margin.Left < this.slideIntervals[localSlideIndex - 1])
+                    int index = localSlideIndex - diff;
+                    if (index >= 0 && index < this.Children.Count)
                     {
-                        SwapSlideInterval(localSlideIndex - 1);
-                        localSlideIndex -= 1;
-                        changed = 1;
-                    }
-                    else if (localSlideIndex + 1 >= 0
-                        && localSlideIndex + 1 < this.slideIntervals.Count
-                        && margin.Left > this.slideIntervals[localSlideIndex + 1])
-                    {
-                        SwapSlideInterval(localSlideIndex + 1);
-                        localSlideIndex += 1;
-                        changed = -1;
-                    }
-                    if (changed != 0)
-                    {
-                        var rightedOriginalIndex = this.originalIndex + 1;
-                        var diff = 1;
-                        if (changed > 0 && localSlideIndex >= rightedOriginalIndex)
+                        ChromeTabItem shiftedTab = this.Children[index] as ChromeTabItem;
+
+                        if (!shiftedTab.Equals(this.draggedTab)
+                            && ((shiftedTab.IsPinned && draggedTab.IsPinned) || (!shiftedTab.IsPinned && !draggedTab.IsPinned)))
                         {
-                            changed = 0;
-                            diff = 0;
-                        }
-                        else if (changed < 0 && localSlideIndex <= rightedOriginalIndex)
-                        {
-                            changed = 0;
-                            diff = 2;
-                        }
-
-                        int index = localSlideIndex - diff;
-                        if (index >= 0 && index < this.Children.Count)
-                        {
-                            ChromeTabItem shiftedTab = this.Children[index] as ChromeTabItem;
-
-                            if (!shiftedTab.Equals(this.draggedTab)
-                                && ((shiftedTab.IsPinned && draggedTab.IsPinned) || (!shiftedTab.IsPinned && !draggedTab.IsPinned)))
-                            {
-                                var offset = changed * (GetWidthForTabItem(this.draggedTab) - this.Overlap);
-                                StickyReanimate(shiftedTab, offset, stickyReanimateDuration);
-                                this.slideIndex = localSlideIndex;
-                            }
+                            var offset = changed * (GetWidthForTabItem(this.draggedTab) - this.Overlap);
+                            StickyReanimate(shiftedTab, offset, stickyReanimateDuration);
+                            this.slideIndex = localSlideIndex;
                         }
                     }
                 }
+            }
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+            if (this.draggedTab != null && Mouse.LeftButton != MouseButtonState.Pressed && !isReleasingTab)
+            {
+                Point p = e.GetPosition(this);
+                OnTabRelease(p, true, false);
             }
         }
 
@@ -543,17 +574,16 @@ namespace ChromeTabs
                 || nowPoint.X > this.ActualWidth + ParentTabControl.TabTearTriggerDistance
                 || nowPoint.Y < -(this.ActualHeight)
                 || nowPoint.Y > this.ActualHeight + 5 + ParentTabControl.TabTearTriggerDistance;
-
             if (isOutsideTabPanel == true && Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 object viewmodel = draggedTab.Content;
                 RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel, this.PointToScreen(e.GetPosition(this))));
-                OnTabRelease(e.GetPosition(this), ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
+                OnTabRelease(e.GetPosition(this), this.IsMouseCaptured, ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
             }
         }
 
 
-        private void OnTabRelease(Point p, bool closeTabOnRelease, double animationDuration = stickyReanimateDuration)
+        private void OnTabRelease(Point p, bool isDragging, bool closeTabOnRelease, double animationDuration = stickyReanimateDuration)
         {
             lock (lockObject)
             {
@@ -571,63 +601,80 @@ namespace ChromeTabs
                     }
 
                 }
-                if (this.IsMouseCaptured)
+                if (isDragging)
                 {
                     this.ReleaseMouseCapture();
-                    double offset = 0;
-                    if (this.slideIntervals != null)
-                    {
-                        if (this.slideIndex < this.originalIndex + 1)
-                        {
-                            offset = this.slideIntervals[this.slideIndex + 1] - GetWidthForTabItem(this.draggedTab) * (1 - tabWidthSlidePercent) + this.Overlap;
-                        }
-                        else if (this.slideIndex > this.originalIndex + 1)
-                        {
-                            offset = this.slideIntervals[this.slideIndex - 1] + GetWidthForTabItem(this.draggedTab) * (1 - tabWidthSlidePercent) - this.Overlap;
-                        }
-                    }
+                    double offset = GetTabOffset();
                     int localSlideIndex = this.slideIndex;
                     Action completed = () =>
                     {
                         if (this.draggedTab != null)
                         {
-                            ParentTabControl.ChangeSelectedItem(this.draggedTab);
-                            object vm = this.draggedTab.Content;
-                            this.draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
-                            this.draggedTab = null;
-                            this.captureGuard = 0;
-                            ParentTabControl.MoveTab(this.originalIndex, localSlideIndex - 1);
-                            this.slideIntervals = null;
-                            this.addButton.Visibility = System.Windows.Visibility.Visible;
-                            hideAddButton = false;
-                            this.InvalidateVisual();
-                            if (closeTabOnRelease && ParentTabControl.CloseTabCommand != null)
+                            try
                             {
-                                Debug.WriteLine("sendt close tab command");
-                                ParentTabControl.CloseTabCommand.Execute(vm);
+                                ParentTabControl.ChangeSelectedItem(this.draggedTab);
+                                object vm = this.draggedTab.Content;
+                                this.draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
+                                this.draggedTab = null;
+                                this.captureGuard = 0;
+                                ParentTabControl.MoveTab(this.originalIndex, Math.Max(0,localSlideIndex - 1));
+                                this.slideIntervals = null;
+                                this.addButton.Visibility = System.Windows.Visibility.Visible;
+                                hideAddButton = false;
+                                this.InvalidateVisual();
+                                if (closeTabOnRelease && ParentTabControl.CloseTabCommand != null)
+                                {
+                                    Debug.WriteLine("sendt close tab command");
+                                    ParentTabControl.CloseTabCommand.Execute(vm);
+                                }
+                                if (this.Children.Count > 1)
+                                {
+                                    //this fixes a bug where sometimes tabs got stuck in the wrong position.
+                                    RealignAllTabs();
+                                }
                             }
-                            if (this.Children.Count > 1)
+                            finally
                             {
-                                //this fixes a bug where sometimes tabs got stuck in the wrong position.
-                                RealignAllTabs();
+                                isReleasingTab = false;
                             }
                         }
                     };
 
-                    Reanimate(this.draggedTab, offset, animationDuration, completed);
+                    if (Reanimate(this.draggedTab, offset, animationDuration, completed))
+                    {
+                        isReleasingTab = true;
+                    }
                 }
                 else
                 {
                     if (this.draggedTab != null)
                     {
+                        double offset = GetTabOffset();
                         ParentTabControl.ChangeSelectedItem(this.draggedTab);
-                        this.draggedTab.Margin = new Thickness(0);
+                        this.draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
                     }
                     this.draggedTab = null;
                     this.captureGuard = 0;
                     this.slideIntervals = null;
                 }
             }
+        }
+
+        private double GetTabOffset()
+        {
+            double offset = 0;
+            if (this.slideIntervals != null)
+            {
+                if (this.slideIndex < this.originalIndex + 1)
+                {
+                    offset = this.slideIntervals[this.slideIndex + 1] - GetWidthForTabItem(this.draggedTab) * (1 - tabWidthSlidePercent) + this.Overlap;
+                }
+                else if (this.slideIndex > this.originalIndex + 1)
+                {
+                    offset = this.slideIntervals[this.slideIndex - 1] + GetWidthForTabItem(this.draggedTab) * (1 - tabWidthSlidePercent) - this.Overlap;
+                }
+            }
+            return offset;
         }
 
         private void RealignAllTabs()
@@ -643,7 +690,7 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonUp(e);
-            OnTabRelease(e.GetPosition(this), false);
+            OnTabRelease(e.GetPosition(this), this.IsMouseCaptured, false);
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
@@ -686,11 +733,11 @@ namespace ChromeTabs
             Reanimate(tab, left, duration, completed);
         }
 
-        private void Reanimate(ChromeTabItem tab, double left, double duration, Action completed)
+        private bool Reanimate(ChromeTabItem tab, double left, double duration, Action completed)
         {
             if (tab == null)
             {
-                return;
+                return false;
             }
             Thickness offset = new Thickness(left, 0, -left, 0);
             ThicknessAnimation moveBackAnimation = new ThicknessAnimation(tab.Margin, offset, new Duration(TimeSpan.FromSeconds(duration)));
@@ -709,6 +756,7 @@ namespace ChromeTabs
                 }
             };
             sb.Begin();
+            return true;
         }
 
 
