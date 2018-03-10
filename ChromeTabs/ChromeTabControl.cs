@@ -834,7 +834,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 return cp;
             }
 
-            // the actual child to be added.  cp.Tag is a reference to the TabItem
+            // the actual child to be added. 
             cp = new ContentPresenter();
             cp.Content = (item is ChromeTabItem) ? (item as ChromeTabItem).Content : item;
             cp.Visibility = Visibility.Collapsed;
@@ -843,11 +843,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         }
 
         /// <summary>
-        /// Find the CP for the given object.  data could be a TabItem or a piece of data
+        ///<para>Find the <see cref="ContentPresenter"/> for the given object. Data could be a <see cref="ChromeTabItem"/> or a ViewModel.</para>
+        ///<para>Returns <see cref="ContentPresenter"/>, or <see langword="null" /> if the content is not loaded.</para>
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private ContentPresenter FindChildContentPresenter(object data)
+        public ContentPresenter FindChildContentPresenter(object data)
         {
             if (data is ChromeTabItem)
             {
