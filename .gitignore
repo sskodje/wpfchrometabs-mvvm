@@ -2,3 +2,8 @@ bin
 obj
 *.suo
 /packages
+*.lock
+*.ide-shm
+*.ide-wal
+*.sqlite
+*.ide
