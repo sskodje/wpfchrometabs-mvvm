@@ -1,15 +1,14 @@
-﻿using ChromeTabs;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
+using ChromeTabs;
+using Demo.Properties;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 
 namespace Demo.ViewModel
 {
@@ -25,7 +24,7 @@ namespace Demo.ViewModel
         private TabBase _selectedTab;
         public TabBase SelectedTab
         {
-            get { return _selectedTab; }
+            get => _selectedTab;
             set
             {
                 if (_selectedTab != value)
@@ -38,52 +37,50 @@ namespace Demo.ViewModel
         private bool _canAddTabs;
         public bool CanAddTabs
         {
-            get { return _canAddTabs; }
+            get => _canAddTabs;
             set
             {
-                if (_canAddTabs != value)
-                {
-                    Set(() => CanAddTabs, ref _canAddTabs, value);
-                    AddTabCommand.RaiseCanExecuteChanged();
-                }
+                if (_canAddTabs == value) return;
+                Set(() => CanAddTabs, ref _canAddTabs, value);
+                AddTabCommand.RaiseCanExecuteChanged();
             }
         }
 
 
         public ViewModelExampleBase()
         {
-            this.ItemCollection = new ObservableCollection<TabBase>();
-            this.ItemCollection.CollectionChanged += ItemCollection_CollectionChanged;
-            this.ReorderTabsCommand = new RelayCommand<TabReorder>(ReorderTabsCommandAction);
-            this.AddTabCommand = new RelayCommand(AddTabCommandAction,()=>CanAddTabs);
-            this.CloseTabCommand = new RelayCommand<TabBase>(CloseTabCommandAction);
+            ItemCollection = new ObservableCollection<TabBase>();
+            ItemCollection.CollectionChanged += ItemCollection_CollectionChanged;
+            ReorderTabsCommand = new RelayCommand<TabReorder>(ReorderTabsCommandAction);
+            AddTabCommand = new RelayCommand(AddTabCommandAction,()=>CanAddTabs);
+            CloseTabCommand = new RelayCommand<TabBase>(CloseTabCommandAction);
             CanAddTabs = true;
         }
 
         protected TabClass1 CreateTab1()
         {
-            var tab = new TabClass1() { TabName = "Tab class 1", MyStringContent = "Try drag the tab from left to right", TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
+            var tab = new TabClass1 { TabName = "Tab class 1", MyStringContent = "Try drag the tab from left to right", TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
             return tab;
         }
         protected TabClass2 CreateTab2()
         {
-            var tab = new TabClass2() { TabName = "Tab class 2, with a long name", MyStringContent = "Try drag the tab outside the bonds of the tab control", MyNumberCollection = new int[] { 1, 2, 3, 4, }, MySelectedNumber = 1, TabIcon = new BitmapImage(new Uri("/Resources/2.png", UriKind.Relative)) };
+            var tab = new TabClass2 { TabName = "Tab class 2, with a long name", MyStringContent = "Try drag the tab outside the bonds of the tab control", MyNumberCollection = new[] { 1, 2, 3, 4 }, MySelectedNumber = 1, TabIcon = new BitmapImage(new Uri("/Resources/2.png", UriKind.Relative)) };
             return tab;
 
         }
         protected TabClass3 CreateTab3()
         {
-            var tab = new TabClass3() { TabName = "Tab class 3", MyStringContent = "Try right clicking on the tab header. This tab can not be dragged out to a new window, to demonstrate that you can dynamically choose what tabs can, based on the viewmodel.", MyImageUrl = new Uri("/Resources/Kitten.jpg", UriKind.Relative), TabIcon = new BitmapImage(new Uri("/Resources/3.png", UriKind.Relative)) };
+            var tab = new TabClass3 { TabName = "Tab class 3", MyStringContent = "Try right clicking on the tab header. This tab can not be dragged out to a new window, to demonstrate that you can dynamically choose what tabs can, based on the viewmodel.", MyImageUrl = new Uri("/Resources/Kitten.jpg", UriKind.Relative), TabIcon = new BitmapImage(new Uri("/Resources/3.png", UriKind.Relative)) };
             return tab;
         }
         protected TabClass4 CreateTab4()
         {
-            var tab = new TabClass4() { TabName = "Tab class 4", MyStringContent = "This tab demonstrates a custom tab header implementation", IsBlinking=true };
+            var tab = new TabClass4 { TabName = "Tab class 4", MyStringContent = "This tab demonstrates a custom tab header implementation", IsBlinking=true };
             return tab;
         }
         protected TabClass1 CreateTabLoremIpsum()
         {
-            var tab = new TabClass1() { TabName = "Tab class 1", MyStringContent = Properties.Resources.LoremImpsum, TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
+            var tab = new TabClass1 { TabName = "Tab class 1", MyStringContent = Resources.LoremImpsum, TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
             return tab;
         }
         /// <summary>
@@ -92,7 +89,7 @@ namespace Demo.ViewModel
         /// <param name="reorder"></param>
         protected virtual void ReorderTabsCommandAction(TabReorder reorder)
         {
-            ICollectionView view = CollectionViewSource.GetDefaultView(this.ItemCollection) as ICollectionView;
+            ICollectionView view = CollectionViewSource.GetDefaultView(ItemCollection);
             int from = reorder.FromIndex;
             int to = reorder.ToIndex;
             var tabCollection = view.Cast<TabBase>().ToList();//Get the ordered collection of our tab control
@@ -124,17 +121,17 @@ namespace Demo.ViewModel
             {
                 foreach (TabBase tab in e.NewItems)
                 {
-                    if (this.ItemCollection.Count > 1)
+                    if (ItemCollection.Count > 1)
                     {
                         //If the new tab don't have an existing number, we increment one to add it to the end.
                         if (tab.TabNumber == 0)
-                            tab.TabNumber = this.ItemCollection.OrderBy(x => x.TabNumber).LastOrDefault().TabNumber + 1;
+                            tab.TabNumber = ItemCollection.OrderBy(x => x.TabNumber).LastOrDefault().TabNumber + 1;
                     }
                 }
             }
             else
             {
-                ICollectionView view = CollectionViewSource.GetDefaultView(this.ItemCollection) as ICollectionView;
+                ICollectionView view = CollectionViewSource.GetDefaultView(ItemCollection);
                 view.Refresh();
                 var tabCollection = view.Cast<TabBase>().ToList();
                 foreach (var item in tabCollection)
@@ -145,7 +142,7 @@ namespace Demo.ViewModel
         //To close a tab, we simply remove the viewmodel from the source collection.
         private void CloseTabCommandAction(TabBase vm)
         {
-            this.ItemCollection.Remove(vm);
+            ItemCollection.Remove(vm);
         }
 
         //Adds a random tab
@@ -154,11 +151,11 @@ namespace Demo.ViewModel
             Random r = new Random();
             int num = r.Next(1, 100);
             if (num < 33)
-                this.ItemCollection.Add(CreateTab1());
+                ItemCollection.Add(CreateTab1());
             else if (num < 66)
-                this.ItemCollection.Add(CreateTab2());
+                ItemCollection.Add(CreateTab2());
             else
-                this.ItemCollection.Add(CreateTab3());
+                ItemCollection.Add(CreateTab3());
         }
     }
 }

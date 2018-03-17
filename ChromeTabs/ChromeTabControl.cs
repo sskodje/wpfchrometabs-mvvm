@@ -1,25 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Controls.Primitives;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Windows.Media.Animation;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.Threading;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ChromeTabs
 {
@@ -72,8 +63,8 @@ namespace ChromeTabs
 
         public ICommand CloseTabCommand
         {
-            get { return (ICommand)GetValue(CloseTabCommandProperty); }
-            set { SetValue(CloseTabCommandProperty, value); }
+            get => (ICommand)GetValue(CloseTabCommandProperty);
+            set => SetValue(CloseTabCommandProperty, value);
         }
 
         public static readonly DependencyProperty PinTabCommandProperty =
@@ -84,15 +75,15 @@ namespace ChromeTabs
 
         public ICommand PinTabCommand
         {
-            get { return (ICommand)GetValue(PinTabCommandProperty); }
-            set { SetValue(PinTabCommandProperty, value); }
+            get => (ICommand)GetValue(PinTabCommandProperty);
+            set => SetValue(PinTabCommandProperty, value);
         }
 
         public static readonly DependencyProperty AddTabCommandProperty =
     DependencyProperty.Register(
         "AddTabCommand",
         typeof(ICommand),
-        typeof(ChromeTabControl), new PropertyMetadata(new PropertyChangedCallback(AddTabCommandPropertyChanged)));
+        typeof(ChromeTabControl), new PropertyMetadata(AddTabCommandPropertyChanged));
 
         private static void AddTabCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -116,19 +107,19 @@ namespace ChromeTabs
         {
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
-            ((ChromeTabPanel)this.ItemsHost).IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
+            ((ChromeTabPanel)ItemsHost).IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
         }
         public static DependencyProperty AddTabCommandParameterProperty =
 DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(ChromeTabControl));
         public object AddTabCommandParameter
         {
-            get { return GetValue(AddTabCommandParameterProperty); }
-            set { SetValue(AddTabCommandParameterProperty, value); }
+            get => GetValue(AddTabCommandParameterProperty);
+            set => SetValue(AddTabCommandParameterProperty, value);
         }
         public ICommand AddTabCommand
         {
-            get { return (ICommand)GetValue(AddTabCommandProperty); }
-            set { SetValue(AddTabCommandProperty, value); }
+            get => (ICommand)GetValue(AddTabCommandProperty);
+            set => SetValue(AddTabCommandProperty, value);
         }
 
         public static readonly DependencyProperty ReorderTabsCommandProperty =
@@ -139,15 +130,15 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public ICommand ReorderTabsCommand
         {
-            get { return (ICommand)GetValue(ReorderTabsCommandProperty); }
-            set { SetValue(ReorderTabsCommandProperty, value); }
+            get => (ICommand)GetValue(ReorderTabsCommandProperty);
+            set => SetValue(ReorderTabsCommandProperty, value);
         }
 
         // Provide CLR accessors for the event
         public event TabDragEventHandler TabDraggedOutsideBonds
         {
-            add { AddHandler(TabDraggedOutsideBondsEvent, value); }
-            remove { RemoveHandler(TabDraggedOutsideBondsEvent, value); }
+            add => AddHandler(TabDraggedOutsideBondsEvent, value);
+            remove => RemoveHandler(TabDraggedOutsideBondsEvent, value);
         }
 
         // Using a RoutedEvent
@@ -159,8 +150,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         // Provide CLR accessors for the event
         public event ContainerOverrideEventHandler ContainerItemPreparedForOverride
         {
-            add { AddHandler(ContainerItemPreparedForOverrideEvent, value); }
-            remove { RemoveHandler(ContainerItemPreparedForOverrideEvent, value); }
+            add => AddHandler(ContainerItemPreparedForOverrideEvent, value);
+            remove => RemoveHandler(ContainerItemPreparedForOverrideEvent, value);
         }
 
         // Using a RoutedEvent
@@ -171,8 +162,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public bool CloseTabWhenDraggedOutsideBonds
         {
-            get { return (bool)GetValue(CloseTabWhenDraggedOutsideBondsProperty); }
-            set { SetValue(CloseTabWhenDraggedOutsideBondsProperty, value); }
+            get => (bool)GetValue(CloseTabWhenDraggedOutsideBondsProperty);
+            set => SetValue(CloseTabWhenDraggedOutsideBondsProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for CloseTabWhenDraggedOutsideBonds.  This enables animation, styling, binding, etc...
@@ -182,13 +173,13 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public bool IsAddButtonVisible
         {
-            get { return (bool)GetValue(IsAddButtonVisibleProperty); }
-            set { SetValue(IsAddButtonVisibleProperty, value); }
+            get => (bool)GetValue(IsAddButtonVisibleProperty);
+            set => SetValue(IsAddButtonVisibleProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for IsAddButtonEnabled.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsAddButtonVisibleProperty =
-            DependencyProperty.Register("IsAddButtonVisible", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true, new PropertyChangedCallback(IsAddButtonVisiblePropertyCallback)));
+            DependencyProperty.Register("IsAddButtonVisible", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true, IsAddButtonVisiblePropertyCallback));
 
         private static void IsAddButtonVisiblePropertyCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -197,15 +188,14 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             ChromeTabControl ctc = d as ChromeTabControl;
 
             ChromeTabPanel panel = (ChromeTabPanel)ctc.ItemsHost;
-            if (panel != null)
-                panel.InvalidateVisual();
-        }
+            panel?.InvalidateVisual();
+        }   
 
 
         public bool CanMoveTabs
         {
-            get { return (bool)GetValue(CanMoveTabsProperty); }
-            set { SetValue(CanMoveTabsProperty, value); }
+            get => (bool)GetValue(CanMoveTabsProperty);
+            set => SetValue(CanMoveTabsProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for CanMoveTabs.  This enables animation, styling, binding, etc...
@@ -215,8 +205,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public bool DragWindowWithOneTab
         {
-            get { return (bool)GetValue(DragWindowWithOneTabProperty); }
-            set { SetValue(DragWindowWithOneTabProperty, value); }
+            get => (bool)GetValue(DragWindowWithOneTabProperty);
+            set => SetValue(DragWindowWithOneTabProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for DragWindowWithOneTab.  This enables animation, styling, binding, etc...
@@ -226,19 +216,19 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public Brush SelectedTabBrush
         {
-            get { return (Brush)GetValue(SelectedTabBrushProperty); }
-            set { SetValue(SelectedTabBrushProperty, value); }
+            get => (Brush)GetValue(SelectedTabBrushProperty);
+            set => SetValue(SelectedTabBrushProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for SelectedTabBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedTabBrushProperty =
-            DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(null, new PropertyChangedCallback(SelectedTabBrushPropertyCallback)));
+            DependencyProperty.Register("SelectedTabBrush", typeof(Brush), typeof(ChromeTabControl), new PropertyMetadata(null, SelectedTabBrushPropertyCallback));
 
 
         public Brush AddTabButtonBrush
         {
-            get { return (Brush)GetValue(AddButtonBrushProperty); }
-            set { SetValue(AddButtonBrushProperty, value); }
+            get => (Brush)GetValue(AddButtonBrushProperty);
+            set => SetValue(AddButtonBrushProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for AddButtonBrush.  This enables animation, styling, binding, etc...
@@ -247,8 +237,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public Brush AddTabButtonMouseDownBrush
         {
-            get { return (Brush)GetValue(AddButtonMouseDownBrushProperty); }
-            set { SetValue(AddButtonMouseDownBrushProperty, value); }
+            get => (Brush)GetValue(AddButtonMouseDownBrushProperty);
+            set => SetValue(AddButtonMouseDownBrushProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for AddButtonBrush.  This enables animation, styling, binding, etc...
@@ -257,8 +247,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public Brush AddTabButtonMouseOverBrush
         {
-            get { return (Brush)GetValue(AddButtonMouseOverBrushProperty); }
-            set { SetValue(AddButtonMouseOverBrushProperty, value); }
+            get => (Brush)GetValue(AddButtonMouseOverBrushProperty);
+            set => SetValue(AddButtonMouseOverBrushProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for AddButtonMouseOverBrush.  This enables animation, styling, binding, etc...
@@ -268,8 +258,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public Brush AddTabButtonDisabledBrush
         {
-            get { return (Brush)GetValue(AddButtonDisabledBrushProperty); }
-            set { SetValue(AddButtonDisabledBrushProperty, value); }
+            get => (Brush)GetValue(AddButtonDisabledBrushProperty);
+            set => SetValue(AddButtonDisabledBrushProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for AddButtonDisabledBrush.  This enables animation, styling, binding, etc...
@@ -279,8 +269,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public double MinimumTabWidth
         {
-            get { return (double)GetValue(MinimumTabWidthProperty); }
-            set { SetValue(MinimumTabWidthProperty, value); }
+            get => (double)GetValue(MinimumTabWidthProperty);
+            set => SetValue(MinimumTabWidthProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for MinimumTabWidth.  This enables animation, styling, binding, etc...
@@ -296,8 +286,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public double MaximumTabWidth
         {
-            get { return (double)GetValue(MaximumTabWidthProperty); }
-            set { SetValue(MaximumTabWidthProperty, value); }
+            get => (double)GetValue(MaximumTabWidthProperty);
+            set => SetValue(MaximumTabWidthProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for MaximumTabWidth.  This enables animation, styling, binding, etc...
@@ -310,14 +300,13 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
             if ((double)baseValue <= ctc.MinimumTabWidth)
                 return ctc.MinimumTabWidth + 1;
-            else
-                return baseValue;
+            return baseValue;
         }
 
         public double PinnedTabWidth
         {
-            get { return (double)GetValue(PinnedTabWidthProperty); }
-            set { SetValue(PinnedTabWidthProperty, value); }
+            get => (double)GetValue(PinnedTabWidthProperty);
+            set => SetValue(PinnedTabWidthProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for PinnedTabWidth.  This enables animation, styling, binding, etc...
@@ -330,8 +319,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
             if (ctc.MinimumTabWidth > (double)baseValue)
                 return ctc.MinimumTabWidth;
-            else
-                return baseValue;
+            return baseValue;
         }
 
         /// <summary>
@@ -339,8 +327,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         /// </summary>
         public double TabTearTriggerDistance
         {
-            get { return (double)GetValue(TabTearTriggerDistanceProperty); }
-            set { SetValue(TabTearTriggerDistanceProperty, value); }
+            get => (double)GetValue(TabTearTriggerDistanceProperty);
+            set => SetValue(TabTearTriggerDistanceProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
@@ -349,8 +337,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public double TabOverlap
         {
-            get { return (double)GetValue(TabOverlapProperty); }
-            set { SetValue(TabOverlapProperty, value); }
+            get => (double)GetValue(TabOverlapProperty);
+            set => SetValue(TabOverlapProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for TabOverlap.  This enables animation, styling, binding, etc...
@@ -363,8 +351,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         /// </summary>
         public TabPersistBehavior TabPersistBehavior
         {
-            get { return (TabPersistBehavior)GetValue(TabPersistBehaviorProperty); }
-            set { SetValue(TabPersistBehaviorProperty, value); }
+            get => (TabPersistBehavior)GetValue(TabPersistBehaviorProperty);
+            set => SetValue(TabPersistBehaviorProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
@@ -389,8 +377,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         /// </summary>
         public TimeSpan TabPersistDuration
         {
-            get { return (TimeSpan)GetValue(TabPersistDurationProperty); }
-            set { SetValue(TabPersistDurationProperty, value); }
+            get => (TimeSpan)GetValue(TabPersistDurationProperty);
+            set => SetValue(TabPersistDurationProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for TabTearTriggerDistance.  This enables animation, styling, binding, etc...
@@ -401,8 +389,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public AddTabButtonBehavior AddTabButtonBehavior
         {
-            get { return (AddTabButtonBehavior)GetValue(AddTabButtonBehaviorProperty); }
-            set { SetValue(AddTabButtonBehaviorProperty, value); }
+            get => (AddTabButtonBehavior)GetValue(AddTabButtonBehaviorProperty);
+            set => SetValue(AddTabButtonBehaviorProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for AddTabButtonBehavior.  This enables animation, styling, binding, etc...
@@ -413,8 +401,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public ControlTemplate AddButtonTemplate
         {
-            get { return (ControlTemplate)GetValue(AddButtonTemplateProperty); }
-            set { SetValue(AddButtonTemplateProperty, value); }
+            get => (ControlTemplate)GetValue(AddButtonTemplateProperty);
+            set => SetValue(AddButtonTemplateProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for AddButtonControlTemplate.  This enables animation, styling, binding, etc...
@@ -425,10 +413,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         {
             ChromeTabControl ctc = (ChromeTabControl)d;
             ChromeTabPanel panel = ctc.ItemsHost as ChromeTabPanel;
-            if (panel != null)
-            {
-                panel.SetAddButtonControlTemplate(e.NewValue as ControlTemplate);
-            }
+            panel?.SetAddButtonControlTemplate(e.NewValue as ControlTemplate);
         }
 
         static ChromeTabControl()
@@ -439,13 +424,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         public ChromeTabControl()
         {
 
-            this.Loaded += ChromeTabControl_Loaded;
+            Loaded += ChromeTabControl_Loaded;
         }
 
         private void ChromeTabControl_Loaded(object sender, RoutedEventArgs e)
         {
-            var panel = ItemsHost as ChromeTabPanel;
-            if (panel != null)
+            if (ItemsHost is ChromeTabPanel panel)
             {
                 if (AddTabCommand != null)
                     panel.IsAddButtonEnabled = AddTabCommand.CanExecute(AddTabCommandParameter);
@@ -468,15 +452,9 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             ChromeTabItem item = AsTabItem(viewModel);
             p.StartTabDrag(item, true);
         }
-        protected Panel ItemsHost
-        {
-            get
-            {
-                return (Panel)typeof(MultiSelector).InvokeMember("ItemsHost",
-                    BindingFlags.NonPublic | BindingFlags.GetProperty | BindingFlags.Instance,
-                    null, this, null);
-            }
-        }
+        protected Panel ItemsHost => (Panel)typeof(MultiSelector).InvokeMember("ItemsHost",
+            BindingFlags.NonPublic | BindingFlags.GetProperty | BindingFlags.Instance,
+            null, this, null);
 
         internal void AddTab()
         {
@@ -485,33 +463,27 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 return;
             }
             _addTabButtonClicked = true;
-            if (this.AddTabCommand != null)
-                this.AddTabCommand.Execute(null);
+            AddTabCommand?.Execute(null);
 
         }
 
-        internal bool CanAddTab
-        {
-            get { return (bool)GetValue(CanAddTabProperty); }
-        }
+        internal bool CanAddTab => (bool)GetValue(CanAddTabProperty);
 
         internal void RemoveTab(object tab)
         {
-            ChromeTabItem removeItem = this.AsTabItem(tab);
-            if (CloseTabCommand != null)
-                CloseTabCommand.Execute(removeItem.DataContext);
+            ChromeTabItem removeItem = AsTabItem(tab);
+            CloseTabCommand?.Execute(removeItem.DataContext);
         }
 
         internal void PinTab(object tab)
         {
-            ChromeTabItem removeItem = this.AsTabItem(tab);
-            if (PinTabCommand != null)
-                PinTabCommand.Execute(removeItem.DataContext);
+            ChromeTabItem removeItem = AsTabItem(tab);
+            PinTabCommand?.Execute(removeItem.DataContext);
         }
 
         internal void RemoveAllTabs(object exceptThis = null)
         {
-            var objects = this.ItemsSource.Cast<object>().Where(x => x != exceptThis).ToList();
+            var objects = ItemsSource.Cast<object>().Where(x => x != exceptThis).ToList();
             foreach (object obj in objects)
             {
                 CloseTabCommand.Execute(obj);
@@ -521,16 +493,16 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         public object SelectedContent
         {
-            get { return (object)GetValue(SelectedContentProperty); }
-            set { SetValue(SelectedContentProperty, value); }
+            get => GetValue(SelectedContentProperty);
+            set => SetValue(SelectedContentProperty, value);
         }
 
         internal int GetTabIndex(ChromeTabItem item)
         {
-            for (int i = 0; i < this.Items.Count; i += 1)
+            for (int i = 0; i < Items.Count; i += 1)
             {
-                ChromeTabItem tabItem = this.AsTabItem(this.Items[i]);
-                if (tabItem == item)
+                ChromeTabItem tabItem = AsTabItem(Items[i]);
+                if (Equals(tabItem, item))
                 {
                     return i;
                 }
@@ -547,40 +519,40 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         internal void ChangeSelectedItem(ChromeTabItem item)
         {
 
-            int index = this.GetTabIndex(item);
-            if (index != this.SelectedIndex)
+            int index = GetTabIndex(item);
+            if (index != SelectedIndex)
             {
                 if (index > -1)
                 {
-                    if (this.SelectedItem != null)
+                    if (SelectedItem != null)
                     {
-                        Canvas.SetZIndex(this.AsTabItem(this.SelectedItem), 0);
+                        Panel.SetZIndex(AsTabItem(SelectedItem), 0);
                     }
-                    this.SelectedIndex = index;
-                    Canvas.SetZIndex(item, 1001);
+                    SelectedIndex = index;
+                    Panel.SetZIndex(item, 1001);
                 }
             }
-            if (this.SelectedContent == null && item != null)
+            if (SelectedContent == null && item != null)
                 SetSelectedContent(false);
         }
 
         internal void MoveTab(int fromIndex, int toIndex)
         {
-            if (this.Items.Count == 0 || fromIndex == toIndex || fromIndex >= this.Items.Count)
+            if (Items.Count == 0 || fromIndex == toIndex || fromIndex >= Items.Count)
             {
                 return;
             }
-            object fromTab = this.Items[fromIndex];
-            object toTab = this.Items[toIndex];
+            object fromTab = Items[fromIndex];
+            object toTab = Items[toIndex];
             ChromeTabItem fromItem = AsTabItem(fromTab);
             ChromeTabItem toItem = AsTabItem(toTab);
             if (fromItem.IsPinned && !toItem.IsPinned)
                 return;
             if (!fromItem.IsPinned && toItem.IsPinned)
                 return;
-            if (this.ReorderTabsCommand != null)
+            if (ReorderTabsCommand != null)
             {
-                this.ReorderTabsCommand.Execute(new TabReorder(fromIndex, toIndex));
+                ReorderTabsCommand.Execute(new TabReorder(fromIndex, toIndex));
             }
             else
             {
@@ -596,12 +568,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 }
             }
 
-            for (int i = 0; i < this.Items.Count; i += 1)
+            for (int i = 0; i < Items.Count; i += 1)
             {
-                var v = this.AsTabItem(this.Items[i]);
+                var v = AsTabItem(Items[i]);
                 v.Margin = new Thickness(0);
             }
-            this.SelectedItem = fromTab;
+            SelectedItem = fromTab;
 
         }
 
@@ -619,8 +591,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         protected override DependencyObject GetContainerForItemOverride()
         {
             var tab = new ChromeTabItem();
-            if (this.SelectedTabBrush != null)
-                tab.SelectedTabBrush = this.SelectedTabBrush;
+            if (SelectedTabBrush != null)
+                tab.SelectedTabBrush = SelectedTabBrush;
             return tab;
         }
 
@@ -639,14 +611,14 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         protected void SetInitialSelection()
         {
             bool? somethingSelected = null;
-            foreach (object element in this.Items)
+            foreach (object element in Items)
             {
-                if (element is DependencyObject)
-                    somethingSelected |= ChromeTabItem.GetIsSelected((DependencyObject)element);
+                if (element is DependencyObject o)
+                    somethingSelected |= ChromeTabItem.GetIsSelected(o);
             }
             if (somethingSelected.HasValue && somethingSelected.Value == false)
             {
-                this.SelectedIndex = 0;
+                SelectedIndex = 0;
             }
         }
 
@@ -695,14 +667,14 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 }
             }
             SetSelectedContent(Items.Count == 0);
-            this.SetChildrenZ();
+            SetChildrenZ();
         }
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
 
             base.OnSelectionChanged(e);
-            this.SetChildrenZ();
+            SetChildrenZ();
 
 
             SetSelectedContent(e.AddedItems.Count == 0);
@@ -711,43 +683,40 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         {
             if (removeContent)
             {
-                if (this.SelectedItem == null)
+                if (SelectedItem == null)
                 {
-                    if (this.Items.Count > 0)
+                    if (Items.Count > 0)
                     {
-                        if (_lastSelectedItem != null)
-                            this.SelectedItem = _lastSelectedItem;
-                        else
-                            this.SelectedItem = this.Items[0];
+                        SelectedItem = _lastSelectedItem ?? Items[0];
                     }
                     else
                     {
-                        this.SelectedItem = null;
-                        this.SelectedContent = null;
+                        SelectedItem = null;
+                        SelectedContent = null;
                     }
                 }
                 return;
             }
 
-            if (this.SelectedIndex > 0)
+            if (SelectedIndex > 0)
             {
-                this._lastSelectedItem = this.Items[this.SelectedIndex - 1];
+                _lastSelectedItem = Items[SelectedIndex - 1];
             }
-            else if (this.SelectedIndex == 0 && this.Items.Count > 1)
+            else if (SelectedIndex == 0 && Items.Count > 1)
             {
-                this._lastSelectedItem = this.Items[this.SelectedIndex + 1];
+                _lastSelectedItem = Items[SelectedIndex + 1];
             }
             else
             {
-                this._lastSelectedItem = null;
+                _lastSelectedItem = null;
             }
 
-            ChromeTabItem item = this.AsTabItem(this.SelectedItem);
+            ChromeTabItem item = AsTabItem(SelectedItem);
             if (TabPersistBehavior != TabPersistBehavior.None)
             {
                 if (item != null && itemsHolder != null)
                 {
-                    CreateChildContentPresenter(this.SelectedItem);
+                    CreateChildContentPresenter(SelectedItem);
                     // show the right child
                     foreach (ContentPresenter child in itemsHolder.Children)
                     {
@@ -757,7 +726,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 }
             }
 
-            this.SelectedContent = item != null ? item.Content : null;
+            SelectedContent = item?.Content;
         }
 
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
@@ -766,11 +735,11 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
             if (element != item)
             {
-                this.ObjectToContainer.Remove(item);
-                this.ObjectToContainer.Add(item, element);
-                this.SetChildrenZ();
+                ObjectToContainer.Remove(item);
+                ObjectToContainer.Add(item, element);
+                SetChildrenZ();
             }
-            RaiseEvent(new ContainerOverrideEventArgs(ChromeTabControl.ContainerItemPreparedForOverrideEvent, this, item, AsTabItem(element)));
+            RaiseEvent(new ContainerOverrideEventArgs(ContainerItemPreparedForOverrideEvent, this, item, AsTabItem(element)));
         }
 
         protected ChromeTabItem AsTabItem(object item)
@@ -779,34 +748,25 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             if (tabItem == null && item != null)
             {
                 DependencyObject dp;
-                this.ObjectToContainer.TryGetValue(item, out dp);
+                ObjectToContainer.TryGetValue(item, out dp);
                 tabItem = dp as ChromeTabItem;
             }
             return tabItem;
         }
 
-        private ConditionalWeakTable<object, DependencyObject> ObjectToContainer
-        {
-            get
-            {
-                if (objectToContainerMap == null)
-                {
-                    objectToContainerMap = new ConditionalWeakTable<object, DependencyObject>();
-                }
-                return objectToContainerMap;
-            }
-        }
+        private ConditionalWeakTable<object, DependencyObject> ObjectToContainer => objectToContainerMap ??
+                                                                                    (objectToContainerMap = new ConditionalWeakTable<object, DependencyObject>());
 
         protected void SetChildrenZ()
         {
-            int zindex = this.Items.Count - 1;
-            foreach (object element in this.Items)
+            int zindex = Items.Count - 1;
+            foreach (object element in Items)
             {
-                ChromeTabItem tabItem = this.AsTabItem(element);
+                ChromeTabItem tabItem = AsTabItem(element);
                 if (tabItem == null) { continue; }
                 if (ChromeTabItem.GetIsSelected(tabItem))
                 {
-                    Panel.SetZIndex(tabItem, this.Items.Count);
+                    Panel.SetZIndex(tabItem, Items.Count);
                 }
                 else
                 {
@@ -835,9 +795,11 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             }
 
             // the actual child to be added. 
-            cp = new ContentPresenter();
-            cp.Content = (item is ChromeTabItem) ? (item as ChromeTabItem).Content : item;
-            cp.Visibility = Visibility.Collapsed;
+            cp = new ContentPresenter
+            {
+                Content = (item is ChromeTabItem) ? (item as ChromeTabItem).Content : item,
+                Visibility = Visibility.Collapsed
+            };
             itemsHolder.Children.Add(cp);
             return cp;
         }
@@ -852,7 +814,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         {
             if (data is ChromeTabItem)
             {
-                data = (data as ChromeTabItem).Content;
+                data = ((ChromeTabItem) data).Content;
             }
 
             if (data == null)

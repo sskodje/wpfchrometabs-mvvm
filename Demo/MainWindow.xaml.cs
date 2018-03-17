@@ -1,24 +1,15 @@
-﻿using ChromeTabs;
-using Demo.Utilities;
-using Demo.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using ChromeTabs;
+using Demo.Utilities;
+using Demo.ViewModel;
+using static System.Windows.PresentationSource;
 
 namespace Demo
 {
@@ -32,7 +23,7 @@ namespace Demo
         public MainWindow()
         {
             InitializeComponent();
-            this._openWindows = new List<DockingWindow>();
+            _openWindows = new List<DockingWindow>();
         }
 
         /// <summary>
@@ -50,10 +41,12 @@ namespace Demo
 
             if (win == null)//If not, create a new one
             {
-                win = new DockingWindow();
+                win = new DockingWindow
+                {
+                    Title = draggedTab?.TabName,
+                    DataContext = draggedTab
+                };
 
-                win.Title = draggedTab.TabName;
-                win.DataContext = draggedTab;
                 win.Closed += win_Closed;
                 win.Loaded += win_Loaded;
                 win.LocationChanged += win_LocationChanged;
@@ -67,7 +60,7 @@ namespace Demo
                 Debug.WriteLine(DateTime.Now.ToShortTimeString() + " got window");
                 MoveWindow(win, e.CursorPosition);
             }
-            this._openWindows.Add(win);
+            _openWindows.Add(win);
             Debug.WriteLine(e.CursorPosition);
         }
 
@@ -81,7 +74,7 @@ namespace Demo
         private void MoveWindow(Window win, Point pt)
         {
             //Use a BeginInvoke to delay the execution slightly, else we can have problems grabbing the newly opened window.
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
                 win.Topmost = true;
                 //We position the window at the mouse position
@@ -100,7 +93,7 @@ namespace Demo
         //remove the window from the open windows collection when it is closed.
         private void win_Closed(object sender, EventArgs e)
         {
-            this._openWindows.Remove(sender as DockingWindow);
+            _openWindows.Remove(sender as DockingWindow);
             Debug.WriteLine(DateTime.Now.ToShortTimeString() + " closed window");
         }
         //We use this to keep track of where the window is on the screen, so we can dock it later
@@ -121,8 +114,8 @@ namespace Demo
 
             if (windowUnder != null && windowUnder.Equals(this))
             {
-                Point relativePoint = this.PointFromScreen(absoluteScreenPos);//The screen position relative to the main window
-                FrameworkElement element = this.MyChromeTabControl.InputHitTest(relativePoint) as FrameworkElement;//Hit test against the tab control
+                Point relativePoint = PointFromScreen(absoluteScreenPos);//The screen position relative to the main window
+                FrameworkElement element = MyChromeTabControl.InputHitTest(relativePoint) as FrameworkElement;//Hit test against the tab control
 
                 if (element != null)
                 {
@@ -130,7 +123,7 @@ namespace Demo
                     if (CanInsertTabItem(element))
                     {
                         TabBase dockedWindowVM = (TabBase)win.DataContext;
-                        ViewModelMainWindow mainWindowVm = (ViewModelMainWindow)this.DataContext;
+                        ViewModelMainWindow mainWindowVm = (ViewModelMainWindow)DataContext;
 
                         mainWindowVm.ItemCollection.Add(dockedWindowVM);
 
@@ -139,7 +132,7 @@ namespace Demo
                         mainWindowVm.SelectedTab = dockedWindowVM;
 
                         //We run this method on the tab control for it to grab the tab and position it at the mouse, ready to move again.
-                        this.MyChromeTabControl.GrabTab(dockedWindowVM);
+                        MyChromeTabControl.GrabTab(dockedWindowVM);
 
                     }
                 }
@@ -150,7 +143,7 @@ namespace Demo
         {
             if (element is ChromeTabItem)
                 return true;
-            else if (element is ChromeTabPanel)
+            if (element is ChromeTabPanel)
                 return true;
             object child = LogicalTreeHelper.GetChildren(element).Cast<object>().FirstOrDefault(x => x is ChromeTabPanel);
             if (child != null)
@@ -158,14 +151,13 @@ namespace Demo
             FrameworkElement localElement = element;
             while (true)
             {
-                Object obj = localElement.TemplatedParent;
+                Object obj = localElement?.TemplatedParent;
                 if (obj == null)
                     break;
 
                 if (obj is ChromeTabItem)
                     return true;
-                else
-                    localElement = localElement.TemplatedParent as FrameworkElement;
+                localElement = localElement.TemplatedParent as FrameworkElement;
             }
             return false;
         }
@@ -180,7 +172,7 @@ namespace Demo
         {
             var allWindows = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>());
             var windowsUnderCurrent = from win in allWindows
-                                      where (win.WindowState == System.Windows.WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
+                                      where (win.WindowState == WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
                                       && !Equals(win, source)
                                       select win;
             return windowsUnderCurrent.FirstOrDefault();
@@ -194,7 +186,7 @@ namespace Demo
         private IEnumerable<Window> SortWindowsTopToBottom(IEnumerable<Window> unsorted)
         {
             var byHandle = unsorted.ToDictionary(win =>
-                ((HwndSource)PresentationSource.FromVisual(win)).Handle);
+                ((HwndSource) FromVisual(win)).Handle);
 
             for (IntPtr hWnd = Win32.GetTopWindow(IntPtr.Zero); hWnd != IntPtr.Zero; hWnd = Win32.GetWindow(hWnd, Win32.GW_HWNDNEXT))
             {
@@ -205,14 +197,12 @@ namespace Demo
 
         private void BnOpenPinnedTabExample_Click(object sender, RoutedEventArgs e)
         {
-            PinnedTabExampleWindow window = new PinnedTabExampleWindow();
-            window.Show();
+            new PinnedTabExampleWindow().Show();
         }
 
         private void BnOpenCustomStyleExample_Click(object sender, RoutedEventArgs e)
         {
-            CustomStyleExampleWindow window = new CustomStyleExampleWindow();
-            window.Show();
+            new CustomStyleExampleWindow().Show();
         }
     }
 }

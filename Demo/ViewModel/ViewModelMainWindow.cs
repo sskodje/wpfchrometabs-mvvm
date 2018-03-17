@@ -1,16 +1,6 @@
-﻿using GalaSoft.MvvmLight.Command;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Windows.Data;
-using System.Windows.Input;
-using ChromeTabs;
-using GalaSoft.MvvmLight;
-using System.Windows.Media.Imaging;
 
 namespace Demo.ViewModel
 {
@@ -20,7 +10,7 @@ namespace Demo.ViewModel
         private bool _canMoveTabs;
         public bool CanMoveTabs
         {
-            get { return _canMoveTabs; }
+            get => _canMoveTabs;
             set
             {
                 if (_canMoveTabs != value)
@@ -33,7 +23,7 @@ namespace Demo.ViewModel
         private bool _showAddButton;
         public bool ShowAddButton
         {
-            get { return _showAddButton; }
+            get => _showAddButton;
             set
             {
                 if (_showAddButton != value)
@@ -47,20 +37,20 @@ namespace Demo.ViewModel
         public ViewModelMainWindow()
         {
             //Adding items to the collection creates a tab
-            this.ItemCollection.Add(CreateTab1());
-            this.ItemCollection.Add(CreateTab2());
-            this.ItemCollection.Add(CreateTab3());
-            this.ItemCollection.Add(CreateTabLoremIpsum());
+            ItemCollection.Add(CreateTab1());
+            ItemCollection.Add(CreateTab2());
+            ItemCollection.Add(CreateTab3());
+            ItemCollection.Add(CreateTabLoremIpsum());
 
-            this.SelectedTab = this.ItemCollection.FirstOrDefault();
-            ICollectionView view = CollectionViewSource.GetDefaultView(this.ItemCollection) as ICollectionView;
+            SelectedTab = ItemCollection.FirstOrDefault();
+            ICollectionView view = CollectionViewSource.GetDefaultView(ItemCollection);
 
             //This sort description is what keeps the source collection sorted, based on tab number. 
             //You can also use the sort description to manually sort the tabs, based on your own criterias.
             view.SortDescriptions.Add(new SortDescription("TabNumber", ListSortDirection.Ascending));
 
-            this.CanMoveTabs = true;
-            this.ShowAddButton = true;
+            CanMoveTabs = true;
+            ShowAddButton = true;
         }
     }
 }

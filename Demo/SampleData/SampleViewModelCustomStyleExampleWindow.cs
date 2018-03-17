@@ -1,45 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using Demo.ViewModel;
 
 namespace Demo.SampleData
 {
-    class SampleViewModelCustomStyleExampleWindow : ViewModel.ViewModelExampleBase, IViewModelCustomStyleExampleWindow
+    class SampleViewModelCustomStyleExampleWindow : ViewModelExampleBase, IViewModelCustomStyleExampleWindow
     {
+        private ObservableCollection<TabBase> _itemCollection;
 
-
-
-        private System.Collections.ObjectModel.ObservableCollection<TabBase> _itemCollection;
-
-        public new System.Collections.ObjectModel.ObservableCollection<TabBase> ItemCollection
+        public new ObservableCollection<TabBase> ItemCollection
         {
-            get
-            {
-                if (_itemCollection == null)
-                {
-                    _itemCollection = new System.Collections.ObjectModel.ObservableCollection<TabBase>();
-
-                    _itemCollection.Add(CreateTab1());
-                    _itemCollection.Add(CreateTab2());
-                    _itemCollection.Add(CreateTab3());
-                    _itemCollection.Add(CreateTabLoremIpsum());
-                }
-                return _itemCollection;
-            }
-            set { _itemCollection = value; }
+            get => _itemCollection ?? (_itemCollection =
+                       new ObservableCollection<TabBase>
+                       {
+                           CreateTab1(),
+                           CreateTab2(),
+                           CreateTab3(),
+                           CreateTabLoremIpsum()
+                       });
+            set => _itemCollection = value;
         }
         public new TabBase SelectedTab
         {
-            get
-            {
-                return ItemCollection.FirstOrDefault();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get => ItemCollection.FirstOrDefault();
+            set => throw new NotImplementedException();
         }
     }
 }

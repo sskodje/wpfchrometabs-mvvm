@@ -7,7 +7,6 @@ namespace ChromeTabs.Utilities
 {
     public static class MouseUtilities
     {
-
         public static Point CorrectGetPosition(Visual relativeTo)
         {
             Win32Point w32Mouse = new Win32Point();
@@ -25,7 +24,7 @@ namespace ChromeTabs.Utilities
         {
             public Int32 X;
             public Int32 Y;
-        };
+        }
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]

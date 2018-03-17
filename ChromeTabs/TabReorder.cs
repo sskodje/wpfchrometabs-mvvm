@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace ChromeTabs
+﻿namespace ChromeTabs
 {
     public class TabReorder
     {
@@ -11,8 +6,8 @@ namespace ChromeTabs
         public int ToIndex { get; set; }
         public TabReorder(int from, int to)
         {
-            this.FromIndex = from;
-            this.ToIndex = to;
+            FromIndex = from;
+            ToIndex = to;
         }
     }
 }

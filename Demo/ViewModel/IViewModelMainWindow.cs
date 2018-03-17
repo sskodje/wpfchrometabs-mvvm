@@ -1,5 +1,4 @@
-﻿using System;
-namespace Demo.ViewModel
+﻿namespace Demo.ViewModel
 {
     public interface IViewModelMainWindow
     {

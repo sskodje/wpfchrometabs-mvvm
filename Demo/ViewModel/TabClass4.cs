@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Demo.ViewModel
+﻿namespace Demo.ViewModel
 {
     public class TabClass4 : TabBase
     {
@@ -11,7 +6,7 @@ namespace Demo.ViewModel
         private bool _isBlinking;
         public bool IsBlinking
         {
-            get { return _isBlinking; }
+            get => _isBlinking;
             set
             {
                 if (_isBlinking != value)

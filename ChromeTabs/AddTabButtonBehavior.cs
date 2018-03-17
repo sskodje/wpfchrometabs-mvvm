@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace ChromeTabs
+﻿namespace ChromeTabs
 {
-   public enum AddTabButtonBehavior
+    public enum AddTabButtonBehavior
     {
         OpenNewTab,
         OpenNewTabInBackground

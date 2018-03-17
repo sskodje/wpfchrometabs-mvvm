@@ -1,6 +1,6 @@
-﻿using GalaSoft.MvvmLight;
-using System;
-using System.Windows.Media;
+﻿using System.Windows.Media;
+using GalaSoft.MvvmLight;
+
 namespace Demo.ViewModel
 {
     public abstract class TabBase : ViewModelBase
@@ -8,7 +8,7 @@ namespace Demo.ViewModel
         private int _tabNumber;
         public int TabNumber
         {
-            get { return _tabNumber; }
+            get => _tabNumber;
             set
             {
                 if (_tabNumber != value)
@@ -21,7 +21,7 @@ namespace Demo.ViewModel
         private string _tabName;
         public string TabName
         {
-            get { return _tabName; }
+            get => _tabName;
             set
             {
                 if (_tabName != value)
@@ -35,7 +35,7 @@ namespace Demo.ViewModel
         private bool _isPinned;
         public bool IsPinned
         {
-            get { return _isPinned; }
+            get => _isPinned;
             set
             {
                 if (_isPinned != value)
@@ -49,10 +49,10 @@ namespace Demo.ViewModel
         private ImageSource _tabIcon;
         public ImageSource TabIcon
         {
-            get { return _tabIcon; }
+            get => _tabIcon;
             set
             {
-                if (_tabIcon != value)
+                if (!Equals(_tabIcon, value))
                 {
                     Set(() => TabIcon, ref _tabIcon, value);
                 }
