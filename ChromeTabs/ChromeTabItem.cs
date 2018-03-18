@@ -1,20 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
-using System.Diagnostics;
-using System.ComponentModel;
 
 namespace ChromeTabs
 {
@@ -53,16 +44,16 @@ namespace ChromeTabs
 
         public bool IsSelected
         {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
         }
-        public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromeTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange, new PropertyChangedCallback(OnIsSelectedChanged)));
+        public static readonly DependencyProperty IsSelectedProperty = Selector.IsSelectedProperty.AddOwner(typeof(ChromeTabItem), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsParentArrange, OnIsSelectedChanged));
 
 
         public bool IsPinned
         {
-            get { return (bool)GetValue(IsPinnedProperty); }
-            set { SetValue(IsPinnedProperty, value); }
+            get => (bool)GetValue(IsPinnedProperty);
+            set => SetValue(IsPinnedProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for IsPinned.  This enables animation, styling, binding, etc...
@@ -73,8 +64,8 @@ namespace ChromeTabs
 
         public Brush SelectedTabBrush
         {
-            get { return (Brush)GetValue(SelectedTabBrushProperty); }
-            set { SetValue(SelectedTabBrushProperty, value); }
+            get => (Brush)GetValue(SelectedTabBrushProperty);
+            set => SetValue(SelectedTabBrushProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for SelectedTabBrush.  This enables animation, styling, binding, etc...
@@ -85,40 +76,28 @@ namespace ChromeTabs
 
         private static readonly RoutedUICommand closeTabCommand = new RoutedUICommand("Close tab", "CloseTab", typeof(ChromeTabItem));
 
-        public static RoutedUICommand CloseTabCommand
-        {
-            get { return closeTabCommand; }
-        }
+        public static RoutedUICommand CloseTabCommand => closeTabCommand;
 
         private static readonly RoutedUICommand closeAllTabsCommand = new RoutedUICommand("Close all tabs", "CloseAllTabs", typeof(ChromeTabItem));
 
-        public static RoutedUICommand CloseAllTabsCommand
-        {
-            get { return closeAllTabsCommand; }
-        }
+        public static RoutedUICommand CloseAllTabsCommand => closeAllTabsCommand;
 
         private static readonly RoutedUICommand closeOtherTabsCommand = new RoutedUICommand("Close other tabs", "CloseOtherTabs", typeof(ChromeTabItem));
 
-        public static RoutedUICommand CloseOtherTabsCommand
-        {
-            get { return closeOtherTabsCommand; }
-        }
+        public static RoutedUICommand CloseOtherTabsCommand => closeOtherTabsCommand;
 
         private static readonly RoutedUICommand pinTabCommand = new RoutedUICommand("Pin Tab", "PinTab", typeof(ChromeTabItem));
 
-        public static RoutedUICommand PinTabCommand
-        {
-            get { return pinTabCommand; }
-        }
+        public static RoutedUICommand PinTabCommand => pinTabCommand;
 
         public static void SetIsSelected(DependencyObject item, bool value)
         {
-            item.SetValue(ChromeTabItem.IsSelectedProperty, value);
+            item.SetValue(IsSelectedProperty, value);
         }
 
         public static bool GetIsSelected(DependencyObject item)
         {
-            return (bool)item.GetValue(ChromeTabItem.IsSelectedProperty);
+            return (bool)item.GetValue(IsSelectedProperty);
         }
 
 
@@ -135,18 +114,18 @@ namespace ChromeTabs
         {
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
-            this.Loaded += ChromeTabItem_Loaded;
+            Loaded += ChromeTabItem_Loaded;
         }
 
         private void ChromeTabItem_Loaded(object sender, RoutedEventArgs e)
         {
-            this.Loaded -= ChromeTabItem_Loaded;
-            this.Unloaded += ChromeTabItem_Unloaded;
+            Loaded -= ChromeTabItem_Loaded;
+            Unloaded += ChromeTabItem_Unloaded;
         }
 
         private void ChromeTabItem_Unloaded(object sender, RoutedEventArgs e)
         {
-            this.Unloaded -= ChromeTabItem_Unloaded;
+            Unloaded -= ChromeTabItem_Unloaded;
             StoptPersistTimer();
         }
 
@@ -156,7 +135,7 @@ namespace ChromeTabs
 
             if (tabItem.ParentTabControl != null && tabItem.ParentTabControl.TabPersistBehavior == TabPersistBehavior.Timed)
             {
-                if ((bool)args.NewValue == true)
+                if ((bool)args.NewValue)
                 {
                     tabItem.StoptPersistTimer();
                 }
@@ -172,8 +151,7 @@ namespace ChromeTabs
         {
             StoptPersistTimer();
 
-            persistentTimer = new DispatcherTimer();
-            persistentTimer.Interval = ParentTabControl.TabPersistDuration;
+            persistentTimer = new DispatcherTimer {Interval = ParentTabControl.TabPersistDuration};
             persistentTimer.Tick += PersistentTimer_Tick;
             persistentTimer.Start();
         }
@@ -192,46 +170,35 @@ namespace ChromeTabs
         private void PersistentTimer_Tick(object sender, EventArgs e)
         {
             StoptPersistTimer();
-            if (ParentTabControl != null)
-                ParentTabControl.RemoveFromItemHolder(this);
+            ParentTabControl?.RemoveFromItemHolder(this);
         }
 
         private static void HandlePinTabCommand(object sender, ExecutedRoutedEventArgs e)
         {
-            ChromeTabItem item = sender as ChromeTabItem;
-            if (item == null) { return; }
+            if (!(sender is ChromeTabItem item)) { return; }
             item.ParentTabControl.PinTab(item.DataContext);
         }
 
 
         private static void HandleCloseOtherTabsCommand(object sender, ExecutedRoutedEventArgs e)
         {
-            ChromeTabItem item = sender as ChromeTabItem;
-            if (item == null) { return; }
+            if (!(sender is ChromeTabItem item)) { return; }
             item.ParentTabControl.RemoveAllTabs(item.DataContext);
         }
 
         private static void HandleCloseAllTabsCommand(object sender, ExecutedRoutedEventArgs e)
         {
-            ChromeTabItem item = sender as ChromeTabItem;
-            if (item == null) { return; }
+            if (!(sender is ChromeTabItem item)) { return; }
             item.ParentTabControl.RemoveAllTabs();
         }
 
         private static void HandleCloseTabCommand(object sender, ExecutedRoutedEventArgs e)
         {
-            ChromeTabItem item = sender as ChromeTabItem;
-            if (item == null) { return; }
+            if (!(sender is ChromeTabItem item)) { return; }
             item.ParentTabControl.RemoveFromItemHolder(item);
             item.ParentTabControl.RemoveTab(item);
         }
-        public int Index
-        {
-            get
-            {
-                return ParentTabControl == null ? -1 : ParentTabControl.GetTabIndex(this);
-            }
-        }
+        public int Index => ParentTabControl?.GetTabIndex(this) ?? -1;
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
@@ -242,9 +209,6 @@ namespace ChromeTabs
             }
         }
 
-        private ChromeTabControl ParentTabControl
-        {
-            get { return ItemsControl.ItemsControlFromItemContainer(this) as ChromeTabControl; }
-        }
+        private ChromeTabControl ParentTabControl => ItemsControl.ItemsControlFromItemContainer(this) as ChromeTabControl;
     }
 }

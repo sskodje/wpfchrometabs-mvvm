@@ -5,7 +5,6 @@
         Title="ChromeTabs Demo"
         Height="600"
         Width="700"
-        xmlns:local="clr-namespace:Demo"
         xmlns:vm="clr-namespace:Demo.ViewModel"
         xmlns:usercontrols="clr-namespace:Demo.UserControls"
         xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"

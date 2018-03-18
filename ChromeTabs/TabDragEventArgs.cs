@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 
 namespace ChromeTabs
 {
@@ -11,7 +7,7 @@ namespace ChromeTabs
     {
         public object Tab { get; set; }
         public Point CursorPosition { get; set; }
-        public TabDragEventArgs(RoutedEvent routedEvent, object tab, Point cursorPos) : base(routedEvent) { this.Tab = tab; this.CursorPosition = cursorPos; }
-        public TabDragEventArgs(RoutedEvent routedEvent, object source, object tab, Point cursorPos) : base(routedEvent, source) { this.Tab = tab; this.CursorPosition = cursorPos; }
+        public TabDragEventArgs(RoutedEvent routedEvent, object tab, Point cursorPos) : base(routedEvent) { Tab = tab; CursorPosition = cursorPos; }
+        public TabDragEventArgs(RoutedEvent routedEvent, object source, object tab, Point cursorPos) : base(routedEvent, source) { Tab = tab; CursorPosition = cursorPos; }
     }
 }
