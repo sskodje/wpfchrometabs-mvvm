@@ -159,7 +159,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             "ContainerItemPreparedForOverride", RoutingStrategy.Bubble, typeof(ContainerOverrideEventHandler), typeof(ChromeTabControl));
 
 
-
+        [Obsolete("Set TabDragEventArgs.Handled in TabDraggedOutsideBonds event instead.")]
         public bool CloseTabWhenDraggedOutsideBonds
         {
             get => (bool)GetValue(CloseTabWhenDraggedOutsideBondsProperty);

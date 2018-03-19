@@ -68,7 +68,6 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BooleanToPinTabTextConverter.cs" />
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
-    <Compile Include="Converters\TabToTabSnapConverter.cs" />
     <Compile Include="CustomStyleExampleWindow.xaml.cs">
       <DependentUpon>CustomStyleExampleWindow.xaml</DependentUpon>
     </Compile>

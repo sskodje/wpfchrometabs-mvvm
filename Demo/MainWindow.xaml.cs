@@ -61,7 +61,8 @@ namespace Demo
                 MoveWindow(win, e.CursorPosition);
             }
             _openWindows.Add(win);
-            Debug.WriteLine(e.CursorPosition);
+            //Set Handled to true to tell the tab control that we have dragged the tab to a window, and the tab should be closed.
+            e.Handled = true;
         }
 
         private void win_Loaded(object sender, RoutedEventArgs e)

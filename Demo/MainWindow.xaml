@@ -14,7 +14,6 @@
         DataContext="{Binding Source={StaticResource Locator},Path=ViewModelMainWindow}">
     <!--These DataTemplates load the correct user control based on the viewmodel-->
     <Window.Resources>
-        <conv:TabToTabSnapConverter x:Key="TabToTabSnapConverter" />
         <DataTemplate DataType="{x:Type vm:TabClass1}">
             <usercontrols:UserControl1 />
         </DataTemplate>
@@ -43,7 +42,6 @@
                              CanMoveTabs="{Binding CanMoveTabs}"
                              DragWindowWithOneTab="True"
                              IsAddButtonVisible="{Binding ShowAddButton}"
-                             CloseTabWhenDraggedOutsideBonds="{Binding SelectedTab, Converter={StaticResource TabToTabSnapConverter}}"
                              AddTabCommand="{Binding AddTabCommand}"
                              CloseTabCommand="{Binding CloseTabCommand}"
                              ReorderTabsCommand="{Binding ReorderTabsCommand}"

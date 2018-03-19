@@ -419,7 +419,7 @@ namespace ChromeTabs
                 originalIndex = draggedTab.Index;
                 slideIndex = originalIndex + 1;
                 //Add slide intervals, the positions  where the tab slides over the next.
-                slideIntervals = new List<double> {double.NegativeInfinity};
+                slideIntervals = new List<double> { double.NegativeInfinity };
 
                 for (int i = 1; i <= Children.Count; i += 1)
                 {
@@ -531,8 +531,11 @@ namespace ChromeTabs
             if (isOutsideTabPanel && Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 object viewmodel = draggedTab.Content;
-                RaiseEvent(new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel, PointToScreen(e.GetPosition(this))));
-                OnTabRelease(e.GetPosition(this), IsMouseCaptured, ParentTabControl.CloseTabWhenDraggedOutsideBonds, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
+                var eventArgs = new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel, PointToScreen(e.GetPosition(this)));
+                RaiseEvent(eventArgs);
+                bool closeTab = eventArgs.Handled || ParentTabControl.CloseTabWhenDraggedOutsideBonds;
+                OnTabRelease(e.GetPosition(this), IsMouseCaptured, closeTab, 0.01);//If we set it to 0 the completed event never fires, so we set it to a small decimal.
+
             }
         }
 
