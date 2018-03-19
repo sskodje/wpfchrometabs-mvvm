@@ -48,12 +48,11 @@ namespace ChromeTabs
     {
         private bool _addTabButtonClicked;
         private object _lastSelectedItem;
-        private Panel itemsHolder;
-        private ConditionalWeakTable<object, DependencyObject> objectToContainerMap;
-        internal static readonly DependencyPropertyKey CanAddTabPropertyKey = DependencyProperty.RegisterReadOnly("CanAddTab", typeof(bool), typeof(ChromeTabControl), new PropertyMetadata(true));
-        public static readonly DependencyProperty CanAddTabProperty = CanAddTabPropertyKey.DependencyProperty;
+        private Panel _itemsHolder;
+        private ConditionalWeakTable<object, DependencyObject> _objectToContainerMap;
         public static readonly DependencyProperty SelectedContentProperty = DependencyProperty.Register("SelectedContent", typeof(object), typeof(ChromeTabControl), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
+        internal bool CanAddTabInternal { get; set; }
 
         public static readonly DependencyProperty CloseTabCommandProperty =
     DependencyProperty.Register(
@@ -364,7 +363,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             ChromeTabControl ct = (ChromeTabControl)d;
             if (((TabPersistBehavior)e.NewValue) == TabPersistBehavior.None)
             {
-                ct.itemsHolder.Children.Clear();
+                ct._itemsHolder.Children.Clear();
             }
             else
             {
@@ -458,7 +457,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         internal void AddTab()
         {
-            if (!CanAddTab)
+            if (!CanAddTabInternal)
             {
                 return;
             }
@@ -469,8 +468,11 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             }
 
         }
-
-        internal bool CanAddTab => (bool)GetValue(CanAddTabProperty);
+        //internal void SetCanAddTab(bool value)
+        //{
+        //    SetValue(CanAddTabPropertyKey, value);
+        //}
+        //internal bool CanAddTab => (bool)GetValue(CanAddTabProperty);
 
         internal void RemoveTab(object obj)
         {
@@ -591,14 +593,10 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         }
 
-        internal void SetCanAddTab(bool value)
-        {
-            SetValue(CanAddTabPropertyKey, value);
-        }
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            itemsHolder = GetTemplateChild("PART_ItemsHolder") as Panel;
+            _itemsHolder = GetTemplateChild("PART_ItemsHolder") as Panel;
             SetSelectedContent(false);
         }
 
@@ -639,16 +637,16 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
-            if (itemsHolder != null)
+            if (_itemsHolder != null)
             {
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Replace:
                     case NotifyCollectionChangedAction.Reset:
                         {
-                            var itemsToRemove = itemsHolder.Children.Cast<ContentPresenter>().Where(x => !Items.Contains(x.Content)).ToList();
+                            var itemsToRemove = _itemsHolder.Children.Cast<ContentPresenter>().Where(x => !Items.Contains(x.Content)).ToList();
                             foreach (var item in itemsToRemove)
-                                itemsHolder.Children.Remove(item);
+                                _itemsHolder.Children.Remove(item);
                         }
                         break;
                     case NotifyCollectionChangedAction.Add:
@@ -671,7 +669,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                                 ContentPresenter cp = FindChildContentPresenter(item);
                                 if (cp != null)
                                 {
-                                    itemsHolder.Children.Remove(cp);
+                                    _itemsHolder.Children.Remove(cp);
                                 }
                             }
                         }
@@ -728,11 +726,11 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             ChromeTabItem item = AsTabItem(SelectedItem);
             if (TabPersistBehavior != TabPersistBehavior.None)
             {
-                if (item != null && itemsHolder != null)
+                if (item != null && _itemsHolder != null)
                 {
                     CreateChildContentPresenter(SelectedItem);
                     // show the right child
-                    foreach (ContentPresenter child in itemsHolder.Children)
+                    foreach (ContentPresenter child in _itemsHolder.Children)
                     {
                         ChromeTabItem childTabItem = AsTabItem(child.Content);
                         child.Visibility = childTabItem.IsSelected ? Visibility.Visible : Visibility.Collapsed;
@@ -768,8 +766,8 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             return tabItem;
         }
 
-        private ConditionalWeakTable<object, DependencyObject> ObjectToContainer => objectToContainerMap ??
-                                                                                    (objectToContainerMap = new ConditionalWeakTable<object, DependencyObject>());
+        private ConditionalWeakTable<object, DependencyObject> ObjectToContainer => _objectToContainerMap ??
+                                                                                    (_objectToContainerMap = new ConditionalWeakTable<object, DependencyObject>());
 
         protected void SetChildrenZ()
         {
@@ -814,7 +812,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 Content = (item is ChromeTabItem) ? (item as ChromeTabItem).Content : item,
                 Visibility = Visibility.Collapsed
             };
-            itemsHolder.Children.Add(cp);
+            _itemsHolder.Children.Add(cp);
             return cp;
         }
 
@@ -828,7 +826,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
         {
             if (data is ChromeTabItem)
             {
-                data = ((ChromeTabItem) data).Content;
+                data = ((ChromeTabItem)data).Content;
             }
 
             if (data == null)
@@ -836,12 +834,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 return null;
             }
 
-            if (itemsHolder == null)
+            if (_itemsHolder == null)
             {
                 return null;
             }
 
-            foreach (ContentPresenter cp in itemsHolder.Children)
+            foreach (ContentPresenter cp in _itemsHolder.Children)
             {
                 if (cp.Content == data)
                 {
@@ -854,12 +852,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         internal void RemoveFromItemHolder(ChromeTabItem item)
         {
-            if (itemsHolder == null)
+            if (_itemsHolder == null)
                 return;
             ContentPresenter presenter = FindChildContentPresenter(item);
             if (presenter != null)
             {
-                itemsHolder.Children.Remove(presenter);
+                _itemsHolder.Children.Remove(presenter);
                 Debug.WriteLine("Removing cached ContentPresenter");
             }
 

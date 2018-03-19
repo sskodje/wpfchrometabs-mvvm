@@ -45,30 +45,35 @@ namespace ChromeTabs
     [ToolboxItem(false)]
     public class ChromeTabPanel : Panel
     {
-        private const double stickyReanimateDuration = 0.10;
-        private const double tabWidthSlidePercent = 0.5;
-        private bool isReleasingTab;
-        private bool hideAddButton;
-        private Size finalSize;
-        private double leftMargin;
-        private double rightMargin;
-        private double defaultMeasureHeight;
-        private double currentTabWidth;
-        private int captureGuard;
-        private int originalIndex;
-        private int slideIndex;
-        private List<double> slideIntervals;
-        private ChromeTabItem draggedTab;
-        private Point downPoint;
-        private Point downTabBoundsPoint;
-        private ChromeTabControl parent;
-        private Rect addButtonRect;
-        private Size addButtonSize;
-        private Button addButton;
-        private DateTime lastMouseDown;
-        private object lockObject = new object();
+        private const double _stickyReanimateDuration = 0.10;
+        private const double _tabWidthSlidePercent = 0.5;
+        private bool _isReleasingTab;
+        private bool _hideAddButton;
+        private Size _finalSize;
+        private double _leftMargin;
+        private double _rightMargin;
+        private double _defaultMeasureHeight;
+        private double _currentTabWidth;
+        private int _captureGuard;
+        private int _originalIndex;
+        private int _slideIndex;
+        private List<double> _slideIntervals;
+        private ChromeTabItem _draggedTab;
+        private Point _downPoint;
+        private Point _downTabBoundsPoint;
+        private ChromeTabControl _parent;
+        private Rect _addButtonRect;
+        private Size _addButtonSize;
+        private Button _addButton;
+        private DateTime _lastMouseDown;
+        private object _lockObject = new object();
 
-        private double Overlap => ParentTabControl?.TabOverlap ?? 10;
+        protected double Overlap => ParentTabControl?.TabOverlap ?? 10;
+        protected double MinTabWidth => _parent?.MinimumTabWidth ?? 40;
+        protected double MaxTabWidth => _parent?.MaximumTabWidth ?? 125;
+        protected double PinnedTabWidth => _parent?.PinnedTabWidth ?? MinTabWidth;
+
+
 
         private bool _isAddButtonEnabled;
 
@@ -80,22 +85,15 @@ namespace ChromeTabs
                 if (_isAddButtonEnabled != value)
                 {
                     _isAddButtonEnabled = value;
-                    addButton.IsEnabled = value;
+                    _addButton.IsEnabled = value;
                     if (ParentTabControl != null)
                     {
-                        addButton.Background = value == false ? ParentTabControl.AddTabButtonDisabledBrush : ParentTabControl.AddTabButtonBrush;
+                        _addButton.Background = value == false ? ParentTabControl.AddTabButtonDisabledBrush : ParentTabControl.AddTabButtonBrush;
                         InvalidateVisual();
                     }
                 }
             }
         }
-
-
-        private double MinTabWidth => parent?.MinimumTabWidth ?? 40;
-
-        private double MaxTabWidth => parent?.MaximumTabWidth ?? 125;
-
-        private double PinnedTabWidth => parent?.PinnedTabWidth ?? MinTabWidth;
 
         static ChromeTabPanel()
         {
@@ -104,15 +102,15 @@ namespace ChromeTabs
 
         public ChromeTabPanel()
         {
-            leftMargin = 0.0;
-            rightMargin = 25.0;
-            defaultMeasureHeight = 30.0;
+            _leftMargin = 0.0;
+            _rightMargin = 25.0;
+            _defaultMeasureHeight = 30.0;
             ComponentResourceKey key = new ComponentResourceKey(typeof(ChromeTabPanel), "addButtonStyle");
             Style addButtonStyle = (Style)FindResource(key);
-            addButton = new Button { Style = addButtonStyle };
-            addButtonSize = new Size(20, 12);
-            Loaded += ChromeTabPanel_Loaded;
-            Unloaded += ChromeTabPanel_Unloaded;
+            _addButton = new Button { Style = addButtonStyle };
+            _addButtonSize = new Size(20, 12);
+            this.Loaded += ChromeTabPanel_Loaded;
+            this.Unloaded += ChromeTabPanel_Unloaded;
         }
 
         private void ChromeTabPanel_Unloaded(object sender, RoutedEventArgs e)
@@ -130,7 +128,7 @@ namespace ChromeTabs
         private void ChromeTabPanel_Dectivated(object sender, EventArgs e)
         {
 
-            if (draggedTab != null && !IsMouseCaptured && !isReleasingTab)
+            if (_draggedTab != null && !IsMouseCaptured && !_isReleasingTab)
             {
                 Point p = MouseUtilities.CorrectGetPosition(this);
                 OnTabRelease(p, true, false);
@@ -141,7 +139,7 @@ namespace ChromeTabs
         {
             Style style = new Style(typeof(Button));
             style.Setters.Add(new Setter(Control.TemplateProperty, template));
-            addButton.Style = style;
+            _addButton.Style = style;
         }
 
         protected override int VisualChildrenCount => base.VisualChildrenCount + 1;
@@ -150,7 +148,7 @@ namespace ChromeTabs
         {
             if (index == VisualChildrenCount - 1)
             {
-                return addButton;
+                return _addButton;
             }
 
             if (index < VisualChildrenCount - 1)
@@ -163,19 +161,19 @@ namespace ChromeTabs
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            rightMargin = ParentTabControl.IsAddButtonVisible ? 25 : 0;
-            currentTabWidth = CalculateTabWidth(finalSize);
-            ParentTabControl.SetCanAddTab(currentTabWidth > MinTabWidth);
+            _rightMargin = ParentTabControl.IsAddButtonVisible ? 25 : 0;
+            _currentTabWidth = CalculateTabWidth(finalSize);
+            ParentTabControl.CanAddTabInternal=_currentTabWidth > MinTabWidth;
 
-            if (hideAddButton)
-                addButton.Visibility = Visibility.Hidden;
+            if (_hideAddButton)
+                _addButton.Visibility = Visibility.Hidden;
             else if (ParentTabControl.IsAddButtonVisible)
-                addButton.Visibility = currentTabWidth > MinTabWidth ? Visibility.Visible : Visibility.Collapsed;
+                _addButton.Visibility = _currentTabWidth > MinTabWidth ? Visibility.Visible : Visibility.Collapsed;
             else
-                addButton.Visibility = Visibility.Collapsed;
+                _addButton.Visibility = Visibility.Collapsed;
 
-            this.finalSize = finalSize;
-            double offset = leftMargin;
+            _finalSize = finalSize;
+            double offset = _leftMargin;
             foreach (UIElement element in Children)
             {
                 double thickness = 0.0;
@@ -187,25 +185,25 @@ namespace ChromeTabs
             }
             if (ParentTabControl.IsAddButtonVisible)
             {
-                addButtonRect = new Rect(new Point(offset + Overlap, (finalSize.Height - addButtonSize.Height) / 2), addButtonSize);
-                addButton.Arrange(addButtonRect);
+                _addButtonRect = new Rect(new Point(offset + Overlap, (finalSize.Height - _addButtonSize.Height) / 2), _addButtonSize);
+                _addButton.Arrange(_addButtonRect);
             }
             return finalSize;
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            currentTabWidth = CalculateTabWidth(availableSize);
-            ParentTabControl.SetCanAddTab(currentTabWidth > MinTabWidth);
+            _currentTabWidth = CalculateTabWidth(availableSize);
+            ParentTabControl.CanAddTabInternal = _currentTabWidth > MinTabWidth;
 
-            if (hideAddButton)
-                addButton.Visibility = Visibility.Hidden;
+            if (_hideAddButton)
+                _addButton.Visibility = Visibility.Hidden;
             else if (ParentTabControl.IsAddButtonVisible)
-                addButton.Visibility = currentTabWidth > MinTabWidth ? Visibility.Visible : Visibility.Collapsed;
+                _addButton.Visibility = _currentTabWidth > MinTabWidth ? Visibility.Visible : Visibility.Collapsed;
             else
-                addButton.Visibility = Visibility.Collapsed;
+                _addButton.Visibility = Visibility.Collapsed;
 
-            double height = double.IsPositiveInfinity(availableSize.Height) ? defaultMeasureHeight : availableSize.Height;
+            double height = double.IsPositiveInfinity(availableSize.Height) ? _defaultMeasureHeight : availableSize.Height;
             Size resultSize = new Size(0, availableSize.Height);
             foreach (UIElement child in Children)
             {
@@ -216,8 +214,8 @@ namespace ChromeTabs
             }
             if (ParentTabControl.IsAddButtonVisible)
             {
-                addButton.Measure(addButtonSize);
-                resultSize.Width += addButtonSize.Width;
+                _addButton.Measure(_addButtonSize);
+                resultSize.Width += _addButtonSize.Width;
             }
             return resultSize;
         }
@@ -227,12 +225,12 @@ namespace ChromeTabs
             {
                 return PinnedTabWidth;
             }
-            return currentTabWidth;
+            return _currentTabWidth;
         }
 
         private double CalculateTabWidth(Size availableSize)
         {
-            double activeWidth = double.IsPositiveInfinity(availableSize.Width) ? 500 : availableSize.Width - leftMargin - rightMargin;
+            double activeWidth = double.IsPositiveInfinity(availableSize.Width) ? 500 : availableSize.Width - _leftMargin - _rightMargin;
             int numberOfPinnedTabs = Children.Cast<ChromeTabItem>().Count(x => x.IsPinned);
 
             double totalPinnedTabsWidth = numberOfPinnedTabs > 0 ? ((numberOfPinnedTabs * PinnedTabWidth)) : 0;
@@ -266,18 +264,18 @@ namespace ChromeTabs
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
-            lock (lockObject)
+            lock (_lockObject)
             {
-                if (slideIntervals != null)
+                if (_slideIntervals != null)
                 {
                     return;
                 }
 
-                if (addButtonRect.Contains(e.GetPosition(this)) && IsAddButtonEnabled)
+                if (_addButtonRect.Contains(e.GetPosition(this)) && IsAddButtonEnabled)
                 {
                     if (ParentTabControl != null)
                     {
-                        addButton.Background = ParentTabControl.AddTabButtonMouseDownBrush;
+                        _addButton.Background = ParentTabControl.AddTabButtonMouseDownBrush;
                         InvalidateVisual();
                     }
                     return;
@@ -304,8 +302,8 @@ namespace ChromeTabs
                 if (isButton)
                     return;
 
-                downPoint = e.GetPosition(this);
-                StartTabDrag(downPoint);
+                _downPoint = e.GetPosition(this);
+                StartTabDrag(_downPoint);
 
             }
         }
@@ -321,10 +319,10 @@ namespace ChromeTabs
                     totalWidth += GetWidthForTabItem(Children[i] as ChromeTabItem) - Overlap;
                 }
                 double xPos = totalWidth + ((GetWidthForTabItem(tab) / 2));
-                this.downPoint = new Point(xPos, downPoint.Y);
+                _downPoint = new Point(xPos, downPoint.Y);
             }
             else
-                this.downPoint = downPoint;
+                _downPoint = downPoint;
 
             StartTabDrag(downPoint, tab, isTabGrab);
         }
@@ -348,35 +346,35 @@ namespace ChromeTabs
 
         internal void StartTabDrag(Point p, ChromeTabItem tab = null, bool isTabGrab = false)
         {
-            lastMouseDown = DateTime.UtcNow;
+            _lastMouseDown = DateTime.UtcNow;
             if (tab == null)
             {
-                tab = GetTabFromMousePosition(downPoint);
+                tab = GetTabFromMousePosition(_downPoint);
             }
 
             if (tab != null)
-                draggedTab = tab;
+                _draggedTab = tab;
             else
             {
                 //The mouse is not over a tab item, so just return.
                 return;
             }
 
-            if (draggedTab != null)
+            if (_draggedTab != null)
             {
                 if (Children.Count == 1
                     && ParentTabControl.DragWindowWithOneTab
                     && Mouse.LeftButton == MouseButtonState.Pressed
                     && !isTabGrab)
                 {
-                    draggedTab = null;
+                    _draggedTab = null;
                     Window.GetWindow(this).DragMove();
                 }
                 else
                 {
-                    downTabBoundsPoint = MouseUtilities.CorrectGetPosition(draggedTab);
-                    SetZIndex(draggedTab, 1000);
-                    ParentTabControl.ChangeSelectedItem(draggedTab);
+                    _downTabBoundsPoint = MouseUtilities.CorrectGetPosition(_draggedTab);
+                    SetZIndex(_draggedTab, 1000);
+                    ParentTabControl.ChangeSelectedItem(_draggedTab);
                     if (isTabGrab)
                     {
                         ProcessMouseMove(new Point(p.X + 0.1, p.Y));
@@ -390,85 +388,85 @@ namespace ChromeTabs
             Point nowPoint = p;
             if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible && IsAddButtonEnabled)
             {
-                if (addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
+                if (_addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
                 {
-                    addButton.Background = ParentTabControl.AddTabButtonMouseOverBrush;
+                    _addButton.Background = ParentTabControl.AddTabButtonMouseOverBrush;
                     InvalidateVisual();
                 }
-                else if (!addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
+                else if (!_addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
                 {
-                    addButton.Background = ParentTabControl.AddTabButtonBrush;
+                    _addButton.Background = ParentTabControl.AddTabButtonBrush;
                     InvalidateVisual();
                 }
             }
-            if (draggedTab == null || !ParentTabControl.CanMoveTabs)
+            if (_draggedTab == null || !ParentTabControl.CanMoveTabs)
             {
                 return;
             }
 
-            Point insideTabPoint = TranslatePoint(p, draggedTab);
-            Thickness margin = new Thickness(nowPoint.X - downPoint.X, 0, downPoint.X - nowPoint.X, 0);
+            Point insideTabPoint = TranslatePoint(p, _draggedTab);
+            Thickness margin = new Thickness(nowPoint.X - _downPoint.X, 0, _downPoint.X - nowPoint.X, 0);
 
 
-            int guardValue = Interlocked.Increment(ref captureGuard);
+            int guardValue = Interlocked.Increment(ref _captureGuard);
             if (guardValue == 1)
             {
-                draggedTab.Margin = margin;
+                _draggedTab.Margin = margin;
 
                 //we capture the mouse and start tab movement
-                originalIndex = draggedTab.Index;
-                slideIndex = originalIndex + 1;
+                _originalIndex = _draggedTab.Index;
+                _slideIndex = _originalIndex + 1;
                 //Add slide intervals, the positions  where the tab slides over the next.
-                slideIntervals = new List<double> { double.NegativeInfinity };
+                _slideIntervals = new List<double> { double.NegativeInfinity };
 
                 for (int i = 1; i <= Children.Count; i += 1)
                 {
                     var tab = Children[i - 1] as ChromeTabItem;
-                    var diff = i - slideIndex;
+                    var diff = i - _slideIndex;
                     var sign = diff == 0 ? 0 : diff / Math.Abs(diff);
-                    var bound = Math.Min(1, Math.Abs(diff)) * ((sign * GetWidthForTabItem(tab) * tabWidthSlidePercent) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (GetWidthForTabItem(tab) - Overlap)));
-                    slideIntervals.Add(bound);
+                    var bound = Math.Min(1, Math.Abs(diff)) * ((sign * GetWidthForTabItem(tab) * _tabWidthSlidePercent) + ((Math.Abs(diff) < 2) ? 0 : (diff - sign) * (GetWidthForTabItem(tab) - Overlap)));
+                    _slideIntervals.Add(bound);
                 }
-                slideIntervals.Add(double.PositiveInfinity);
+                _slideIntervals.Add(double.PositiveInfinity);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (this.CaptureMouse())
+                    if (CaptureMouse())
                         Debug.WriteLine("has mouse capture=true");
                     else
                         Debug.WriteLine("has mouse capture=false");
                 }));
             }
-            else if (slideIntervals != null)
+            else if (_slideIntervals != null)
             {
-                if (insideTabPoint.X > 0 && (nowPoint.X + (draggedTab.ActualWidth - insideTabPoint.X)) >= ActualWidth)
+                if (insideTabPoint.X > 0 && (nowPoint.X + (_draggedTab.ActualWidth - insideTabPoint.X)) >= ActualWidth)
                 {
                     return;
                 }
 
-                if (insideTabPoint.X < downTabBoundsPoint.X && (nowPoint.X - insideTabPoint.X) <= 0)
+                if (insideTabPoint.X < _downTabBoundsPoint.X && (nowPoint.X - insideTabPoint.X) <= 0)
                 {
                     return;
                 }
-                draggedTab.Margin = margin;
+                _draggedTab.Margin = margin;
                 //We return on small marging changes to avoid the tabs jumping around when quickly clicking between tabs.
-                if (Math.Abs(draggedTab.Margin.Left) < 10)
+                if (Math.Abs(_draggedTab.Margin.Left) < 10)
                     return;
-                addButton.Visibility = Visibility.Hidden;
-                hideAddButton = true;
+                _addButton.Visibility = Visibility.Hidden;
+                _hideAddButton = true;
 
                 int changed = 0;
-                int localSlideIndex = slideIndex;
+                int localSlideIndex = _slideIndex;
                 if (localSlideIndex - 1 >= 0
-                    && localSlideIndex - 1 < slideIntervals.Count
-                    && margin.Left < slideIntervals[localSlideIndex - 1])
+                    && localSlideIndex - 1 < _slideIntervals.Count
+                    && margin.Left < _slideIntervals[localSlideIndex - 1])
                 {
                     SwapSlideInterval(localSlideIndex - 1);
                     localSlideIndex -= 1;
                     changed = 1;
                 }
                 else if (localSlideIndex + 1 >= 0
-                    && localSlideIndex + 1 < slideIntervals.Count
-                    && margin.Left > slideIntervals[localSlideIndex + 1])
+                    && localSlideIndex + 1 < _slideIntervals.Count
+                    && margin.Left > _slideIntervals[localSlideIndex + 1])
                 {
                     SwapSlideInterval(localSlideIndex + 1);
                     localSlideIndex += 1;
@@ -476,7 +474,7 @@ namespace ChromeTabs
                 }
                 if (changed != 0)
                 {
-                    var rightedOriginalIndex = originalIndex + 1;
+                    var rightedOriginalIndex = _originalIndex + 1;
                     var diff = 1;
                     if (changed > 0 && localSlideIndex >= rightedOriginalIndex)
                     {
@@ -494,12 +492,12 @@ namespace ChromeTabs
                     {
                         ChromeTabItem shiftedTab = Children[index] as ChromeTabItem;
 
-                        if (!shiftedTab.Equals(draggedTab)
-                            && ((shiftedTab.IsPinned && draggedTab.IsPinned) || (!shiftedTab.IsPinned && !draggedTab.IsPinned)))
+                        if (!shiftedTab.Equals(_draggedTab)
+                            && ((shiftedTab.IsPinned && _draggedTab.IsPinned) || (!shiftedTab.IsPinned && !_draggedTab.IsPinned)))
                         {
-                            var offset = changed * (GetWidthForTabItem(draggedTab) - Overlap);
-                            StickyReanimate(shiftedTab, offset, stickyReanimateDuration);
-                            slideIndex = localSlideIndex;
+                            var offset = changed * (GetWidthForTabItem(_draggedTab) - Overlap);
+                            StickyReanimate(shiftedTab, offset, _stickyReanimateDuration);
+                            _slideIndex = localSlideIndex;
                         }
                     }
                 }
@@ -509,7 +507,7 @@ namespace ChromeTabs
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-            if (draggedTab != null && Mouse.LeftButton != MouseButtonState.Pressed && !isReleasingTab)
+            if (_draggedTab != null && Mouse.LeftButton != MouseButtonState.Pressed && !_isReleasingTab)
             {
                 Point p = e.GetPosition(this);
                 OnTabRelease(p, true, false);
@@ -522,7 +520,7 @@ namespace ChromeTabs
 
             ProcessMouseMove(e.GetPosition(this));
 
-            if (draggedTab == null || DateTime.UtcNow.Subtract(lastMouseDown).TotalMilliseconds < 50)
+            if (_draggedTab == null || DateTime.UtcNow.Subtract(_lastMouseDown).TotalMilliseconds < 50)
             {
                 return;
             }
@@ -533,7 +531,7 @@ namespace ChromeTabs
                 || nowPoint.Y > ActualHeight + 5 + ParentTabControl.TabTearTriggerDistance;
             if (isOutsideTabPanel && Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                object viewmodel = draggedTab.Content;
+                object viewmodel = _draggedTab.Content;
                 var eventArgs = new TabDragEventArgs(ChromeTabControl.TabDraggedOutsideBondsEvent, this, viewmodel, PointToScreen(e.GetPosition(this)));
                 RaiseEvent(eventArgs);
                 bool closeTab = eventArgs.Handled || ParentTabControl.CloseTabWhenDraggedOutsideBonds;
@@ -543,17 +541,17 @@ namespace ChromeTabs
         }
 
 
-        private void OnTabRelease(Point p, bool isDragging, bool closeTabOnRelease, double animationDuration = stickyReanimateDuration)
+        private void OnTabRelease(Point p, bool isDragging, bool closeTabOnRelease, double animationDuration = _stickyReanimateDuration)
         {
-            lock (lockObject)
+            lock (_lockObject)
             {
                 if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible)
                 {
-                    if (addButtonRect.Contains(p) && IsAddButtonEnabled)
+                    if (_addButtonRect.Contains(p) && IsAddButtonEnabled)
                     {
-                        addButton.Background = ParentTabControl.AddTabButtonBrush;
+                        _addButton.Background = ParentTabControl.AddTabButtonBrush;
                         InvalidateVisual();
-                        if (addButton.Visibility == Visibility.Visible)
+                        if (_addButton.Visibility == Visibility.Visible)
                         {
                             ParentTabControl.AddTab();
                         }
@@ -565,22 +563,22 @@ namespace ChromeTabs
                 {
                     ReleaseMouseCapture();
                     double offset = GetTabOffset();
-                    int localSlideIndex = slideIndex;
+                    int localSlideIndex = _slideIndex;
                     void completed()
                     {
-                        if (draggedTab != null)
+                        if (_draggedTab != null)
                         {
                             try
                             {
-                                ParentTabControl.ChangeSelectedItem(draggedTab);
-                                object vm = draggedTab.Content;
-                                draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
-                                draggedTab = null;
-                                captureGuard = 0;
-                                ParentTabControl.MoveTab(originalIndex, Math.Max(0, localSlideIndex - 1));
-                                slideIntervals = null;
-                                addButton.Visibility = Visibility.Visible;
-                                hideAddButton = false;
+                                ParentTabControl.ChangeSelectedItem(_draggedTab);
+                                object vm = _draggedTab.Content;
+                                _draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
+                                _draggedTab = null;
+                                _captureGuard = 0;
+                                ParentTabControl.MoveTab(_originalIndex, Math.Max(0, localSlideIndex - 1));
+                                _slideIntervals = null;
+                                _addButton.Visibility = Visibility.Visible;
+                                _hideAddButton = false;
                                 InvalidateVisual();
                                 if (closeTabOnRelease && ParentTabControl.CloseTabCommand != null)
                                 {
@@ -595,27 +593,27 @@ namespace ChromeTabs
                             }
                             finally
                             {
-                                isReleasingTab = false;
+                                _isReleasingTab = false;
                             }
                         }
                     }
 
-                    if (Reanimate(draggedTab, offset, animationDuration, completed))
+                    if (Reanimate(_draggedTab, offset, animationDuration, completed))
                     {
-                        isReleasingTab = true;
+                        _isReleasingTab = true;
                     }
                 }
                 else
                 {
-                    if (draggedTab != null)
+                    if (_draggedTab != null)
                     {
                         double offset = GetTabOffset();
-                        ParentTabControl.ChangeSelectedItem(draggedTab);
-                        draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
+                        ParentTabControl.ChangeSelectedItem(_draggedTab);
+                        _draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
                     }
-                    draggedTab = null;
-                    captureGuard = 0;
-                    slideIntervals = null;
+                    _draggedTab = null;
+                    _captureGuard = 0;
+                    _slideIntervals = null;
                 }
             }
         }
@@ -623,15 +621,15 @@ namespace ChromeTabs
         private double GetTabOffset()
         {
             double offset = 0;
-            if (slideIntervals != null)
+            if (_slideIntervals != null)
             {
-                if (slideIndex < originalIndex + 1)
+                if (_slideIndex < _originalIndex + 1)
                 {
-                    offset = slideIntervals[slideIndex + 1] - GetWidthForTabItem(draggedTab) * (1 - tabWidthSlidePercent) + Overlap;
+                    offset = _slideIntervals[_slideIndex + 1] - GetWidthForTabItem(_draggedTab) * (1 - _tabWidthSlidePercent) + Overlap;
                 }
-                else if (slideIndex > originalIndex + 1)
+                else if (_slideIndex > _originalIndex + 1)
                 {
-                    offset = slideIntervals[slideIndex - 1] + GetWidthForTabItem(draggedTab) * (1 - tabWidthSlidePercent) - Overlap;
+                    offset = _slideIntervals[_slideIndex - 1] + GetWidthForTabItem(_draggedTab) * (1 - _tabWidthSlidePercent) - Overlap;
                 }
             }
             return offset;
@@ -656,7 +654,7 @@ namespace ChromeTabs
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
-            parent = null;
+            _parent = null;
 
         }
 
@@ -664,16 +662,16 @@ namespace ChromeTabs
         {
             get
             {
-                if (this.parent == null)
+                if (_parent == null)
                 {
                     DependencyObject parent = this;
                     while (parent != null && !(parent is ChromeTabControl))
                     {
                         parent = VisualTreeHelper.GetParent(parent);
                     }
-                    this.parent = parent as ChromeTabControl;
+                    _parent = parent as ChromeTabControl;
                 }
-                return this.parent;
+                return _parent;
             }
         }
         /*
@@ -684,7 +682,7 @@ namespace ChromeTabs
         {
             void completed()
             {
-                if (draggedTab != null)
+                if (_draggedTab != null)
                 {
                     tab.Margin = new Thickness(left, 0, -left, 0);
                 }
@@ -736,8 +734,8 @@ namespace ChromeTabs
 
         private void SwapSlideInterval(int index)
         {
-            slideIntervals[slideIndex] = slideIntervals[index];
-            slideIntervals[index] = 0;
+            _slideIntervals[_slideIndex] = _slideIntervals[index];
+            _slideIntervals[index] = 0;
         }
     }
 }
