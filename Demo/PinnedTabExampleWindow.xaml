@@ -1,4 +1,4 @@
-﻿<Window x:Class="Demo.PinnedTabExampleWindow"
+﻿<local:WindowBase x:Class="Demo.PinnedTabExampleWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Demo"
@@ -36,6 +36,7 @@
                               MinimumTabWidth="40"
                               PinnedTabWidth="50"
                               MaximumTabWidth="125"
+                              TabDraggedOutsideBonds="TabControl_TabDraggedOutsideBonds"
                               ContainerItemPreparedForOverride="TabControl_ContainerItemPreparedForOverride">
             <!--We override the control template here to show how you can modify the properties of tab panel and content presenter-->
             <ct:ChromeTabControl.Template>
@@ -108,4 +109,4 @@
             </ct:ChromeTabControl.ItemTemplate>
         </ct:ChromeTabControl>
     </Grid>
-</Window>
+</local:WindowBase>

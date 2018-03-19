@@ -107,6 +107,7 @@
     <Compile Include="ViewModel\ViewModelMainWindow.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="ViewModel\ViewModelPinnedTabExampleWindow.cs" />
+    <Compile Include="WindowBase.cs" />
     <Page Include="CustomStyleExampleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
