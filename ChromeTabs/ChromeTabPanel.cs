@@ -432,7 +432,10 @@ namespace ChromeTabs
                 slideIntervals.Add(double.PositiveInfinity);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    Debug.WriteLine(CaptureMouse() ? "has mouse capture=true" : "has mouse capture=false");
+                    if (this.CaptureMouse())
+                        Debug.WriteLine("has mouse capture=true");
+                    else
+                        Debug.WriteLine("has mouse capture=false");
                 }));
             }
             else if (slideIntervals != null)
