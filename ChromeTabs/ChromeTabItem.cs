@@ -195,7 +195,6 @@ namespace ChromeTabs
         private static void HandleCloseTabCommand(object sender, ExecutedRoutedEventArgs e)
         {
             if (!(sender is ChromeTabItem item)) { return; }
-            item.ParentTabControl.RemoveFromItemHolder(item);
             item.ParentTabControl.RemoveTab(item);
         }
         public int Index => ParentTabControl?.GetTabIndex(this) ?? -1;

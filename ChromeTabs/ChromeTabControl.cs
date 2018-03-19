@@ -189,7 +189,7 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
             ChromeTabPanel panel = (ChromeTabPanel)ctc.ItemsHost;
             panel?.InvalidateVisual();
-        }   
+        }
 
 
         public bool CanMoveTabs
@@ -462,23 +462,33 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             {
                 return;
             }
-            _addTabButtonClicked = true;
-            AddTabCommand?.Execute(null);
+            if (AddTabCommand != null && AddTabCommand.CanExecute(null))
+            {
+                _addTabButtonClicked = true;
+                AddTabCommand?.Execute(null);
+            }
 
         }
 
         internal bool CanAddTab => (bool)GetValue(CanAddTabProperty);
 
-        internal void RemoveTab(object tab)
+        internal void RemoveTab(object obj)
         {
-            ChromeTabItem removeItem = AsTabItem(tab);
-            CloseTabCommand?.Execute(removeItem.DataContext);
+            ChromeTabItem removeItem = AsTabItem(obj);
+            if (CloseTabCommand != null && CloseTabCommand.CanExecute(removeItem.DataContext))
+            {
+                CloseTabCommand.Execute(removeItem.DataContext);
+                RemoveFromItemHolder(removeItem);
+            }
         }
 
         internal void PinTab(object tab)
         {
             ChromeTabItem removeItem = AsTabItem(tab);
-            PinTabCommand?.Execute(removeItem.DataContext);
+            if (PinTabCommand != null && PinTabCommand.CanExecute(removeItem.DataContext))
+            {
+                PinTabCommand.Execute(removeItem.DataContext);
+            }
         }
 
         internal void RemoveAllTabs(object exceptThis = null)
@@ -486,7 +496,10 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             var objects = ItemsSource.Cast<object>().Where(x => x != exceptThis).ToList();
             foreach (object obj in objects)
             {
-                CloseTabCommand.Execute(obj);
+                if (CloseTabCommand != null && CloseTabCommand.CanExecute(obj))
+                {
+                    CloseTabCommand.Execute(obj);
+                }
             }
         }
 
@@ -550,9 +563,10 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
                 return;
             if (!fromItem.IsPinned && toItem.IsPinned)
                 return;
-            if (ReorderTabsCommand != null)
+            TabReorder tabReorder = new TabReorder(fromIndex, toIndex);
+            if (ReorderTabsCommand != null && ReorderTabsCommand.CanExecute(tabReorder))
             {
-                ReorderTabsCommand.Execute(new TabReorder(fromIndex, toIndex));
+                ReorderTabsCommand.Execute(tabReorder);
             }
             else
             {
