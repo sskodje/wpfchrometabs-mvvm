@@ -153,8 +153,9 @@ namespace Demo
             var allWindows = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>());
             var windowsUnderCurrent = from win in allWindows
                                       where (win.WindowState == WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
-                                      && win.GetType().ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerLayerWindow"
                                       && !Equals(win, source)
+                                      //This prevents "UI debugging tools for XAML" from interfering when debugging.
+                                      && win.GetType().ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerLayerWindow"
                                       select win;
             return windowsUnderCurrent.FirstOrDefault();
         }
