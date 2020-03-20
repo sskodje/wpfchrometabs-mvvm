@@ -80,7 +80,7 @@ namespace Demo.ViewModel
         }
         protected TabClass1 CreateTabLoremIpsum()
         {
-            var tab = new TabClass1 { TabName = "Tab class 1", MyStringContent = Resources.LoremImpsum, TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
+            var tab = new TabClass1 { TabName = "Tab class 1", MyStringContent = Resources.LoremIpsum, TabIcon = new BitmapImage(new Uri("/Resources/1.png", UriKind.Relative)) };
             return tab;
         }
         /// <summary>

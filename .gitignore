@@ -7,3 +7,5 @@ obj
 *.ide-wal
 *.sqlite
 *.ide
+/Demo/.vs/
+/.vs/

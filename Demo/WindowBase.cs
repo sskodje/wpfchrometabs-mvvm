@@ -150,12 +150,12 @@ namespace Demo
         /// <returns></returns>
         private Window FindWindowUnderThisAt(Window source, Point screenPoint)  // WPF units (96dpi), not device units
         {
-            var allWindows = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>());
+            //This prevents "UI debugging tools for XAML" from interfering when debugging.
+            var allWindows = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>().Where(x => x.GetType().ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerWindow"
+                                                                                                         && x.GetType().ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerLayerWindow"));
             var windowsUnderCurrent = from win in allWindows
                                       where (win.WindowState == WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
                                       && !Equals(win, source)
-                                      //This prevents "UI debugging tools for XAML" from interfering when debugging.
-                                      && win.GetType().ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerLayerWindow"
                                       select win;
             return windowsUnderCurrent.FirstOrDefault();
         }
