@@ -575,7 +575,7 @@ namespace ChromeTabs
                                 _draggedTab.Margin = new Thickness(offset, 0, -offset, 0);
                                 _draggedTab = null;
                                 _captureGuard = 0;
-                                ParentTabControl.MoveTab(_originalIndex, Math.Max(0, localSlideIndex - 1));
+                                ParentTabControl.MoveTab(_originalIndex, localSlideIndex - 1);
                                 _slideIntervals = null;
                                 _addButton.Visibility = Visibility.Visible;
                                 _hideAddButton = false;

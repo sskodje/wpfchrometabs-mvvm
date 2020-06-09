@@ -561,7 +561,12 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
 
         internal void MoveTab(int fromIndex, int toIndex)
         {
-            if (Items.Count == 0 || fromIndex == toIndex || fromIndex >= Items.Count)
+            if (Items.Count == 0
+                || fromIndex == toIndex
+                || fromIndex >= Items.Count
+                || fromIndex < 0
+                || toIndex >= Items.Count
+                || toIndex < 0)
             {
                 return;
             }
