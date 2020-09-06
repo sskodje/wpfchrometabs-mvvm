@@ -10,14 +10,21 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <!--<StackPanel Margin="30,10">-->
-            <Label Content="{Binding TabName}"
-                   FontSize="18" />
-            <ScrollViewer Grid.Row="1">
-                <TextBlock Text="{Binding MyStringContent}"
-                           TextWrapping="Wrap" />
-            </ScrollViewer>
-        <!--</StackPanel>-->
+        <Label Content="{Binding TabName}"
+               FontSize="18" />
+        <ScrollViewer Grid.Row="1">
+            <TextBlock Text="{Binding MyStringContent}"
+                       TextWrapping="Wrap" />
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2"
+                    Margin="0,20,0,0"
+                    Orientation="Horizontal">
+            <TextBlock Text="Unique control ID: " />
+            <TextBlock x:Name="ID"
+                       FontSize="12" />
+        </StackPanel>
     </Grid>
 </UserControl>

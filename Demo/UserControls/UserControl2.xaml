@@ -5,7 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <Grid Margin="30,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <StackPanel Margin="30,10">
             <Label Content="{Binding TabName}"
                    FontSize="18" />
@@ -14,6 +18,13 @@
             <ComboBox ItemsSource="{Binding MyNumberCollection}"
                       SelectedItem="{Binding MySelectedNumber}"
                       HorizontalAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Margin="0,20,0,0"
+                    Orientation="Horizontal">
+            <TextBlock Text="Unique control ID: " />
+            <TextBlock x:Name="ID"
+                       FontSize="12" />
         </StackPanel>
     </Grid>
 </UserControl>

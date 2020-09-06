@@ -10,14 +10,22 @@
     <Grid Margin="30,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <!--<StackPanel Margin="30,10">-->
         <Label Content="{Binding TabName}"
                FontSize="18" />
+
         <CheckBox Grid.Row="1"
                   Content="Is blinking"
-                  IsChecked="{Binding IsBlinking,Mode=TwoWay}"/>
+                  IsChecked="{Binding IsBlinking,Mode=TwoWay}" />
+
+        <StackPanel Grid.Row="4"
+                    Margin="0,20,0,0"
+                    Orientation="Horizontal">
+            <TextBlock Text="Unique control ID: " />
+            <TextBlock x:Name="ID"
+                       FontSize="12" />
+        </StackPanel>
     </Grid>
 </UserControl>
