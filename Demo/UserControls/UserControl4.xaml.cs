@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 
 namespace Demo.UserControls
 {
@@ -10,6 +11,7 @@ namespace Demo.UserControls
         public UserControl4()
         {
             InitializeComponent();
+            this.ID.Text = Guid.NewGuid().ToString();
         }
     }
 }
