@@ -105,7 +105,7 @@ namespace ChromeTabs
             }
             if (e.OldValue != null)
             {
-                ICommand command = (ICommand)e.NewValue;
+                ICommand command = (ICommand)e.OldValue;
                 command.CanExecuteChanged -= ct.Command_CanExecuteChanged;
             }
         }
