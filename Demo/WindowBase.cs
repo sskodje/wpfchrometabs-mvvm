@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using static System.Windows.PresentationSource;
 
 namespace Demo
@@ -46,8 +47,10 @@ namespace Demo
                 win.Loaded += win_Loaded;
                 win.LocationChanged += win_LocationChanged;
                 win.Tag = position;
-                win.Left = position.X - win.Width + 200;
-                win.Top = position.Y - 20;
+                var scale = VisualTreeHelper.GetDpi(this);
+                win.Left = position.X / scale.DpiScaleX - win.Width / 2;
+                win.Top = position.Y / scale.DpiScaleY - 10;
+                
                 win.Show();
             }
             else
@@ -68,15 +71,17 @@ namespace Demo
             Point cursorPosition = (Point)win.Tag;
             MoveWindow(win, cursorPosition);
         }
+
         private void MoveWindow(Window win, Point pt)
         {
             //Use a BeginInvoke to delay the execution slightly, else we can have problems grabbing the newly opened window.
-            Dispatcher.BeginInvoke(new Action(() =>
+            Dispatcher.BeginInvoke(new Action(() => 
             {
-                win.Topmost = true;
+	            win.Topmost = true;
                 //We position the window at the mouse position
-                win.Left = pt.X - win.Width + 200;
-                win.Top = pt.Y - 20;
+	            var scale = VisualTreeHelper.GetDpi(this);
+                win.Left = pt.X / scale.DpiScaleX - win.Width / 2;
+                win.Top = pt.Y / scale.DpiScaleY - 10;
                 Debug.WriteLine(DateTime.Now.ToShortTimeString() + " dragging window");
 
                 if (Mouse.LeftButton == MouseButtonState.Pressed)
