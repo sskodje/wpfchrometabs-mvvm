@@ -33,10 +33,11 @@ namespace Demo
             }
         }
 
-        protected override bool TryDockWindow(Point position, TabBase dockedWindowVM)
+        protected override bool TryDockWindow(Point absoluteScreenPosition, TabBase dockedWindowVM)
         {
+	        Point relativePoint = PointFromScreen(absoluteScreenPosition);//The screen position relative to the tab control
             //Hit test against the tab control
-            if (MyChromeTabControlWithPinnedTabs.InputHitTest(position) is FrameworkElement element)
+            if (MyChromeTabControlWithPinnedTabs.InputHitTest(relativePoint) is FrameworkElement element)
             {
                 ////test if the mouse is over the tab panel or a tab item.
                 if (CanInsertTabItem(element))

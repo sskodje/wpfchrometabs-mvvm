@@ -19,7 +19,7 @@ namespace Demo
         //We use this collection to keep track of what windows we have open
         protected List<DockingWindow> OpenWindows = new List<DockingWindow>();
 
-        protected abstract bool TryDockWindow(Point position, TabBase dockedWindowVM);
+        protected abstract bool TryDockWindow(Point absoluteScreenPosition, TabBase dockedWindowVM);
 
         public WindowBase()
         {
@@ -116,8 +116,8 @@ namespace Demo
 
             if (windowUnder != null && windowUnder.Equals(this))
             {
-                Point relativePoint = PointFromScreen(absoluteScreenPos);//The screen position relative to the main window
-                if (TryDockWindow(relativePoint, win.DataContext as TabBase))
+                
+                if (TryDockWindow(absoluteScreenPos, win.DataContext as TabBase))
                 {
                     win.Close();
                 }
