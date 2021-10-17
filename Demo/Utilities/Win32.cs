@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace Demo.Utilities
 {
@@ -27,8 +29,36 @@ namespace Demo.Utilities
         internal static extern IntPtr GetTopWindow(IntPtr hWnd);
         [DllImport("User32")]
         internal static extern IntPtr GetWindow(IntPtr hWnd, uint wCmd);
-
+        [DllImport("user32.dll", SetLastError=true)]
+        static extern bool GetWindowRect(IntPtr hwnd, out W32Rect lpRect);
+        [DllImport("shcore.dll",SetLastError = true)]
+        private static extern uint SetProcessDpiAwareness(int awareness);
         #endregion
+
+        /// <summary>
+        /// Gets the window rect in device units.
+        /// </summary>
+        /// <param name="window">The window.</param>
+        /// <returns>Rect.</returns>
+        public static Rect GetWindowRect(Window window) {
+            var hwnd = new WindowInteropHelper(window).Handle;
+            GetWindowRect(hwnd, out var r);
+            return new Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top);
+        }
+
+        private const int PROCESS_PER_MONITOR_DPI_AWARE = 2;
+        /// <summary>
+        /// Sets the dpi awareness for the current process to: per monitor dpi aware.
+        /// </summary>
+        public static void SetProcessDpiAwarenessPerMonitor() 
+        {
+            var result = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+            switch (result) {
+                case 0: return;
+                case 0x80070005: return; // The DPI awareness is already set, either by calling this API previously or through the application (.exe) manifest.
+                default: Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error()); return;
+            }
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
