@@ -159,7 +159,7 @@ namespace Demo
             var allWindows = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>().Where(x => x.GetType().ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerWindow"
                                                                                                          && x.GetType().ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerLayerWindow"));
             var windowsUnderCurrent = from win in allWindows
-                                      where (win.WindowState == WindowState.Maximized || new Rect(win.Left, win.Top, win.Width, win.Height).Contains(screenPoint))
+                                      where (win.WindowState == WindowState.Maximized || Win32.GetWindowRect(win).Contains(screenPoint))
                                       && !Equals(win, source)
                                       select win;
             return windowsUnderCurrent.FirstOrDefault();
