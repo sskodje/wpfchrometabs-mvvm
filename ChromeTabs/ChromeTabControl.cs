@@ -423,6 +423,24 @@ DependencyProperty.Register("AddTabCommandParameter", typeof(object), typeof(Chr
             panel?.SetAddButtonControlTemplate(e.NewValue as ControlTemplate);
         }
 
+        public double AddTabButtonWidth
+        {
+            get => (double)GetValue(AddTabButtonWidthProperty);
+            set => SetValue(AddTabButtonWidthProperty, value);
+        }
+        
+        public static readonly DependencyProperty AddTabButtonWidthProperty =
+            DependencyProperty.Register("AddTabButtonWidth", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(20.0));
+        
+        public double AddTabButtonHeight
+        {
+            get => (double)GetValue(AddTabButtonHeightProperty);
+            set => SetValue(AddTabButtonHeightProperty, value);
+        }
+        
+        public static readonly DependencyProperty AddTabButtonHeightProperty =
+            DependencyProperty.Register("AddTabButtonHeight", typeof(double), typeof(ChromeTabControl), new PropertyMetadata(12.0));
+
         static ChromeTabControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ChromeTabControl), new FrameworkPropertyMetadata(typeof(ChromeTabControl)));
