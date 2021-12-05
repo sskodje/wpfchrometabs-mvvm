@@ -387,12 +387,12 @@ namespace ChromeTabs
             Point nowPoint = p;
             if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible && IsAddButtonEnabled)
             {
-                if (_addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
+                if (_addButtonRect.Contains(nowPoint))
                 {
                     _addButton.Background = ParentTabControl.AddTabButtonMouseOverBrush;
                     InvalidateVisual();
                 }
-                else if (!_addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
+                else
                 {
                     _addButton.Background = ParentTabControl.AddTabButtonBrush;
                     InvalidateVisual();
@@ -506,6 +506,13 @@ namespace ChromeTabs
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
+            
+            if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible && IsAddButtonEnabled)
+            {
+                _addButton.Background = ParentTabControl.AddTabButtonBrush;
+                InvalidateVisual();
+            }
+            
             if (_draggedTab != null && Mouse.LeftButton != MouseButtonState.Pressed && !_isReleasingTab)
             {
                 Point p = e.GetPosition(this);
