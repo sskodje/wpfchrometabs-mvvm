@@ -63,7 +63,6 @@ namespace ChromeTabs
         private Point _downTabBoundsPoint;
         private ChromeTabControl _parent;
         private Rect _addButtonRect;
-        private Size _addButtonSize;
         private Button _addButton;
         private DateTime _lastMouseDown;
         private object _lockObject = new object();
@@ -108,7 +107,6 @@ namespace ChromeTabs
             ComponentResourceKey key = new ComponentResourceKey(typeof(ChromeTabPanel), "addButtonStyle");
             Style addButtonStyle = (Style)FindResource(key);
             _addButton = new Button { Style = addButtonStyle };
-            _addButtonSize = new Size(20, 12);
             this.Loaded += ChromeTabPanel_Loaded;
             this.Unloaded += ChromeTabPanel_Unloaded;
         }
@@ -183,9 +181,9 @@ namespace ChromeTabs
                 element.Arrange(new Rect(offset, 0, tabWidth, finalSize.Height - thickness));
                 offset += tabWidth - Overlap;
             }
-            if (ParentTabControl.IsAddButtonVisible)
-            {
-                _addButtonRect = new Rect(new Point(offset + Overlap, (finalSize.Height - _addButtonSize.Height) / 2), _addButtonSize);
+            if (ParentTabControl.IsAddButtonVisible) {
+                var addButtonSize = new Size(ParentTabControl.AddTabButtonWidth, ParentTabControl.AddTabButtonHeight);
+                _addButtonRect = new Rect(new Point(offset + Overlap, (finalSize.Height - addButtonSize.Height) / 2), addButtonSize);
                 _addButton.Arrange(_addButtonRect);
             }
             return finalSize;
@@ -214,8 +212,9 @@ namespace ChromeTabs
             }
             if (ParentTabControl.IsAddButtonVisible)
             {
-                _addButton.Measure(_addButtonSize);
-                resultSize.Width += _addButtonSize.Width;
+                var addButtonSize = new Size(ParentTabControl.AddTabButtonWidth, ParentTabControl.AddTabButtonHeight);
+                _addButton.Measure(addButtonSize);
+                resultSize.Width += addButtonSize.Width;
             }
             return resultSize;
         }
@@ -388,12 +387,12 @@ namespace ChromeTabs
             Point nowPoint = p;
             if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible && IsAddButtonEnabled)
             {
-                if (_addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
+                if (_addButtonRect.Contains(nowPoint))
                 {
                     _addButton.Background = ParentTabControl.AddTabButtonMouseOverBrush;
                     InvalidateVisual();
                 }
-                else if (!_addButtonRect.Contains(nowPoint) && IsAddButtonEnabled)
+                else
                 {
                     _addButton.Background = ParentTabControl.AddTabButtonBrush;
                     InvalidateVisual();
@@ -507,6 +506,13 @@ namespace ChromeTabs
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
+            
+            if (ParentTabControl != null && ParentTabControl.IsAddButtonVisible && IsAddButtonEnabled)
+            {
+                _addButton.Background = ParentTabControl.AddTabButtonBrush;
+                InvalidateVisual();
+            }
+            
             if (_draggedTab != null && Mouse.LeftButton != MouseButtonState.Pressed && !_isReleasingTab)
             {
                 Point p = e.GetPosition(this);

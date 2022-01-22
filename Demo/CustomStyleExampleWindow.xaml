@@ -308,6 +308,8 @@
         <ct:ChromeTabControl  x:Name="MyChromeTabControlWithCustomStyle"
                               AddTabButtonMouseOverBrush="Orange"
                               AddTabButtonMouseDownBrush="Red"
+                              AddTabButtonWidth="20"
+                              AddTabButtonHeight="24"
                               SelectedTabBrush="WhiteSmoke"
                               TabOverlap="0"
                               Background="AliceBlue"
