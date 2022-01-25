@@ -13,16 +13,17 @@
 	<RootNamespace>ChromeTabs</RootNamespace>
 	<AssemblyName>ChromeTabs</AssemblyName>
 	<DelaySign>false</DelaySign>
-	<Version>1.3.4.1</Version>
+	<Version>1.4.0.0</Version>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageProjectUrl>https://github.com/sskodje/wpfchrometabs-mvvm</PackageProjectUrl>
 	<PackageDescription>WPF chrome tabs is a tab control modeled after the tabs in Google's Chrome browser. Tabs can be reordered and snapped to/from windows.</PackageDescription>
-	<PackageReleaseNotes>- Fixes a nullreference exception when setting AddTabCommand</PackageReleaseNotes>
+	<PackageReleaseNotes>- Added properties for configuring size of "add tab" button.
+- Some graphical fixes for "add tab" button.</PackageReleaseNotes>
 	<Description>WPF chrome tabs is a tab control modeled after the tabs in Google's Chrome browser. Tabs can be reordered and snapped to/from windows.</Description>
 	<NeutralLanguage>en</NeutralLanguage>
 	<Product>WPF Chrome Tabs - MVVM</Product>
-	<AssemblyVersion>1.3.4.1</AssemblyVersion>
-	<FileVersion>1.3.4.1</FileVersion>
+	<AssemblyVersion>1.4.0.0</AssemblyVersion>
+	<FileVersion>1.4.0.0</FileVersion>
   <IncludeSymbols>true</IncludeSymbols>
   <PublishRepositoryUrl>true</PublishRepositoryUrl>
   <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -43,6 +44,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>
