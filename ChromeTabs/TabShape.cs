@@ -12,6 +12,18 @@ namespace ChromeTabs
             Stretch = Stretch.Fill;
         }
 
+        public Path TabShapePath
+        {
+            get { return (Path)GetValue(TabShapePathProperty); }
+            set { SetValue(TabShapePathProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TabShapePath.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TabShapePathProperty =
+            DependencyProperty.Register("TabShapePath", typeof(Path), typeof(TabShape), new PropertyMetadata(null));
+
+
+
         protected override Size MeasureOverride(Size constraint)
         {
             if (constraint.Width == double.PositiveInfinity || constraint.Height == double.PositiveInfinity)
@@ -25,6 +37,10 @@ namespace ChromeTabs
 
         private Geometry GetGeometry()
         {
+            if(TabShapePath!= null)
+            {
+                return TabShapePath.Data;
+            }
             double width = DesiredSize.Width - StrokeThickness;
 
             double height = 25;

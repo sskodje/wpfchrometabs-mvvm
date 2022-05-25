@@ -104,6 +104,8 @@
         <SolidColorBrush x:Key="SelectedTabStrokeBrush">WhiteSmoke</SolidColorBrush>
         <SolidColorBrush x:Key="TabHighlightBrush">White</SolidColorBrush>
         <SolidColorBrush x:Key="SelectedTabHighlighBrush">Transparent</SolidColorBrush>
+        <Path x:Key="CustomTabShape"
+              Data="M0,25 C0,0 2,0 10,0 15,0 95,0 100,0 106,0 108,0 108,25"/>
         <sys:Double x:Key="MinTabWidthToShowCloseButton">60</sys:Double>
         <Style TargetType="{x:Type ct:ChromeTabItem}"
                x:Key="CustomTabItemStyle">
@@ -131,10 +133,12 @@
                                               CommandParameter="{Binding}" />
                                 </ContextMenu>
                             </Grid.ContextMenu>
-                            <local:CustomTabShape x:Name="TabFill"
+                            <ct:TabShape x:Name="TabFill"
                                                   Grid.ColumnSpan="5"
                                                   VerticalAlignment="Top"
-                                                  Stretch="Fill">
+                                                  Stretch="Fill"
+                                                  TabShapePath="{StaticResource CustomTabShape}">
+
                                 <Shape.Fill>
                                     <LinearGradientBrush EndPoint="0.5,1"
                                                          StartPoint="0.5,0"
@@ -147,19 +151,21 @@
                                                       Offset="1" />
                                     </LinearGradientBrush>
                                 </Shape.Fill>
-                            </local:CustomTabShape>
+                            </ct:TabShape>
 
-                            <local:CustomTabShape x:Name="TabPath"
+                            <ct:TabShape x:Name="TabPath"
                                                   Grid.ColumnSpan="5"
                                                   VerticalAlignment="Top"
                                                   Stretch="Fill"
+                                                  TabShapePath="{StaticResource CustomTabShape}"
                                                   Stroke="{StaticResource TabStrokeBrush}" />
 
-                            <local:CustomTabShape x:Name="TabHighlight"
+                            <ct:TabShape x:Name="TabHighlight"
                                                   Margin="1"
                                                   Grid.ColumnSpan="5"
                                                   VerticalAlignment="Top"
                                                   Stretch="Fill"
+                                                  TabShapePath="{StaticResource CustomTabShape}"
                                                   Stroke="{StaticResource TabHighlightBrush}" />
                             <ContentPresenter x:Name="ContentSite"
                                               Grid.Column="1"
