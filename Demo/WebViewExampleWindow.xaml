@@ -1,0 +1,42 @@
+﻿<Window x:Class="Demo.WebViewExampleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Demo"
+        mc:Ignorable="d"
+        xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
+        xmlns:web="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="WebViewExampleWindow"
+        Height="450"
+        Width="800">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type local:WebViewTabObject}">
+            <web:WebView2 Source="{Binding TabUri}" />
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <ct:ChromeTabControl  x:Name="MyChromeTabControl"
+                              Background="AliceBlue"
+                              ItemsSource="{Binding TabsCollection}"
+                              SelectedItem="{Binding SelectedTab}"
+                              AddTabCommand="{Binding AddTabCommand}"
+                              CloseTabCommand="{Binding CloseTabCommand}"
+                              MinimumTabWidth="40"
+                              PinnedTabWidth="50"
+                              MaximumTabWidth="125"
+                              CanMoveTabs="False"
+                              TabPersistBehavior="All">
+            <!--This is the content for the tab headers-->
+            <ct:ChromeTabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding TabName, UpdateSourceTrigger=PropertyChanged}"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0" />
+                </DataTemplate>
+            </ct:ChromeTabControl.ItemTemplate>
+        </ct:ChromeTabControl>
+    </Grid>
+</Window>

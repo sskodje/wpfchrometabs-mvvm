@@ -69,5 +69,10 @@ namespace Demo
         {
             new CustomStyleExampleWindow().Show();
         }
+
+        private void BnOpenWebViewExample_Click(object sender, RoutedEventArgs e)
+        {
+            new WebViewExampleWindow().Show(); 
+        }
     }
 }
