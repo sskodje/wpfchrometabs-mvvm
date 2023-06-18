@@ -13,8 +13,11 @@
 */
 
 using CommonServiceLocator;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Ioc;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
+using System.Windows.Navigation;
+
 
 namespace Demo.ViewModel
 {
@@ -29,30 +32,33 @@ namespace Demo.ViewModel
         /// </summary>
         public ViewModelLocator()
         {
-            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-
-            if (ViewModelBase.IsInDesignModeStatic)
+            if (DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
             {
                 // Create design time view services and models
-                SimpleIoc.Default.Register<IViewModelMainWindow, SampleData.SampleViewModelMainWindow>();
-                SimpleIoc.Default.Register<IViewModelPinnedTabExampleWindow, SampleData.SampleViewModelPinnedTabExampleWindow>();
-                SimpleIoc.Default.Register<IViewModelCustomStyleExampleWindow, SampleData.SampleViewModelCustomStyleExampleWindow>();
+                Ioc.Default.ConfigureServices(
+                        new ServiceCollection()
+                          .AddSingleton<IViewModelMainWindow, SampleData.SampleViewModelMainWindow>()
+                          .AddSingleton<IViewModelPinnedTabExampleWindow, SampleData.SampleViewModelPinnedTabExampleWindow>()
+                          .AddSingleton<IViewModelCustomStyleExampleWindow, SampleData.SampleViewModelCustomStyleExampleWindow>()
+                          .BuildServiceProvider());
             }
             else
             {
                 // Create run time view services and models
-                SimpleIoc.Default.Register<IViewModelMainWindow, ViewModelMainWindow>();
-                SimpleIoc.Default.Register<IViewModelPinnedTabExampleWindow, ViewModelPinnedTabExampleWindow>();
-                SimpleIoc.Default.Register<IViewModelCustomStyleExampleWindow, ViewModelCustomStyleExampleWindow>();
+                Ioc.Default.ConfigureServices(
+                        new ServiceCollection()
+                          .AddSingleton<IViewModelMainWindow, ViewModelMainWindow>()
+                          .AddSingleton<IViewModelPinnedTabExampleWindow, ViewModelPinnedTabExampleWindow>()
+                          .AddSingleton<IViewModelCustomStyleExampleWindow, ViewModelCustomStyleExampleWindow>()
+                          .BuildServiceProvider());
             }
-
         }
 
         public IViewModelCustomStyleExampleWindow VieWModelCustomStyleExampleWindow
         {
-             get
+            get
             {
-                return ServiceLocator.Current.GetInstance<IViewModelCustomStyleExampleWindow>();
+                return Ioc.Default.GetService<IViewModelCustomStyleExampleWindow>();
             }
         }
 
@@ -60,7 +66,7 @@ namespace Demo.ViewModel
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<IViewModelMainWindow>();
+                return Ioc.Default.GetService<IViewModelMainWindow>();
             }
         }
 
@@ -68,12 +74,12 @@ namespace Demo.ViewModel
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<IViewModelPinnedTabExampleWindow>();
+                return Ioc.Default.GetService<IViewModelPinnedTabExampleWindow>();
             }
 
         }
 
-        
+
         public static void Cleanup()
         {
             // TODO Clear the ViewModels

@@ -6,13 +6,13 @@ using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using ChromeTabs;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Demo.Properties;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 
 namespace Demo.ViewModel
 {
-    public class ViewModelExampleBase : ViewModelBase
+    public class ViewModelExampleBase : ObservableRecipient
     {
         //since we don't know what kind of objects are bound, so the sorting happens outside with the ReorderTabsCommand.
         public RelayCommand<TabReorder> ReorderTabsCommand { get; set; }
@@ -29,7 +29,7 @@ namespace Demo.ViewModel
             {
                 if (_selectedTab != value)
                 {
-                    Set(() => SelectedTab, ref _selectedTab, value);
+                    SetProperty(ref _selectedTab, value);
                 }
             }
         }
@@ -41,8 +41,8 @@ namespace Demo.ViewModel
             set
             {
                 if (_canAddTabs == value) return;
-                Set(() => CanAddTabs, ref _canAddTabs, value);
-                AddTabCommand.RaiseCanExecuteChanged();
+                SetProperty(ref _canAddTabs, value);
+                AddTabCommand.NotifyCanExecuteChanged();
             }
         }
 

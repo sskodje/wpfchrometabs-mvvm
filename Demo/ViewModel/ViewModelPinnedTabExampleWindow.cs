@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
-using GalaSoft.MvvmLight.Command;
 
 namespace Demo.ViewModel
 {

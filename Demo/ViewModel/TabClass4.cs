@@ -11,7 +11,7 @@
             {
                 if (_isBlinking != value)
                 {
-                    Set(() => IsBlinking, ref _isBlinking, value);
+                    SetProperty(ref _isBlinking, value);
                 }
             }
         }

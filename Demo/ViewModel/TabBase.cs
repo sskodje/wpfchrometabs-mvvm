@@ -1,9 +1,9 @@
-﻿using System.Windows.Media;
-using GalaSoft.MvvmLight;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Media;
 
 namespace Demo.ViewModel
 {
-    public abstract class TabBase : ViewModelBase
+    public abstract class TabBase : ObservableRecipient
     {
         private int _tabNumber;
         public int TabNumber
@@ -13,7 +13,7 @@ namespace Demo.ViewModel
             {
                 if (_tabNumber != value)
                 {
-                    Set(() => TabNumber, ref _tabNumber, value);
+                    SetProperty(ref _tabNumber, value);
                 }
             }
         }
@@ -26,7 +26,7 @@ namespace Demo.ViewModel
             {
                 if (_tabName != value)
                 {
-                    Set(() => TabName, ref _tabName, value);
+                    SetProperty(ref _tabName, value);
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace Demo.ViewModel
             {
                 if (_isPinned != value)
                 {
-                    Set(() => IsPinned, ref _isPinned, value);
+                    SetProperty(ref _isPinned, value);
                 }
             }
         }
@@ -54,7 +54,7 @@ namespace Demo.ViewModel
             {
                 if (!Equals(_tabIcon, value))
                 {
-                    Set(() => TabIcon, ref _tabIcon, value);
+                    SetProperty(ref _tabIcon, value);
                 }
             }
         }

@@ -15,7 +15,7 @@ namespace Demo.ViewModel
             {
                 if (_canMoveTabs != value)
                 {
-                    Set(() => CanMoveTabs, ref _canMoveTabs, value);
+                    SetProperty(ref _canMoveTabs, value);
                 }
             }
         }
@@ -28,7 +28,7 @@ namespace Demo.ViewModel
             {
                 if (_showAddButton != value)
                 {
-                    Set(() => ShowAddButton, ref _showAddButton, value);
+                    SetProperty(ref _showAddButton, value);
                 }
             }
         }

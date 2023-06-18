@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using CommunityToolkit.Mvvm.Input;
 using Demo.ViewModel;
-using GalaSoft.MvvmLight.Command;
 
 namespace Demo.SampleData
 {
