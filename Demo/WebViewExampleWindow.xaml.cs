@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -53,6 +54,7 @@ namespace Demo
             AddTabCommand = new RelayCommand(AddTabCommandAction, () => true);
             CloseTabCommand = new RelayCommand<WebViewTabObject>(CloseTabCommandAction);
             AddTabCommand.Execute(null);
+            SelectedTab = TabsCollection.FirstOrDefault();
         }
 
         private void AddTabCommandAction()
